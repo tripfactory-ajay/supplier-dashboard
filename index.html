@@ -10,46 +10,51 @@
 </head>
 <body>
 
-<!-- TOP USER BAR -->
-<div class="top-user-bar">
-  <div class="top-user-left">
-    <div class="orn-logo-top">
-      <div class="logo-bars-sm">
-        <span style="background:#1e3a5f;height:14px"></span>
-        <span style="background:#1a6faf;height:17px"></span>
-        <span style="background:#29a8e0;height:19px"></span>
-        <span style="background:#3aaa35;height:16px"></span>
-        <span style="background:#f5d700;height:14px"></span>
-        <span style="background:#e03a1e;height:12px"></span>
-      </div>
-      <span class="logo-txt-sm">ORN</span>
+<!-- TOPBAR: light grey with user/logo -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="logo-bars">
+      <span style="background:#1e3a5f;height:13px"></span>
+      <span style="background:#1a6faf;height:16px"></span>
+      <span style="background:#29a8e0;height:18px"></span>
+      <span style="background:#3aaa35;height:15px"></span>
+      <span style="background:#f5d700;height:13px"></span>
+      <span style="background:#e03a1e;height:11px"></span>
     </div>
+    <span class="logo-txt">ORN</span>
   </div>
-  <div class="top-user-right">
-    <span class="user-name-top">&#128100; Ajay Kawa &#9660;</span>
-    <img src="https://flagcdn.com/w20/gb.png" alt="EN" style="height:14px;border-radius:2px;margin-left:8px">
+  <div class="topbar-right">
+    <span class="topbar-user">&#128100; Ajay Kawa &#9660;</span>
+    <img src="https://flagcdn.com/w20/gb.png" alt="EN" style="height:13px;border-radius:2px">
   </div>
 </div>
 
-<!-- PRIMARY NAV -->
+<!-- PRIMARY NAV: white bar, navy active underline -->
 <nav class="primary-nav" id="primary-nav">
-  <a class="pnav-item" href="#" data-primary="products">Products</a>
-  <a class="pnav-item" href="#" data-primary="sales">Manage Sales</a>
-  <a class="pnav-item" href="#" data-primary="supply">Supply Monitor</a>
-  <a class="pnav-item active" href="#" data-primary="suppliers">Manage Suppliers</a>
-  <a class="pnav-item" href="#" data-primary="hotels">Manage Hotels</a>
-  <a class="pnav-item" href="#" data-primary="activities">Manage Activities</a>
-  <a class="pnav-item" href="#" data-primary="vehicles">Leased Vehicles</a>
-  <a class="pnav-item" href="#" data-primary="delivery">Delivery Operations</a>
+  <a class="pnav" data-p="products" href="#">Products</a>
+  <a class="pnav" data-p="sales" href="#">Manage Sales</a>
+  <a class="pnav" data-p="supply" href="#">Supply Monitor</a>
+  <a class="pnav active" data-p="suppliers" href="#">Manage Suppliers</a>
+  <a class="pnav" data-p="hotels" href="#">Manage Hotels</a>
+  <a class="pnav" data-p="activities" href="#">Manage Activities</a>
+  <a class="pnav" data-p="vehicles" href="#">Leased Vehicles</a>
+  <a class="pnav" data-p="delivery" href="#">Delivery Operations</a>
 </nav>
 
-<!-- SECONDARY NAV -->
+<!-- SECONDARY NAV: white bar, bold underline active -->
 <nav class="secondary-nav" id="secondary-nav"></nav>
 
-<!-- MAIN CONTENT -->
-<div class="page-content" id="page-content"></div>
+<!-- CONTENT -->
+<div class="content" id="content"></div>
 
-<!-- Toast notification -->
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal()"></div>
+<div class="modal-box" id="modal-box">
+  <div class="modal-header"><span id="modal-title">Modal</span><button class="modal-close" onclick="closeModal()">&#10005;</button></div>
+  <div class="modal-body" id="modal-body"></div>
+</div>
+
+<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script src="app.js"></script>
