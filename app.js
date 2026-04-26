@@ -1076,10 +1076,7 @@ function renderContent(){
   }
 }
 
-// page functions registered on window
-['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_hotel_content','pg_hotel_rates','pg_act_all','pg_sales_dest'].forEach(k=>{
-  if(typeof window[k]==='undefined') window[k]=eval(k);
-});
+// Register page functions on window
 window.pg_sup_dash=pg_sup_dash;
 window.pg_sup_all=pg_sup_all;
 window.pg_sup_onboard=pg_sup_onboard;
@@ -1092,6 +1089,7 @@ window.pg_sup_dest=pg_sup_dest;
 window.pg_hotel_content=pg_hotel_content;
 window.pg_hotel_rates=pg_hotel_rates;
 window.pg_act_all=pg_act_all;
+window.pg_sales_dest=function(){return '<div class="page-title">Destination Dashboard</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)">Connect live data to populate.</div>';};
 
 // ── TOAST ─────────────────────────────────────────────────────────
 function toast(msg,err=false){
