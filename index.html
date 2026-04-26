@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORN Supplier Management Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-wrap">
+      <div class="logo-bars">
+        <span style="background:#1e3a5f;height:38px"></span>
+        <span style="background:#1a6faf;height:46px"></span>
+        <span style="background:#29a8e0;height:52px"></span>
+        <span style="background:#3aaa35;height:44px"></span>
+        <span style="background:#f5d700;height:38px"></span>
+        <span style="background:#e03a1e;height:32px"></span>
+      </div>
+      <span class="logo-text">ORN</span>
+    </div>
+    <div class="logo-subtitle">Supplier Portal</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">MAIN</div>
+    <a href="#" class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="#" class="nav-item" data-page="suppliers" onclick="showPage('suppliers',this)">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Suppliers
+      <span class="nav-badge">142</span>
+    </a>
+    <a href="#" class="nav-item" data-page="onboarding" onclick="showPage('onboarding',this)">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Onboarding
+      <span class="nav-badge warn">7</span>
+    </a>
+    <a href="#" class="nav-item" data-page="contracts" onclick="showPage('contracts',this)">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Contracts & Docs
+    </a>
+    <a href="#" class="nav-item" data-page="payments" onclick="showPage('payments',this)">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Payments
+      <span class="nav-badge warn">3</span>
+    </a>
+
+    <div class="nav-section-label" style="margin-top:16px">PRODUCT</div>
+    <a href="#" class="nav-item" data-page="hotels" onclick="showPage('hotels',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Hotels
+    </a>
+    <a href="#" class="nav-item" data-page="tours" onclick="showPage('tours',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      Tours & Activities
+    </a>
+    <a href="#" class="nav-item" data-page="transport" onclick="showPage('transport',this)">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Transport
+    </a>
+
+    <div class="nav-section-label" style="margin-top:16px">SETTINGS</div>
+    <a href="#" class="nav-item" data-page="tiers" onclick="showPage('tiers',this)">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Tier Management
+    </a>
+    <a href="#" class="nav-item" data-page="destinations" onclick="showPage('destinations',this)">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Destinations
+    </a>
+    <a href="#" class="nav-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41"/><path d="M4.93 4.93l1.41 1.41"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M20 12h2"/><path d="M2 12h2"/><path d="M19.07 19.07l-1.41-1.41"/><path d="M4.93 19.07l1.41-1.41"/></svg>
+      Settings
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">JD</div>
+      <div>
+        <div class="user-name">James Donovan</div>
+        <div class="user-role">Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<div class="main-wrap">
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg viewBox="0 0 24 24" width="20" height="20"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="breadcrumb" id="breadcrumb">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="Search suppliers, destinations...">
+      </div>
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <button class="icon-btn" title="Help">
+        <svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- PAGE: Dashboard -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <h1>Supplier Dashboard</h1>
+        <p class="page-sub">Overview of all supplier activity and performance</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline" onclick="showPage('onboarding', document.querySelector('[data-page=onboarding]'))">
+          <svg viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Supplier
+        </button>
+        <button class="btn-primary">Export Report</button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <select class="filter-select" onchange="filterDashboard()">
+        <option value="">All Destinations</option>
+        <option>Dubai</option>
+        <option>Abu Dhabi</option>
+        <option>Oman</option>
+        <option>Egypt</option>
+        <option>Jordan</option>
+        <option>Morocco</option>
+        <option>Turkey</option>
+        <option>Maldives</option>
+      </select>
+      <select class="filter-select" onchange="filterDashboard()">
+        <option value="">All Types</option>
+        <option>Hotels</option>
+        <option>Tours & Activities</option>
+        <option>Transport</option>
+        <option>Restaurants</option>
+        <option>Experiences</option>
+        <option>Cruises</option>
+      </select>
+      <select class="filter-select" onchange="filterDashboard()">
+        <option value="">All Tiers</option>
+        <option>Tier 1 – Premium</option>
+        <option>Tier 2 – Standard</option>
+        <option>Tier 3 – Budget</option>
+      </select>
+      <select class="filter-select" onchange="filterDashboard()">
+        <option value="">All Status</option>
+        <option>Active</option>
+        <option>Pending</option>
+        <option>Suspended</option>
+        <option>Under Review</option>
+      </select>
+      <input type="date" class="filter-select" placeholder="From date">
+      <input type="date" class="filter-select" placeholder="To date">
+      <button class="btn-outline btn-sm" onclick="clearFilters()">Clear</button>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(41,168,224,0.12);color:#29a8e0">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="kpi-data">
+          <div class="kpi-value">142</div>
+          <div class="kpi-label">Total Suppliers</div>
+          <div class="kpi-change up">↑ 8 this month</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(58,170,53,0.12);color:#3aaa35">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="kpi-data">
+          <div class="kpi-value">118</div>
+          <div class="kpi-label">Active Suppliers</div>
+          <div class="kpi-change up">↑ 83% active rate</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(245,215,0,0.12);color:#c9a800">
+          <svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="kpi-data">
+          <div class="kpi-value">7</div>
+          <div class="kpi-label">Pending Onboarding</div>
+          <div class="kpi-change warn">⚠ Needs action</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(224,58,30,0.12);color:#e03a1e">
+          <svg viewBox="0 0 24 24" width="22" height="22"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="kpi-data">
+          <div class="kpi-value">£248K</div>
+          <div class="kpi-label">Payments This Month</div>
+          <div class="kpi-change up">↑ 12% vs last month</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(30,58,95,0.15);color:#1a6faf">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="kpi-data">
+          <div class="kpi-value">3</div>
+          <div class="kpi-label">Contracts Expiring</div>
+          <div class="kpi-change warn">⚠ Within 30 days</div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(41,168,224,0.12);color:#29a8e0">
+          <svg viewBox="0 0 24 24" width="22" height="22"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="kpi-data">
+          <div class="kpi-value">18</div>
+          <div class="kpi-label">Destinations</div>
+          <div class="kpi-change up">↑ 2 new regions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts + Table Row -->
+    <div class="content-grid">
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3>Suppliers by Type</h3>
+          <select class="mini-select"><option>This Year</option><option>Last Year</option></select>
+        </div>
+        <div class="donut-wrap">
+          <svg viewBox="0 0 200 200" class="donut-chart">
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#2a2d35" stroke-width="28"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#29a8e0" stroke-width="28" stroke-dasharray="175 264" stroke-dashoffset="0" class="donut-seg"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#1a6faf" stroke-width="28" stroke-dasharray="110 329" stroke-dashoffset="-175" class="donut-seg"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#3aaa35" stroke-width="28" stroke-dasharray="66 373" stroke-dashoffset="-285" class="donut-seg"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#f5d700" stroke-width="28" stroke-dasharray="44 395" stroke-dashoffset="-351" class="donut-seg"/>
+            <circle cx="100" cy="100" r="70" fill="none" stroke="#e03a1e" stroke-width="28" stroke-dasharray="44 395" stroke-dashoffset="-395" class="donut-seg"/>
+            <text x="100" y="95" text-anchor="middle" class="donut-center-num">142</text>
+            <text x="100" y="112" text-anchor="middle" class="donut-center-label">Suppliers</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item"><span style="background:#29a8e0"></span>Hotels <b>50</b></div>
+            <div class="legend-item"><span style="background:#1a6faf"></span>Tours & Act. <b>31</b></div>
+            <div class="legend-item"><span style="background:#3aaa35"></span>Transport <b>19</b></div>
+            <div class="legend-item"><span style="background:#f5d700"></span>Restaurants <b>12</b></div>
+            <div class="legend-item"><span style="background:#e03a1e"></span>Other <b>12</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-header">
+          <h3>Monthly Payments (£)</h3>
+          <select class="mini-select"><option>2025</option><option>2024</option></select>
+        </div>
+        <div class="bar-chart-wrap">
+          <div class="bar-chart">
+            <div class="bar-group"><div class="bar" style="height:55%" data-val="£148K"></div><span>Jan</span></div>
+            <div class="bar-group"><div class="bar" style="height:62%" data-val="£167K"></div><span>Feb</span></div>
+            <div class="bar-group"><div class="bar" style="height:70%" data-val="£189K"></div><span>Mar</span></div>
+            <div class="bar-group"><div class="bar" style="height:58%" data-val="£157K"></div><span>Apr</span></div>
+            <div class="bar-group"><div class="bar" style="height:80%" data-val="£215K"></div><span>May</span></div>
+            <div class="bar-group"><div class="bar" style="height:90%" data-val="£243K"></div><span>Jun</span></div>
+            <div class="bar-group"><div class="bar" style="height:92%" data-val="£248K" style2="background:#29a8e0"></div><span>Jul</span></div>
+            <div class="bar-group"><div class="bar future" style="height:40%" data-val="Proj."></div><span>Aug</span></div>
+            <div class="bar-group"><div class="bar future" style="height:40%" data-val="Proj."></div><span>Sep</span></div>
+            <div class="bar-group"><div class="bar future" style="height:40%" data-val="Proj."></div><span>Oct</span></div>
+            <div class="bar-group"><div class="bar future" style="height:40%" data-val="Proj."></div><span>Nov</span></div>
+            <div class="bar-group"><div class="bar future" style="height:40%" data-val="Proj."></div><span>Dec</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Top Destinations</h3>
+          <a href="#" class="card-link">View all</a>
+        </div>
+        <div class="dest-list">
+          <div class="dest-item">
+            <div class="dest-flag">🇦🇪</div>
+            <div class="dest-info"><b>Dubai</b><span>38 suppliers</span></div>
+            <div class="dest-bar-wrap"><div class="dest-bar" style="width:75%"></div></div>
+            <div class="dest-pct">75%</div>
+          </div>
+          <div class="dest-item">
+            <div class="dest-flag">🇦🇪</div>
+            <div class="dest-info"><b>Abu Dhabi</b><span>24 suppliers</span></div>
+            <div class="dest-bar-wrap"><div class="dest-bar" style="width:50%"></div></div>
+            <div class="dest-pct">50%</div>
+          </div>
+          <div class="dest-item">
+            <div class="dest-flag">🇴🇲</div>
+            <div class="dest-info"><b>Oman</b><span>18 suppliers</span></div>
+            <div class="dest-bar-wrap"><div class="dest-bar" style="width:38%"></div></div>
+            <div class="dest-pct">38%</div>
+          </div>
+          <div class="dest-item">
+            <div class="dest-flag">🇪🇬</div>
+            <div class="dest-info"><b>Egypt</b><span>14 suppliers</span></div>
+            <div class="dest-bar-wrap"><div class="dest-bar" style="width:28%"></div></div>
+            <div class="dest-pct">28%</div>
+          </div>
+          <div class="dest-item">
+            <div class="dest-flag">🇯🇴</div>
+            <div class="dest-info"><b>Jordan</b><span>10 suppliers</span></div>
+            <div class="dest-bar-wrap"><div class="dest-bar" style="width:20%"></div></div>
+            <div class="dest-pct">20%</div>
+          </div>
+          <div class="dest-item">
+            <div class="dest-flag">🇲🇦</div>
+            <div class="dest-info"><b>Morocco</b><span>8 suppliers</span></div>
+            <div class="dest-bar-wrap"><div class="dest-bar" style="width:16%"></div></div>
+            <div class="dest-pct">16%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Suppliers Table -->
+    <div class="card table-card">
+      <div class="card-header">
+        <h3>Recent Supplier Activity</h3>
+        <button class="btn-outline btn-sm" onclick="showPage('suppliers', document.querySelector('[data-page=suppliers]'))">View All</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th>Type</th>
+              <th>Destination</th>
+              <th>Tier</th>
+              <th>Status</th>
+              <th>Contract</th>
+              <th>Last Payment</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="supplier-cell"><div class="s-avatar" style="background:#1e3a5f">AT</div><div><b>Atlantis The Palm</b><small>ID: SUP-0081</small></div></div></td>
+              <td><span class="tag tag-hotel">Hotel</span></td>
+              <td>🇦🇪 Dubai</td>
+              <td><span class="tier tier-1">Tier 1</span></td>
+              <td><span class="status active">Active</span></td>
+              <td>Dec 2025</td>
+              <td>£42,000</td>
+              <td><div class="action-btns"><button class="act-btn" title="View">👁</button><button class="act-btn" title="Edit">✏️</button><button class="act-btn" title="Documents">📄</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="supplier-cell"><div class="s-avatar" style="background:#1a6faf">DT</div><div><b>Desert Tracks Tours</b><small>ID: SUP-0094</small></div></div></td>
+              <td><span class="tag tag-tour">Tour</span></td>
+              <td>🇦🇪 Dubai</td>
+              <td><span class="tier tier-2">Tier 2</span></td>
+              <td><span class="status active">Active</span></td>
+              <td>Mar 2026</td>
+              <td>£8,500</td>
+              <td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button><button class="act-btn">📄</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="supplier-cell"><div class="s-avatar" style="background:#3aaa35">OL</div><div><b>Oman Luxury Resorts</b><small>ID: SUP-0072</small></div></div></td>
+              <td><span class="tag tag-hotel">Hotel</span></td>
+              <td>🇴🇲 Oman</td>
+              <td><span class="tier tier-1">Tier 1</span></td>
+              <td><span class="status active">Active</span></td>
+              <td>Jun 2026</td>
+              <td>£28,000</td>
+              <td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button><button class="act-btn">📄</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="supplier-cell"><div class="s-avatar" style="background:#e03a1e">NT</div><div><b>Nile Tours Egypt</b><small>ID: SUP-0103</small></div></div></td>
+              <td><span class="tag tag-tour">Tour</span></td>
+              <td>🇪🇬 Egypt</td>
+              <td><span class="tier tier-2">Tier 2</span></td>
+              <td><span class="status pending">Pending</span></td>
+              <td>Awaiting</td>
+              <td>—</td>
+              <td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button><button class="act-btn">📄</button></div></td>
+            </tr>
+            <tr>
+              <td><div class="supplier-cell"><div class="s-avatar" style="background:#c9a800">JT</div><div><b>Jordan Transfer Co</b><small>ID: SUP-0089</small></div></div></td>
+              <td><span class="tag tag-transport">Transport</span></td>
+              <td>🇯🇴 Jordan</td>
+              <td><span class="tier tier-2">Tier 2</span></td>
+              <td><span class="status active">Active</span></td>
+              <td>Sep 2025</td>
+              <td>£5,200</td>
+              <td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button><button class="act-btn">📄</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /dashboard -->
+
+  <!-- PAGE: Suppliers -->
+  <div class="page" id="page-suppliers">
+    <div class="page-header">
+      <div>
+        <h1>Supplier Directory</h1>
+        <p class="page-sub">Manage all registered suppliers across all destinations</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline" onclick="showPage('onboarding', document.querySelector('[data-page=onboarding]'))">
+          <svg viewBox="0 0 24 24" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Supplier
+        </button>
+        <button class="btn-primary">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" class="filter-select" placeholder="🔍 Search supplier name or ID..." style="min-width:220px">
+      <select class="filter-select">
+        <option value="">All Destinations</option>
+        <option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option>
+      </select>
+      <select class="filter-select">
+        <option value="">All Types</option>
+        <option>Hotels</option><option>Tours & Activities</option><option>Transport</option><option>Restaurants</option>
+      </select>
+      <select class="filter-select">
+        <option value="">All Tiers</option>
+        <option>Tier 1</option><option>Tier 2</option><option>Tier 3</option>
+      </select>
+      <select class="filter-select">
+        <option value="">All Status</option>
+        <option>Active</option><option>Pending</option><option>Suspended</option>
+      </select>
+    </div>
+
+    <div class="card table-card">
+      <div class="card-header">
+        <h3>All Suppliers <span class="count-badge">142</span></h3>
+        <div style="display:flex;gap:8px">
+          <button class="view-toggle active" title="Table view">☰</button>
+          <button class="view-toggle" title="Card view">⊞</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>Supplier ↕</th>
+              <th>Type ↕</th>
+              <th>Destination ↕</th>
+              <th>Tier ↕</th>
+              <th>Rating</th>
+              <th>Status ↕</th>
+              <th>TAX/VAT No.</th>
+              <th>Contract End</th>
+              <th>Outstanding</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="supplier-table-body">
+            <!-- Generated by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span>Showing 1–20 of 142</span>
+        <div class="pagination">
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <span>...</span>
+          <button class="pg-btn">8</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Onboarding -->
+  <div class="page" id="page-onboarding">
+    <div class="page-header">
+      <div>
+        <h1>Supplier Onboarding</h1>
+        <p class="page-sub">Register new suppliers and manage the onboarding workflow</p>
+      </div>
+      <button class="btn-primary" onclick="openModal('new-supplier-modal')">+ Start New Application</button>
+    </div>
+
+    <div class="onboard-pipeline">
+      <div class="pipeline-stage">
+        <div class="stage-header">
+          <span class="stage-dot" style="background:#f5d700"></span>
+          <h4>Application Submitted</h4>
+          <span class="stage-count">3</span>
+        </div>
+        <div class="pipeline-card">
+          <div class="pc-title">Blue Waters Hotel Group</div>
+          <div class="pc-meta">Dubai · Hotel · Submitted 2 days ago</div>
+          <div class="pc-progress"><div style="width:25%"></div></div>
+          <div class="pc-actions"><button class="btn-outline btn-sm">Review</button></div>
+        </div>
+        <div class="pipeline-card">
+          <div class="pc-title">Sahara Adventure Tours</div>
+          <div class="pc-meta">Morocco · Tour · Submitted 4 days ago</div>
+          <div class="pc-progress"><div style="width:25%"></div></div>
+          <div class="pc-actions"><button class="btn-outline btn-sm">Review</button></div>
+        </div>
+        <div class="pipeline-card">
+          <div class="pc-title">Istanbul Express</div>
+          <div class="pc-meta">Turkey · Transport · Submitted 1 day ago</div>
+          <div class="pc-progress"><div style="width:25%"></div></div>
+          <div class="pc-actions"><button class="btn-outline btn-sm">Review</button></div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">›</div>
+
+      <div class="pipeline-stage">
+        <div class="stage-header">
+          <span class="stage-dot" style="background:#29a8e0"></span>
+          <h4>Document Verification</h4>
+          <span class="stage-count">2</span>
+        </div>
+        <div class="pipeline-card">
+          <div class="pc-title">Red Sea Divers</div>
+          <div class="pc-meta">Egypt · Activity · Docs pending</div>
+          <div class="pc-docs">
+            <span class="doc-tag done">✓ Company Reg</span>
+            <span class="doc-tag done">✓ TAX/VAT</span>
+            <span class="doc-tag miss">✗ Insurance</span>
+          </div>
+          <div class="pc-progress"><div style="width:60%"></div></div>
+          <div class="pc-actions"><button class="btn-outline btn-sm">Chase Docs</button></div>
+        </div>
+        <div class="pipeline-card">
+          <div class="pc-title">Petra Tours & Travel</div>
+          <div class="pc-meta">Jordan · Tour · Docs 90% complete</div>
+          <div class="pc-docs">
+            <span class="doc-tag done">✓ Company Reg</span>
+            <span class="doc-tag done">✓ TAX/VAT</span>
+            <span class="doc-tag done">✓ Insurance</span>
+            <span class="doc-tag miss">✗ Contract</span>
+          </div>
+          <div class="pc-progress"><div style="width:75%"></div></div>
+          <div class="pc-actions"><button class="btn-outline btn-sm">Send Contract</button></div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">›</div>
+
+      <div class="pipeline-stage">
+        <div class="stage-header">
+          <span class="stage-dot" style="background:#c9a800"></span>
+          <h4>Contract Signing</h4>
+          <span class="stage-count">1</span>
+        </div>
+        <div class="pipeline-card">
+          <div class="pc-title">Maldives Sunset Cruises</div>
+          <div class="pc-meta">Maldives · Cruise · Contract sent</div>
+          <div class="pc-docs">
+            <span class="doc-tag done">✓ All docs verified</span>
+            <span class="doc-tag miss">✗ Awaiting signature</span>
+          </div>
+          <div class="pc-progress"><div style="width:85%"></div></div>
+          <div class="pc-actions"><button class="btn-outline btn-sm">Resend Contract</button></div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">›</div>
+
+      <div class="pipeline-stage">
+        <div class="stage-header">
+          <span class="stage-dot" style="background:#3aaa35"></span>
+          <h4>Payment Setup</h4>
+          <span class="stage-count">1</span>
+        </div>
+        <div class="pipeline-card">
+          <div class="pc-title">Arabian Nights Dining</div>
+          <div class="pc-meta">Dubai · Restaurant · Bank details pending</div>
+          <div class="pc-progress"><div style="width:92%"></div></div>
+          <div class="pc-actions"><button class="btn-outline btn-sm">Follow Up</button></div>
+        </div>
+      </div>
+      <div class="pipeline-arrow">›</div>
+
+      <div class="pipeline-stage">
+        <div class="stage-header">
+          <span class="stage-dot" style="background:#1e3a5f"></span>
+          <h4>Live on Platform</h4>
+          <span class="stage-count">118</span>
+        </div>
+        <div class="pipeline-card completed">
+          <div class="pc-title">✓ Fully onboarded</div>
+          <div class="pc-meta">118 active suppliers live</div>
+          <div class="pc-actions"><button class="btn-outline btn-sm" onclick="showPage('suppliers', document.querySelector('[data-page=suppliers]'))">View All</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Supplier Form -->
+    <div class="card" style="margin-top:24px">
+      <div class="card-header">
+        <h3>New Supplier Application Form</h3>
+      </div>
+      <form class="supplier-form" onsubmit="submitSupplier(event)">
+        <div class="form-section-title">Company Information</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Company Name *</label>
+            <input type="text" class="form-input" placeholder="Full legal company name" required>
+          </div>
+          <div class="form-group">
+            <label>Trading Name</label>
+            <input type="text" class="form-input" placeholder="Trading / DBA name">
+          </div>
+          <div class="form-group">
+            <label>Supplier Type *</label>
+            <select class="form-input" required>
+              <option value="">Select type...</option>
+              <option>Hotel / Accommodation</option>
+              <option>Tour Operator</option>
+              <option>Activity Provider</option>
+              <option>Transport / Transfer</option>
+              <option>Restaurant / Dining</option>
+              <option>Cruise / Boat</option>
+              <option>Experience Provider</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Destination *</label>
+            <select class="form-input" required>
+              <option value="">Select destination...</option>
+              <option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option><option>Morocco</option><option>Turkey</option><option>Maldives</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Company Registration No. *</label>
+            <input type="text" class="form-input" placeholder="Official registration number" required>
+          </div>
+          <div class="form-group">
+            <label>TAX / VAT Number *</label>
+            <input type="text" class="form-input" placeholder="TAX or VAT registration number" required>
+          </div>
+          <div class="form-group">
+            <label>Website</label>
+            <input type="url" class="form-input" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Years in Operation</label>
+            <input type="number" class="form-input" placeholder="e.g. 5">
+          </div>
+        </div>
+
+        <div class="form-section-title">Primary Contact</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Contact Name *</label>
+            <input type="text" class="form-input" placeholder="Full name" required>
+          </div>
+          <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" class="form-input" placeholder="Position / title">
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" class="form-input" placeholder="email@company.com" required>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" class="form-input" placeholder="+971...">
+          </div>
+        </div>
+
+        <div class="form-section-title">Documents Upload</div>
+        <div class="upload-grid">
+          <div class="upload-box" onclick="triggerUpload(this)">
+            <input type="file" hidden accept=".pdf,.jpg,.png">
+            <svg viewBox="0 0 24 24" width="28" height="28"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <div class="upload-label">Company Registration</div>
+            <div class="upload-sub">PDF, JPG, PNG up to 10MB</div>
+          </div>
+          <div class="upload-box" onclick="triggerUpload(this)">
+            <input type="file" hidden accept=".pdf,.jpg,.png">
+            <svg viewBox="0 0 24 24" width="28" height="28"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <div class="upload-label">TAX / VAT Certificate</div>
+            <div class="upload-sub">PDF, JPG, PNG up to 10MB</div>
+          </div>
+          <div class="upload-box" onclick="triggerUpload(this)">
+            <input type="file" hidden accept=".pdf,.jpg,.png">
+            <svg viewBox="0 0 24 24" width="28" height="28"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <div class="upload-label">Insurance Certificate</div>
+            <div class="upload-sub">PDF, JPG, PNG up to 10MB</div>
+          </div>
+          <div class="upload-box" onclick="triggerUpload(this)">
+            <input type="file" hidden accept=".pdf">
+            <svg viewBox="0 0 24 24" width="28" height="28"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+            <div class="upload-label">Signed Contract</div>
+            <div class="upload-sub">PDF only up to 20MB</div>
+          </div>
+          <div class="upload-box" onclick="triggerUpload(this)">
+            <input type="file" hidden accept=".pdf,.jpg,.png">
+            <svg viewBox="0 0 24 24" width="28" height="28"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/></svg>
+            <div class="upload-label">ID / Passport (Owner)</div>
+            <div class="upload-sub">PDF, JPG, PNG up to 5MB</div>
+          </div>
+          <div class="upload-box" onclick="triggerUpload(this)">
+            <input type="file" hidden>
+            <svg viewBox="0 0 24 24" width="28" height="28"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <div class="upload-label">Other Documents</div>
+            <div class="upload-sub">Any additional files</div>
+          </div>
+        </div>
+
+        <div class="form-section-title">Tier & Listing Settings</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Assign Tier</label>
+            <select class="form-input">
+              <option>Tier 1 – Premium (Featured)</option>
+              <option>Tier 2 – Standard</option>
+              <option>Tier 3 – Budget</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Commission Rate (%)</label>
+            <input type="number" class="form-input" placeholder="e.g. 15" min="0" max="50">
+          </div>
+          <div class="form-group">
+            <label>Payment Terms</label>
+            <select class="form-input">
+              <option>Net 30</option>
+              <option>Net 15</option>
+              <option>Net 60</option>
+              <option>On Completion</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select class="form-input">
+              <option>GBP (£)</option>
+              <option>USD ($)</option>
+              <option>AED (د.إ)</option>
+              <option>EUR (€)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-outline">Save as Draft</button>
+          <button type="submit" class="btn-primary">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PAGE: Contracts -->
+  <div class="page" id="page-contracts">
+    <div class="page-header">
+      <div>
+        <h1>Contracts & Documents</h1>
+        <p class="page-sub">Manage all supplier contracts, compliance documents and certificates</p>
+      </div>
+      <button class="btn-primary">Upload Document</button>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(58,170,53,0.12);color:#3aaa35"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 11l3 3L22 4"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">131</div><div class="kpi-label">Active Contracts</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(245,215,0,0.12);color:#c9a800"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">3</div><div class="kpi-label">Expiring Soon</div><div class="kpi-change warn">Within 30 days</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(224,58,30,0.12);color:#e03a1e"><svg viewBox="0 0 24 24" width="22" height="22"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">2</div><div class="kpi-label">Expired</div><div class="kpi-change warn">⚠ Renew now</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(41,168,224,0.12);color:#29a8e0"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">486</div><div class="kpi-label">Total Documents</div></div>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <div class="card-header">
+        <h3>Contract Registry</h3>
+        <div style="display:flex;gap:8px">
+          <select class="mini-select"><option>All Types</option><option>Contract</option><option>Insurance</option><option>Tax Cert</option></select>
+          <input type="text" class="filter-select btn-sm" placeholder="Search...">
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Supplier</th>
+              <th>Document Type</th>
+              <th>Document No.</th>
+              <th>Uploaded</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Atlantis The Palm</b></td>
+              <td>Service Contract</td>
+              <td>CTR-2024-0081</td>
+              <td>Jan 2024</td>
+              <td>Dec 2025</td>
+              <td><span class="status active">Valid</span></td>
+              <td><div class="action-btns"><button class="act-btn" title="Download">⬇</button><button class="act-btn" title="View">👁</button><button class="act-btn" title="Renew">🔄</button></div></td>
+            </tr>
+            <tr>
+              <td><b>Desert Tracks Tours</b></td>
+              <td>Service Contract</td>
+              <td>CTR-2023-0094</td>
+              <td>Mar 2023</td>
+              <td>Mar 2024</td>
+              <td><span class="status suspended">Expired</span></td>
+              <td><div class="action-btns"><button class="act-btn">⬇</button><button class="act-btn">👁</button><button class="act-btn">🔄</button></div></td>
+            </tr>
+            <tr>
+              <td><b>Jordan Transfer Co</b></td>
+              <td>Insurance Certificate</td>
+              <td>INS-2024-0089</td>
+              <td>Sep 2024</td>
+              <td>Sep 2025</td>
+              <td><span class="status pending">Expiring</span></td>
+              <td><div class="action-btns"><button class="act-btn">⬇</button><button class="act-btn">👁</button><button class="act-btn">🔄</button></div></td>
+            </tr>
+            <tr>
+              <td><b>Oman Luxury Resorts</b></td>
+              <td>VAT Certificate</td>
+              <td>VAT-2024-0072</td>
+              <td>Jun 2024</td>
+              <td>Jun 2026</td>
+              <td><span class="status active">Valid</span></td>
+              <td><div class="action-btns"><button class="act-btn">⬇</button><button class="act-btn">👁</button><button class="act-btn">🔄</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Payments -->
+  <div class="page" id="page-payments">
+    <div class="page-header">
+      <div>
+        <h1>Payment Management</h1>
+        <p class="page-sub">Track, approve and process supplier payments</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline">Bulk Pay</button>
+        <button class="btn-primary">New Payment</button>
+      </div>
+    </div>
+
+    <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(58,170,53,0.12);color:#3aaa35"><svg viewBox="0 0 24 24" width="22" height="22"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">£248K</div><div class="kpi-label">Paid This Month</div><div class="kpi-change up">↑ 12%</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(245,215,0,0.12);color:#c9a800"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">£34K</div><div class="kpi-label">Pending Approval</div><div class="kpi-change warn">3 invoices</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(224,58,30,0.12);color:#e03a1e"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">£12K</div><div class="kpi-label">Overdue</div><div class="kpi-change warn">⚠ 2 suppliers</div></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon" style="background:rgba(30,58,95,0.15);color:#1a6faf"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="kpi-data"><div class="kpi-value">£2.1M</div><div class="kpi-label">YTD Total</div><div class="kpi-change up">↑ 18% vs last year</div></div>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <div class="card-header">
+        <h3>Payment Queue</h3>
+        <select class="mini-select"><option>All Status</option><option>Pending</option><option>Approved</option><option>Paid</option><option>Overdue</option></select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>Supplier</th>
+              <th>Invoice No.</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><b>Atlantis The Palm</b></td>
+              <td>INV-2024-0281</td>
+              <td>July accommodation services</td>
+              <td><b>£42,000</b></td>
+              <td>31 Jul 2024</td>
+              <td><span class="status pending">Pending Approval</span></td>
+              <td><div class="action-btns"><button class="btn-outline btn-sm">Approve</button><button class="act-btn">👁</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><b>Desert Tracks Tours</b></td>
+              <td>INV-2024-0279</td>
+              <td>July tour operations</td>
+              <td><b>£8,500</b></td>
+              <td>25 Jul 2024</td>
+              <td><span class="status active">Approved</span></td>
+              <td><div class="action-btns"><button class="btn-primary btn-sm">Pay Now</button><button class="act-btn">👁</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><b>Jordan Transfer Co</b></td>
+              <td>INV-2024-0265</td>
+              <td>June transfers - overdue</td>
+              <td><b>£5,200</b></td>
+              <td>30 Jun 2024</td>
+              <td><span class="status suspended">Overdue</span></td>
+              <td><div class="action-btns"><button class="btn-primary btn-sm">Pay Now</button><button class="act-btn">👁</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td><b>Oman Luxury Resorts</b></td>
+              <td>INV-2024-0280</td>
+              <td>July accommodation</td>
+              <td><b>£28,000</b></td>
+              <td>31 Jul 2024</td>
+              <td><span class="status active">Paid</span></td>
+              <td><div class="action-btns"><button class="act-btn">⬇ Receipt</button><button class="act-btn">👁</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Hotels -->
+  <div class="page" id="page-hotels">
+    <div class="page-header">
+      <div>
+        <h1>Hotels & Accommodation</h1>
+        <p class="page-sub">Manage hotel suppliers, tiers and website listing order</p>
+      </div>
+      <button class="btn-primary">+ Add Hotel</button>
+    </div>
+    <div class="filter-bar">
+      <select class="filter-select"><option>All Destinations</option><option>Dubai</option><option>Abu Dhabi</option><option>Oman</option></select>
+      <select class="filter-select"><option>All Stars</option><option>5★</option><option>4★</option><option>3★</option></select>
+      <select class="filter-select"><option>All Tiers</option><option>Tier 1</option><option>Tier 2</option><option>Tier 3</option></select>
+      <input type="text" class="filter-select" placeholder="🔍 Search hotels...">
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>Hotel Suppliers — Tier & Listing Manager</h3><button class="btn-outline btn-sm">Reorder Mode</button></div>
+      <div class="hotel-grid">
+        <div class="hotel-card">
+          <div class="hotel-rank">1</div>
+          <div class="hotel-body">
+            <div class="hotel-name">Atlantis The Palm</div>
+            <div class="hotel-meta">🇦🇪 Dubai · 5★ · <span class="tier tier-1">Tier 1</span></div>
+            <div class="hotel-details">
+              <span>Rooms: 1,548</span>
+              <span>Commission: 18%</span>
+              <span>Rating: ★ 4.8</span>
+            </div>
+            <div class="hotel-toggle">
+              <label class="toggle"><input type="checkbox" checked><span></span></label>
+              <span>Featured on website</span>
+            </div>
+          </div>
+          <div class="hotel-actions">
+            <button class="btn-outline btn-sm">Edit</button>
+            <button class="btn-outline btn-sm">Tiers</button>
+          </div>
+        </div>
+        <div class="hotel-card">
+          <div class="hotel-rank">2</div>
+          <div class="hotel-body">
+            <div class="hotel-name">Burj Al Arab Jumeirah</div>
+            <div class="hotel-meta">🇦🇪 Dubai · 7★ · <span class="tier tier-1">Tier 1</span></div>
+            <div class="hotel-details">
+              <span>Rooms: 202</span>
+              <span>Commission: 20%</span>
+              <span>Rating: ★ 4.9</span>
+            </div>
+            <div class="hotel-toggle">
+              <label class="toggle"><input type="checkbox" checked><span></span></label>
+              <span>Featured on website</span>
+            </div>
+          </div>
+          <div class="hotel-actions">
+            <button class="btn-outline btn-sm">Edit</button>
+            <button class="btn-outline btn-sm">Tiers</button>
+          </div>
+        </div>
+        <div class="hotel-card">
+          <div class="hotel-rank">3</div>
+          <div class="hotel-body">
+            <div class="hotel-name">Al Maha Desert Resort</div>
+            <div class="hotel-meta">🇦🇪 Dubai · 5★ · <span class="tier tier-1">Tier 1</span></div>
+            <div class="hotel-details">
+              <span>Rooms: 42</span>
+              <span>Commission: 15%</span>
+              <span>Rating: ★ 4.7</span>
+            </div>
+            <div class="hotel-toggle">
+              <label class="toggle"><input type="checkbox" checked><span></span></label>
+              <span>Featured on website</span>
+            </div>
+          </div>
+          <div class="hotel-actions">
+            <button class="btn-outline btn-sm">Edit</button>
+            <button class="btn-outline btn-sm">Tiers</button>
+          </div>
+        </div>
+        <div class="hotel-card">
+          <div class="hotel-rank">4</div>
+          <div class="hotel-body">
+            <div class="hotel-name">Oman Luxury Resort</div>
+            <div class="hotel-meta">🇴🇲 Oman · 5★ · <span class="tier tier-1">Tier 1</span></div>
+            <div class="hotel-details">
+              <span>Rooms: 320</span>
+              <span>Commission: 16%</span>
+              <span>Rating: ★ 4.6</span>
+            </div>
+            <div class="hotel-toggle">
+              <label class="toggle"><input type="checkbox"><span></span></label>
+              <span>Featured on website</span>
+            </div>
+          </div>
+          <div class="hotel-actions">
+            <button class="btn-outline btn-sm">Edit</button>
+            <button class="btn-outline btn-sm">Tiers</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Tours -->
+  <div class="page" id="page-tours">
+    <div class="page-header">
+      <div><h1>Tours & Activities</h1><p class="page-sub">Manage tour and activity suppliers</p></div>
+      <button class="btn-primary">+ Add Tour/Activity</button>
+    </div>
+    <div class="card"><div class="card-header"><h3>Tours & Activities Suppliers</h3></div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Supplier</th><th>Activity Type</th><th>Destination</th><th>Duration</th><th>Commission</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      <tr><td><b>Desert Tracks Tours</b></td><td>Desert Safari</td><td>🇦🇪 Dubai</td><td>4–8 hrs</td><td>15%</td><td><span class="status active">Active</span></td><td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button></div></td></tr>
+      <tr><td><b>Nile Tours Egypt</b></td><td>River Cruise</td><td>🇪🇬 Egypt</td><td>1–7 days</td><td>12%</td><td><span class="status pending">Pending</span></td><td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button></div></td></tr>
+      <tr><td><b>Petra Tours & Travel</b></td><td>Historical Tour</td><td>🇯🇴 Jordan</td><td>Full day</td><td>14%</td><td><span class="status active">Active</span></td><td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button></div></td></tr>
+      <tr><td><b>Red Sea Divers</b></td><td>Diving/Snorkelling</td><td>🇪🇬 Egypt</td><td>Half day</td><td>16%</td><td><span class="status active">Active</span></td><td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button></div></td></tr>
+    </tbody></table></div></div>
+  </div>
+
+  <!-- PAGE: Transport -->
+  <div class="page" id="page-transport">
+    <div class="page-header">
+      <div><h1>Transport & Transfers</h1><p class="page-sub">Manage all ground and air transport suppliers</p></div>
+      <button class="btn-primary">+ Add Transport</button>
+    </div>
+    <div class="card"><div class="card-header"><h3>Transport Suppliers</h3></div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Supplier</th><th>Vehicle Type</th><th>Destination</th><th>Fleet Size</th><th>Commission</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      <tr><td><b>Jordan Transfer Co</b></td><td>Sedan / SUV</td><td>🇯🇴 Jordan</td><td>24</td><td>12%</td><td><span class="status active">Active</span></td><td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button></div></td></tr>
+      <tr><td><b>Dubai Luxury Limos</b></td><td>Limousine</td><td>🇦🇪 Dubai</td><td>18</td><td>18%</td><td><span class="status active">Active</span></td><td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button></div></td></tr>
+      <tr><td><b>Istanbul Express</b></td><td>Coach / Bus</td><td>🇹🇷 Turkey</td><td>8</td><td>10%</td><td><span class="status pending">Pending</span></td><td><div class="action-btns"><button class="act-btn">👁</button><button class="act-btn">✏️</button></div></td></tr>
+    </tbody></table></div></div>
+  </div>
+
+  <!-- PAGE: Tier Management -->
+  <div class="page" id="page-tiers">
+    <div class="page-header">
+      <div><h1>Tier Management</h1><p class="page-sub">Configure supplier tiers and website display priority</p></div>
+      <button class="btn-primary">Save Tier Settings</button>
+    </div>
+    <div class="tier-grid">
+      <div class="tier-card t1">
+        <div class="tier-badge">TIER 1</div>
+        <h3>Premium</h3>
+        <p>Top-featured suppliers with highest visibility on the ORN platform. Priority placement, featured badges and enhanced listings.</p>
+        <div class="tier-stats"><div><b>50</b><span>Hotels</span></div><div><b>18</b><span>Tours</span></div><div><b>8</b><span>Other</span></div></div>
+        <div class="tier-features">
+          <div class="tf">✓ Homepage featured</div>
+          <div class="tf">✓ Priority search result</div>
+          <div class="tf">✓ Gold badge on listing</div>
+          <div class="tf">✓ Commission: 15–20%</div>
+          <div class="tf">✓ Dedicated account manager</div>
+        </div>
+        <button class="btn-outline" style="margin-top:16px;width:100%">Edit Tier 1 Rules</button>
+      </div>
+      <div class="tier-card t2">
+        <div class="tier-badge">TIER 2</div>
+        <h3>Standard</h3>
+        <p>Mid-level suppliers with standard listings. Appear in regular search results and category pages.</p>
+        <div class="tier-stats"><div><b>42</b><span>Hotels</span></div><div><b>31</b><span>Tours</span></div><div><b>14</b><span>Other</span></div></div>
+        <div class="tier-features">
+          <div class="tf">✓ Standard search listing</div>
+          <div class="tf">✓ Category pages</div>
+          <div class="tf">✓ Silver badge</div>
+          <div class="tf">✓ Commission: 10–15%</div>
+          <div class="tf">✗ No homepage feature</div>
+        </div>
+        <button class="btn-outline" style="margin-top:16px;width:100%">Edit Tier 2 Rules</button>
+      </div>
+      <div class="tier-card t3">
+        <div class="tier-badge">TIER 3</div>
+        <h3>Budget</h3>
+        <p>Entry-level suppliers. Appear at the bottom of listings. Lower commission, lower visibility.</p>
+        <div class="tier-stats"><div><b>10</b><span>Hotels</span></div><div><b>12</b><span>Tours</span></div><div><b>8</b><span>Other</span></div></div>
+        <div class="tier-features">
+          <div class="tf">✓ Basic listing</div>
+          <div class="tf">✓ Searchable</div>
+          <div class="tf">✗ No badge</div>
+          <div class="tf">✓ Commission: 8–12%</div>
+          <div class="tf">✗ No priority placement</div>
+        </div>
+        <button class="btn-outline" style="margin-top:16px;width:100%">Edit Tier 3 Rules</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Destinations -->
+  <div class="page" id="page-destinations">
+    <div class="page-header">
+      <div><h1>Destinations</h1><p class="page-sub">Manage destination coverage and regional settings</p></div>
+      <button class="btn-primary">+ Add Destination</button>
+    </div>
+    <div class="dest-cards-grid">
+      <div class="dest-full-card"><div class="dest-flag-lg">🇦🇪</div><div class="dest-card-body"><h4>Dubai</h4><div class="dest-card-stats"><span>38 suppliers</span><span>Tier 1 ×12</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+      <div class="dest-full-card"><div class="dest-flag-lg">🇦🇪</div><div class="dest-card-body"><h4>Abu Dhabi</h4><div class="dest-card-stats"><span>24 suppliers</span><span>Tier 1 ×8</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+      <div class="dest-full-card"><div class="dest-flag-lg">🇴🇲</div><div class="dest-card-body"><h4>Oman</h4><div class="dest-card-stats"><span>18 suppliers</span><span>Tier 1 ×6</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+      <div class="dest-full-card"><div class="dest-flag-lg">🇪🇬</div><div class="dest-card-body"><h4>Egypt</h4><div class="dest-card-stats"><span>14 suppliers</span><span>Tier 1 ×4</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+      <div class="dest-full-card"><div class="dest-flag-lg">🇯🇴</div><div class="dest-card-body"><h4>Jordan</h4><div class="dest-card-stats"><span>10 suppliers</span><span>Tier 1 ×3</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+      <div class="dest-full-card"><div class="dest-flag-lg">🇲🇦</div><div class="dest-card-body"><h4>Morocco</h4><div class="dest-card-stats"><span>8 suppliers</span><span>Tier 1 ×2</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+      <div class="dest-full-card"><div class="dest-flag-lg">🇹🇷</div><div class="dest-card-body"><h4>Turkey</h4><div class="dest-card-stats"><span>6 suppliers</span><span>Tier 1 ×1</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+      <div class="dest-full-card"><div class="dest-flag-lg">🇲🇻</div><div class="dest-card-body"><h4>Maldives</h4><div class="dest-card-stats"><span>4 suppliers</span><span>Tier 1 ×2</span><span>Active</span></div></div><button class="btn-outline btn-sm">Manage</button></div>
+    </div>
+  </div>
+
+</div><!-- /main-wrap -->
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
