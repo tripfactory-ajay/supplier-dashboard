@@ -89,7 +89,7 @@ function pg_sup_dash(){
     <div class="tbl-wrap"><table>
       ${thdr('#','Destination ↕','Suppliers ↕','Hotels ↕','Tours ↕','Transport ↕','Pending ↕','Contract Value ↕','Payments MTD ↕','Outstanding ↕','Tier 1 ↕','Compliance ↕','ORN Lead ↕')}
       ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1)}
-      <tbody>${dr.map((r,i)=>`<tr><td class="rn">${i+1}</td><td class="lnk">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]>0?`<span class="badge-teal">${r[5]}</span>`:'0'}</td><td>${r[6]}</td><td><b>${r[7]}</b></td><td style="color:${r[8]>0?'var(--red)':'inherit'};font-weight:${r[8]>0?700:400}">${r[8]>0?'£'+r[8].toLocaleString():'£0'}</td><td class="lnk" style="color:var(--teal)">${r[9]}</td><td>${compliancePill(r[10])}</td><td style="font-size:11.5px">${r[11]}</td></tr>`).join('')}</tbody>
+      <tbody>${dr.map((r,i)=>`<tr><td class="rn">${i+1}</td><td class="lnk" onclick="openDestDrillModal('${r[0].replace(/[^a-zA-Z ]/g,'').trim()}')" style="cursor:pointer">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]>0?`<span class="badge-teal">${r[5]}</span>`:'0'}</td><td>${r[6]}</td><td><b>${r[7]}</b></td><td style="color:${r[8]>0?'var(--red)':'inherit'};font-weight:${r[8]>0?700:400}">${r[8]>0?'£'+r[8].toLocaleString():'£0'}</td><td class="lnk" style="color:var(--teal)">${r[9]}</td><td>${compliancePill(r[10])}</td><td style="font-size:11.5px">${r[11]}</td></tr>`).join('')}</tbody>
     </table>${pgfoot('1–8',18,2)}</div>`;
 }
 
@@ -390,7 +390,9 @@ function openModal(title,body,footer=''){
 }
 function closeModal(){
   document.getElementById('modal-overlay').classList.remove('open');
-  document.getElementById('modal-box').classList.remove('open');
+  const mb=document.getElementById('modal-box');
+  mb.classList.remove('open');
+  mb.style.width='';
 }
 window.closeModal=closeModal;
 
@@ -1208,6 +1210,232 @@ function openAssignContractsModal(){
   );
 }
 window.openAssignContractsModal = openAssignContractsModal;
+
+
+// ─── DESTINATION DRILL-DOWN MODAL ────────────────────────────────
+// Called when user clicks any destination on the Supplier Dashboard
+function openDestDrillModal(destRaw){
+  // Normalise — strip flag emoji, trim
+  const dest = destRaw.replace(/[\u{1F1E0}-\u{1F1FF}\u{1F300}-\u{1F9FF}]/gu,'').trim();
+
+  const destSuppliers  = suppliers.filter(s=>s.dest===dest);
+  const destContracts  = contracts.filter(c=>c.dest===dest);
+  const destPayments   = payments.filter(p=>p.dest===dest);
+  const destRates      = rates.filter(r=>r.dest===dest);
+
+  // Summary numbers
+  const active   = destSuppliers.filter(s=>s.status==='Active').length;
+  const pending  = destSuppliers.filter(s=>s.status==='Pending').length;
+  const suspended= destSuppliers.filter(s=>s.status==='Suspended').length;
+  const outstanding = destSuppliers.reduce((a,s)=>a+(s.outstanding||0),0);
+  const avgCompliance = destSuppliers.length
+    ? Math.round(destSuppliers.reduce((a,s)=>a+(s.complianceScore||0),0)/destSuppliers.length)
+    : 0;
+  const expiringContracts = destContracts.filter(c=>c.status==='Expiring'||c.status==='Expired').length;
+  const ornLead = destSuppliers[0]?.ornRegionalLead || destSuppliers[0]?.ornManager || '—';
+  const totalPayments = destPayments.reduce((a,p)=>a+p.amount,0);
+
+  // KPI strip HTML
+  const kpis = [
+    ['Total Suppliers', destSuppliers.length, ''],
+    ['Active', active, 'green'],
+    ['Pending', pending, 'orange'],
+    ['Suspended', suspended, suspended>0?'red':''],
+    ['Avg Compliance', avgCompliance+'%', avgCompliance>=85?'green':avgCompliance>=60?'orange':'red'],
+    ['Contracts', destContracts.length, ''],
+    ['Expiring / Expired', expiringContracts, expiringContracts>0?'red':''],
+    ['Payments MTD', '£'+totalPayments.toLocaleString(), 'green'],
+    ['Outstanding', outstanding>0?'£'+outstanding.toLocaleString():'£0', outstanding>0?'red':''],
+    ['Rates on File', destRates.length, ''],
+    ['ORN Lead', ornLead, ''],
+  ];
+
+  const kpiHtml = `<div class="kpi-strip" style="margin:0 0 14px">${
+    kpis.map(([l,v,c])=>`<div class="kpi-cell"><div class="kpi-lbl">${l}</div><div class="kpi-val ${c}">${v}</div></div>`).join('')
+  }</div>`;
+
+  // ── TAB: SUPPLIERS ──
+  const tabSuppliers = destSuppliers.length === 0
+    ? '<p style="color:var(--text3);padding:12px">No suppliers found for this destination.</p>'
+    : `<div class="tbl-wrap"><table>
+        <tr>${['#','Supplier','Type','Tier','Status','ORN Manager','Contract Owner','Commission','Compliance','Outstanding','Contract End','Manage'].map(h=>`<th>${h}</th>`).join('')}</tr>
+        <tbody>${destSuppliers.map((s,i)=>`<tr>
+          <td class="rn">${i+1}</td>
+          <td><a class="lnk" onclick="closeModal();setTimeout(()=>openSupModal(${esc(s)}),120)">${s.name}</a></td>
+          <td>${s.type}</td>
+          <td><span class="tbadge t${s.tier}">Tier ${s.tier}</span></td>
+          <td><span class="pill ${sc(s.status)}">${s.status}</span></td>
+          <td style="font-size:11.5px">${s.ornManager}</td>
+          <td style="font-size:11.5px">${s.ornContractOwner}</td>
+          <td>${s.commission}%</td>
+          <td>${compliancePill(s.complianceScore||0)}</td>
+          <td style="color:${s.outstanding>0?'var(--red)':'inherit'};font-weight:${s.outstanding>0?700:400}">${fmtGbp(s.outstanding)}</td>
+          <td>${s.contract}</td>
+          <td class="act">
+            <a onclick="closeModal();setTimeout(()=>openSupModal(${esc(s)}),120)">View</a>
+            <a onclick="closeModal();setTimeout(()=>openEditSupModal(${esc(s)}),120)">Edit</a>
+            <a onclick="closeModal();setTimeout(()=>openDocsModal('${s.name}'),120)">Docs</a>
+          </td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+
+  // ── TAB: CONTRACTS ──
+  const tabContracts = destContracts.length === 0
+    ? '<p style="color:var(--text3);padding:12px">No contracts found for this destination.</p>'
+    : `<div class="tbl-wrap"><table>
+        <tr>${['#','Supplier','Type','Doc No.','Start','Expiry','Value','Status','ORN Owner','ORN Manager','Governing Law','Auto-Renew','Review Due','Manage'].map(h=>`<th>${h}</th>`).join('')}</tr>
+        <tbody>${destContracts.map((c,i)=>`<tr>
+          <td class="rn">${i+1}</td>
+          <td><a class="lnk" onclick="closeModal();setTimeout(()=>openContractModal(${esc(c)}),120)">${c.supplier}</a></td>
+          <td style="font-size:11.5px">${c.type}</td>
+          <td class="mono">${c.id}</td>
+          <td style="font-size:11px">${c.start}</td>
+          <td style="font-size:11.5px;color:${c.status==='Expired'?'var(--red)':c.status==='Expiring'?'var(--orange)':'inherit'};font-weight:${c.status!=='Valid'?700:400}">${c.expiry}</td>
+          <td><b>${c.value}</b></td>
+          <td><span class="pill ${sc(c.status)}">${c.status}</span></td>
+          <td style="font-size:11.5px"><b>${c.ornOwner}</b></td>
+          <td style="font-size:11.5px">${c.ornManager}</td>
+          <td style="font-size:11.5px">${c.governingLaw}</td>
+          <td style="font-size:11.5px">${c.autoRenew}</td>
+          <td style="font-size:11.5px;color:${c.reviewDate==='Overdue'?'var(--red)':'inherit'};font-weight:${c.reviewDate==='Overdue'?700:400}">${c.reviewDate}</td>
+          <td class="act">
+            <a onclick="closeModal();setTimeout(()=>openContractModal(${esc(c)}),120)">View</a>
+            <a onclick="closeModal();setTimeout(()=>openEditContractModal(${esc(c)}),120)">Edit</a>
+            <a onclick="toast('Downloading...')">&#8595;</a>
+            <a onclick="toast('Renewal started')">Renew</a>
+          </td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+
+  // ── TAB: PAYMENTS ──
+  const tabPayments = destPayments.length === 0
+    ? '<p style="color:var(--text3);padding:12px">No payments found for this destination.</p>'
+    : `<div class="tbl-wrap"><table>
+        <tr>${['#','Supplier','Invoice No.','Description','Amount','Due Date','PO Ref','Approver','Status','Actions'].map(h=>`<th>${h}</th>`).join('')}</tr>
+        <tbody>${destPayments.map((p,i)=>{
+          const ac = p.status==='Pending Approval'
+            ? `<a onclick="toast('Approved!')">Approve</a>`
+            : p.status==='Approved'
+            ? `<a onclick="toast('Processing...')">Pay Now</a>`
+            : p.status==='Overdue'
+            ? `<a onclick="toast('Processing...')">Pay Now</a><a onclick="toast('Chasing...')">Chase</a>`
+            : `<a onclick="toast('Downloading...')">&#8595; Receipt</a>`;
+          return `<tr>
+            <td class="rn">${i+1}</td>
+            <td class="lnk">${p.supplier}</td>
+            <td class="mono">${p.id}</td>
+            <td>${p.desc}</td>
+            <td><b>£${p.amount.toLocaleString()}</b></td>
+            <td style="color:${p.status==='Overdue'?'var(--red)':'inherit'}">${p.due}</td>
+            <td class="mono" style="font-size:11px">${p.poRef}</td>
+            <td style="font-size:11.5px">${p.approver}</td>
+            <td><span class="pill ${sc(p.status)}">${p.status}</span></td>
+            <td class="act">${ac}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+      <div style="margin:10px 0;display:flex;gap:10px;align-items:center">
+        <b style="font-size:13px">Total: £${totalPayments.toLocaleString()}</b>
+        ${outstanding>0?`<span style="color:var(--red);font-weight:700">Outstanding: £${outstanding.toLocaleString()}</span>`:''}
+      </div></div>`;
+
+  // ── TAB: RATES ──
+  const tabRates = destRates.length === 0
+    ? '<p style="color:var(--text3);padding:12px">No rates configured for this destination.</p>'
+    : `<div class="tbl-wrap"><table>
+        <tr>${['#','Supplier','Type','Room / Service','Season','Period','Net Rate','Gross Rate','Commission','Status','Last Updated','Updated By','Manage'].map(h=>`<th>${h}</th>`).join('')}</tr>
+        <tbody>${destRates.map((r,i)=>`<tr>
+          <td class="rn">${i+1}</td>
+          <td class="lnk">${r.supplier}</td>
+          <td>${r.type}</td>
+          <td>${r.room}</td>
+          <td><span class="pill ${r.season==='Peak'?'p-red':r.season==='High'?'p-orange':r.season==='Low'?'p-blue':'p-gray'}">${r.season}</span></td>
+          <td>${r.period}</td>
+          <td><b>${r.net}</b></td>
+          <td>${r.gross}</td>
+          <td>${r.commission}</td>
+          <td><span class="pill p-green">${r.status}</span></td>
+          <td style="font-size:11.5px;color:var(--text3)">${r.lastUpdated}</td>
+          <td style="font-size:11.5px">${r.updatedBy}</td>
+          <td class="act">
+            <a onclick="closeModal();setTimeout(()=>openEditRateModal('${r.supplier}','${r.season}'),120)">Edit</a>
+            <a onclick="toast('Duplicating...')">Duplicate</a>
+          </td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+
+  // ── TAB: COMPLIANCE ──
+  const tabCompliance = destSuppliers.length === 0
+    ? '<p style="color:var(--text3);padding:12px">No suppliers to show compliance for.</p>'
+    : `<div class="tbl-wrap"><table>
+        <tr>${['#','Supplier','ORN Manager','Score','KYC','Owner ID','Bank Verified','Insurance Expiry','VAT Expiry','Contract','Sanctions','Actions'].map(h=>`<th>${h}</th>`).join('')}</tr>
+        <tbody>${destSuppliers.map((s,i)=>`<tr>
+          <td class="rn">${i+1}</td>
+          <td><a class="lnk" onclick="closeModal();setTimeout(()=>openSupModal(${esc(s)}),120)">${s.name}</a></td>
+          <td style="font-size:11.5px">${s.ornManager}</td>
+          <td>${compliancePill(s.complianceScore||0)}</td>
+          <td><span class="pill ${s.status==='Active'?'p-green':'p-orange'}">${s.status==='Active'?'Complete':'Pending'}</span></td>
+          <td><span class="pill ${s.ownerPassport?'p-green':'p-red'}">${s.ownerPassport?'On file':'Missing'}</span></td>
+          <td><span class="pill ${s.outstanding===0&&s.bankAccount?'p-green':'p-orange'}">${s.outstanding===0&&s.bankAccount?'Verified':'Pending'}</span></td>
+          <td style="font-size:11.5px;color:${(s.insuranceExpiry||'').includes('2025')||s.insuranceExpiry==='Pending'?'var(--red)':'inherit'}">${s.insuranceExpiry||'—'}</td>
+          <td style="font-size:11.5px">${s.vatExpiry||'—'}</td>
+          <td style="font-size:11.5px;color:${s.contract==='Expired'||s.contract==='Awaiting'?'var(--red)':'inherit'}">${s.contract}</td>
+          <td><span class="pill p-green">Clear</span></td>
+          <td class="act">
+            <a onclick="closeModal();setTimeout(()=>openSupModal(${esc(s)}),120)">View</a>
+            ${(s.complianceScore||0)<60?`<a onclick="toast('Opening actions...')">⚠ Fix</a>`:''}
+          </td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+
+  // ── TAB: AUDIT ──
+  const destAudit = auditLog.filter(a=>
+    destSuppliers.some(s=>s.name===a.supplier)
+  );
+  const tabAudit = destAudit.length === 0
+    ? '<p style="color:var(--text3);padding:12px">No audit entries for this destination.</p>'
+    : `<div class="audit-list">${destAudit.map(a=>`
+        <div class="audit-item">
+          <div class="audit-dot" style="background:${a.color}"></div>
+          <div class="audit-content">
+            <div class="audit-action">${a.action} — <span style="color:var(--text2)">${a.supplier}</span></div>
+            <div class="audit-meta">${a.ts} · by ${a.user}</div>
+            <div class="audit-detail">${a.detail}</div>
+          </div>
+        </div>`).join('')}
+      </div>`;
+
+  // ── ASSEMBLE MODAL ──
+  const flags = {'Dubai':'🇦🇪','Abu Dhabi':'🇦🇪','Oman':'🇴🇲','Egypt':'🇪🇬','Jordan':'🇯🇴',
+                 'Morocco':'🇲🇦','Turkey':'🇹🇷','Maldives':'🇲🇻','Saudi Arabia':'🇸🇦','Kenya':'🇰🇪'};
+
+  // Set modal to wide mode for destination drill-down
+  const mb=document.getElementById('modal-box');
+  if(mb)mb.style.width='1100px';
+  openModal(
+    `${flags[dest]||'🌍'} ${dest} — Destination Overview`,
+    `${kpiHtml}
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab(this,'dd-sup')">Suppliers (${destSuppliers.length})</div>
+      <div class="tab" onclick="switchTab(this,'dd-con')">Contracts (${destContracts.length})</div>
+      <div class="tab" onclick="switchTab(this,'dd-pay')">Payments (${destPayments.length})</div>
+      <div class="tab" onclick="switchTab(this,'dd-rat')">Rates (${destRates.length})</div>
+      <div class="tab" onclick="switchTab(this,'dd-cmp')">Compliance</div>
+      <div class="tab" onclick="switchTab(this,'dd-aud')">Audit (${destAudit.length})</div>
+    </div>
+    <div id="dd-sup" class="tab-panel active">${tabSuppliers}</div>
+    <div id="dd-con" class="tab-panel">${tabContracts}</div>
+    <div id="dd-pay" class="tab-panel">${tabPayments}</div>
+    <div id="dd-rat" class="tab-panel">${tabRates}</div>
+    <div id="dd-cmp" class="tab-panel">${tabCompliance}</div>
+    <div id="dd-aud" class="tab-panel">${tabAudit}</div>`,
+    `${btn('+ New Supplier','btn-white','closeModal();openNewSupModal()')}
+     ${btn('+ Upload Contract','btn-white','closeModal();openUploadModal()')}
+     ${btn('&#8595; Export Destination','btn-white',"toast('Exporting "+dest+" data...')")}
+     ${btn('Close','btn-navy','closeModal()')}`
+  );
+}
+window.openDestDrillModal = openDestDrillModal;
 
 // Register all page functions
 window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
