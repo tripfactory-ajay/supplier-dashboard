@@ -1,683 +1,388 @@
-// ORN Supplier Management Portal — Full Featured
+// ORN Global Supplier Management Portal
 'use strict';
+const NAV={products:{sub:['Product Catalogue','Categories','Pricing'],pages:[]},sales:{sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'],pages:['pg_sales_dest']},supply:{sub:['Overview','Availability','Allotments'],pages:[]},suppliers:{sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts & Docs','Payments','Rates & Pricing','Compliance','Audit Trail','Tier Management','Destinations','Regional Offices'],pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_compliance','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_sup_regions']},hotels:{sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Supply Sources','GIT Blockings','GIT Calendar'],pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings','pg_hotel_sources']},activities:{sub:['All Activities','Tours','Transfers','Experiences'],pages:['pg_act_all']},vehicles:{sub:['Fleet','Bookings','Maintenance'],pages:[]},delivery:{sub:['Overview','Pending','Completed'],pages:[]}};
+let curPrimary='suppliers',curSub=0;
 
-// ── NAV CONFIG ───────────────────────────────────────────────────
-const NAV = {
-  products:  { sub:['Product Catalogue','Categories','Pricing'],               pages:[] },
-  sales:     { sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'], pages:['pg_sales_dest'] },
-  supply:    { sub:['Overview','Availability','Allotments'],                   pages:[] },
-  suppliers: { sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts','Payments','Rates & Pricing','Audit Trail','Tier Management','Destinations'], pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_audit','pg_sup_tiers','pg_sup_dest'] },
-  hotels:    { sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Manage Supply','GIT Blockings','GIT Calendar'], pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings'] },
-  activities:{ sub:['All Activities','Tours','Transfers','Experiences'],       pages:['pg_act_all'] },
-  vehicles:  { sub:['Fleet','Bookings','Maintenance'],                         pages:[] },
-  delivery:  { sub:['Overview','Pending','Completed'],                         pages:[] },
-};
-
-let curPrimary = 'suppliers', curSub = 0;
-
-// ── DATA ─────────────────────────────────────────────────────────
-const suppliers = [
-  {id:'SUP-0081',name:'Atlantis The Palm',type:'Hotel',dest:'Dubai',tier:1,rating:4.8,status:'Active',tax:'AE-VAT-100384721',regNo:'DED-2018-88231',contract:'Dec 2025',outstanding:0,commission:18,currency:'GBP',payTerms:'Net 30',contact:'James Al Rashid',email:'james@atlantis.com',phone:'+971 4 426 0000'},
-  {id:'SUP-0082',name:'Burj Al Arab Jumeirah',type:'Hotel',dest:'Dubai',tier:1,rating:4.9,status:'Active',tax:'AE-VAT-100284622',regNo:'DED-2016-44112',contract:'Nov 2025',outstanding:0,commission:20,currency:'GBP',payTerms:'Net 30',contact:'Sara Khalid',email:'sara@burjalarab.com',phone:'+971 4 301 7777'},
-  {id:'SUP-0083',name:'Desert Tracks Tours',type:'Tour',dest:'Dubai',tier:2,rating:4.5,status:'Active',tax:'AE-VAT-100512388',regNo:'DED-2019-22788',contract:'Mar 2026',outstanding:0,commission:15,currency:'GBP',payTerms:'Net 15',contact:'Ahmed Hassan',email:'ahmed@deserttracks.ae',phone:'+971 50 222 3344'},
-  {id:'SUP-0084',name:'Nile Tours Egypt',type:'Tour',dest:'Egypt',tier:2,rating:4.2,status:'Pending',tax:'EG-TAX-302847',regNo:'CAI-2021-99821',contract:'Awaiting',outstanding:0,commission:12,currency:'GBP',payTerms:'Net 30',contact:'Mona Farouk',email:'mona@niletours.eg',phone:'+20 2 2345 6789'},
-  {id:'SUP-0085',name:'Jordan Transfer Co',type:'Transport',dest:'Jordan',tier:2,rating:4.1,status:'Active',tax:'JO-TAX-884421',regNo:'AMM-2017-55512',contract:'Sep 2025',outstanding:6800,commission:12,currency:'GBP',payTerms:'Net 30',contact:'Khalid Nassar',email:'khalid@jordantransfer.jo',phone:'+962 6 567 8901'},
-  {id:'SUP-0086',name:'Oman Luxury Resorts',type:'Hotel',dest:'Oman',tier:1,rating:4.6,status:'Active',tax:'OM-VAT-729341',regNo:'MCT-2015-11234',contract:'Jun 2026',outstanding:0,commission:16,currency:'GBP',payTerms:'Net 30',contact:'Fatima Al Balushi',email:'fatima@omanluxury.om',phone:'+968 2 456 7890'},
-  {id:'SUP-0087',name:'Petra Tours & Travel',type:'Tour',dest:'Jordan',tier:2,rating:4.3,status:'Active',tax:'JO-TAX-992817',regNo:'AMM-2018-77234',contract:'Apr 2026',outstanding:0,commission:14,currency:'GBP',payTerms:'Net 15',contact:'Omar Dabbas',email:'omar@petratours.jo',phone:'+962 3 215 6789'},
-  {id:'SUP-0088',name:'Red Sea Divers',type:'Activity',dest:'Egypt',tier:2,rating:4.4,status:'Active',tax:'EG-TAX-558821',regNo:'HRG-2020-33441',contract:'Aug 2025',outstanding:0,commission:16,currency:'GBP',payTerms:'Net 30',contact:'Tarek Salama',email:'tarek@redseadivers.eg',phone:'+20 65 334 4556'},
-  {id:'SUP-0089',name:'Maldives Sunset Cruises',type:'Cruise',dest:'Maldives',tier:1,rating:4.7,status:'Pending',tax:'MV-TAX-00182',regNo:'MLE-2022-00821',contract:'Awaiting',outstanding:0,commission:18,currency:'GBP',payTerms:'On Completion',contact:'Ibrahim Waheed',email:'ibrahim@sunsetcruises.mv',phone:'+960 333 1122'},
-  {id:'SUP-0090',name:'Arabian Nights Dining',type:'Restaurant',dest:'Dubai',tier:2,rating:4.5,status:'Active',tax:'AE-VAT-100671239',regNo:'DED-2020-66123',contract:'Jan 2026',outstanding:2400,commission:13,currency:'GBP',payTerms:'Net 30',contact:'Rania Farsi',email:'rania@arabiannights.ae',phone:'+971 4 388 9900'},
-  {id:'SUP-0091',name:'Dubai Luxury Limos',type:'Transport',dest:'Dubai',tier:1,rating:4.8,status:'Active',tax:'AE-VAT-100234887',regNo:'DED-2017-55321',contract:'Oct 2025',outstanding:0,commission:18,currency:'GBP',payTerms:'Net 15',contact:'Faisal Mirza',email:'faisal@dubailimos.ae',phone:'+971 4 355 7700'},
-  {id:'SUP-0092',name:'Sahara Adventure Tours',type:'Tour',dest:'Morocco',tier:2,rating:4.2,status:'Pending',tax:'MA-TAX-28481',regNo:'CMK-2021-44552',contract:'Awaiting',outstanding:0,commission:13,currency:'GBP',payTerms:'Net 30',contact:'Yassin Benali',email:'yassin@saharaadventure.ma',phone:'+212 524 445566'},
-  {id:'SUP-0093',name:'Istanbul Express Transfers',type:'Transport',dest:'Turkey',tier:3,rating:3.9,status:'Pending',tax:'TR-TAX-102948',regNo:'IST-2022-88112',contract:'Awaiting',outstanding:0,commission:10,currency:'GBP',payTerms:'Net 30',contact:'Mehmet Yilmaz',email:'mehmet@istanbulexpress.tr',phone:'+90 212 556 7788'},
-  {id:'SUP-0094',name:'Abu Dhabi Experiences',type:'Activity',dest:'Abu Dhabi',tier:2,rating:4.3,status:'Active',tax:'AE-VAT-100881234',regNo:'ADBC-2019-33421',contract:'Feb 2026',outstanding:1200,commission:14,currency:'GBP',payTerms:'Net 30',contact:'Layla Al Mazrouei',email:'layla@adexperiences.ae',phone:'+971 2 678 9900'},
-  {id:'SUP-0095',name:'Muscat Heritage Tours',type:'Tour',dest:'Oman',tier:2,rating:4.4,status:'Active',tax:'OM-VAT-883291',regNo:'MCT-2018-55678',contract:'May 2026',outstanding:0,commission:13,currency:'GBP',payTerms:'Net 30',contact:'Salim Al Harthi',email:'salim@muscattours.om',phone:'+968 2 234 5678'},
-  {id:'SUP-0096',name:'Pyramids View Hotel',type:'Hotel',dest:'Egypt',tier:2,rating:4.1,status:'Suspended',tax:'EG-TAX-719283',regNo:'CAI-2016-88234',contract:'Expired',outstanding:14200,commission:12,currency:'GBP',payTerms:'Net 30',contact:'Hassan Ibrahim',email:'hassan@pyramidsview.eg',phone:'+20 2 3377 8899'},
-  {id:'SUP-0097',name:'Marrakech Riad Collection',type:'Hotel',dest:'Morocco',tier:1,rating:4.6,status:'Active',tax:'MA-TAX-48122',regNo:'CMK-2017-22341',contract:'Jul 2026',outstanding:0,commission:16,currency:'GBP',payTerms:'Net 30',contact:'Amina Bensouda',email:'amina@marrakechriad.ma',phone:'+212 524 334455'},
-  {id:'SUP-0098',name:'Dead Sea Wellness Spa',type:'Activity',dest:'Jordan',tier:2,rating:4.5,status:'Active',tax:'JO-TAX-118843',regNo:'AMM-2019-66221',contract:'Dec 2025',outstanding:0,commission:14,currency:'GBP',payTerms:'Net 30',contact:'Ruba Haddad',email:'ruba@deadseaspa.jo',phone:'+962 5 349 0011'},
-  {id:'SUP-0099',name:'Cappadocia Balloon Tours',type:'Activity',dest:'Turkey',tier:1,rating:4.8,status:'Active',tax:'TR-TAX-287641',regNo:'KAY-2016-11234',contract:'Sep 2026',outstanding:0,commission:17,currency:'GBP',payTerms:'Net 30',contact:'Mustafa Kaya',email:'mustafa@cappadociaballoon.tr',phone:'+90 384 212 3344'},
-  {id:'SUP-0100',name:'Jumeirah Beach Resort',type:'Hotel',dest:'Dubai',tier:1,rating:4.7,status:'Active',tax:'AE-VAT-100924571',regNo:'DED-2015-11998',contract:'Jan 2026',outstanding:0,commission:19,currency:'GBP',payTerms:'Net 30',contact:'Noura Al Maktoum',email:'noura@jumeirahbeach.ae',phone:'+971 4 348 0000'},
+const ornTeam=[
+  {id:'T01',name:'Ajay Kawa',role:'Head of Supply',region:'Global',email:'ajay.kawa@orn.com',phone:'+44 20 7946 0100'},
+  {id:'T02',name:'Priya Sharma',role:'Senior Supplier Manager',region:'Middle East & Asia',email:'priya.sharma@orn.com',phone:'+44 20 7946 0101'},
+  {id:'T03',name:'Ravi Patel',role:'Supplier Manager',region:'Africa & Middle East',email:'ravi.patel@orn.com',phone:'+44 20 7946 0102'},
+  {id:'T04',name:'Sarah Mitchell',role:'Supplier Manager',region:'Europe & Americas',email:'sarah.mitchell@orn.com',phone:'+44 20 7946 0103'},
+  {id:'T05',name:'James Thornton',role:'Commercial Director',region:'Global',email:'james.thornton@orn.com',phone:'+44 20 7946 0104'},
+  {id:'T06',name:'Layla Hassan',role:'Contracts Manager',region:'Global',email:'layla.hassan@orn.com',phone:'+44 20 7946 0105'},
+  {id:'T07',name:'Omar Al Farsi',role:'Regional Manager – Gulf',region:'Gulf & Oman',email:'omar.alfarsi@orn.com',phone:'+44 20 7946 0106'},
+  {id:'T08',name:'Nina Kowalski',role:'Finance & Payments',region:'Global',email:'nina.kowalski@orn.com',phone:'+44 20 7946 0107'},
 ];
 
-const contracts = [
-  {id:'CTR-2024-0081',supplier:'Atlantis The Palm',type:'Service Contract',dest:'Dubai',uploaded:'15 Jan 2024',expiry:'31 Dec 2025',status:'Valid',value:'£840,000',file:'atlantis_contract_2024.pdf',notes:'Annual rolling contract. Includes room block allocation of 200 rooms peak season.'},
-  {id:'CTR-2023-0094',supplier:'Desert Tracks Tours',type:'Service Contract',dest:'Dubai',uploaded:'01 Mar 2023',expiry:'28 Feb 2024',status:'Expired',value:'£120,000',file:'deserttracks_2023.pdf',notes:'Expired. Renewal in progress.'},
-  {id:'INS-2024-0089',supplier:'Jordan Transfer Co',type:'Insurance Certificate',dest:'Jordan',uploaded:'10 Sep 2024',expiry:'09 Sep 2025',status:'Expiring',value:'—',file:'jordan_transfer_insurance.pdf',notes:'Public liability £5M. Renewal reminder sent 01 Aug 2025.'},
-  {id:'VAT-2024-0072',supplier:'Oman Luxury Resorts',type:'VAT Certificate',dest:'Oman',uploaded:'01 Jun 2024',expiry:'31 May 2026',status:'Valid',value:'—',file:'oman_vat_cert.pdf',notes:'VAT registered OM. Certificate valid 2 years.'},
-  {id:'INS-2024-0088',supplier:'Red Sea Divers',type:'Insurance Certificate',dest:'Egypt',uploaded:'01 Aug 2024',expiry:'31 Jul 2025',status:'Expiring',value:'—',file:'redseadivers_ins.pdf',notes:'Dive liability and marine insurance.'},
-  {id:'CTR-2022-0096',supplier:'Pyramids View Hotel',type:'Service Contract',dest:'Egypt',uploaded:'01 Jan 2022',expiry:'31 Dec 2023',status:'Expired',value:'£96,000',file:'pyramids_contract_2022.pdf',notes:'Expired. Supplier currently suspended pending review.'},
-  {id:'CTR-2024-0097',supplier:'Marrakech Riad Collection',type:'Service Contract',dest:'Morocco',uploaded:'01 Jul 2024',expiry:'30 Jun 2026',status:'Valid',value:'£220,000',file:'marrakech_riad_2024.pdf',notes:'Boutique riad portfolio, 8 properties.'},
-  {id:'ID-2024-0083',supplier:'Desert Tracks Tours',type:'Owner ID / Passport',dest:'Dubai',uploaded:'01 Mar 2024',expiry:'28 Feb 2029',status:'Valid',value:'—',file:'dt_owner_passport.pdf',notes:'Passport copy. UK national. Expires Feb 2029.'},
-  {id:'REG-2024-0081',supplier:'Atlantis The Palm',type:'Company Registration',dest:'Dubai',uploaded:'01 Jan 2024',expiry:'31 Dec 2026',status:'Valid',value:'—',file:'atlantis_reg.pdf',notes:'DED registered.'},
-  {id:'CTR-2024-0099',supplier:'Cappadocia Balloon Tours',type:'Service Contract',dest:'Turkey',uploaded:'01 Sep 2024',expiry:'31 Aug 2026',status:'Valid',value:'£180,000',file:'cappadocia_2024.pdf',notes:'Premium balloon tour packages.'},
+const suppliers=[
+  {id:'SUP-0081',name:'Atlantis The Palm',type:'Hotel',dest:'Dubai',region:'Gulf',tier:1,rating:4.8,status:'Active',tax:'AE-VAT-100384721',regNo:'DED-2018-88231',contract:'Dec 2025',contractStart:'Jan 2024',outstanding:0,commission:18,currency:'GBP',payTerms:'Net 30',contact:'James Al Rashid',email:'james@atlantis.com',phone:'+971 4 426 0000',contactRole:'Director of Revenue',owner:'Sheikh Mohammed Al Maktoum',ownerPassport:'UAE-P-8821341',ownerNationality:'UAE',ownerDOB:'12 Mar 1975',ownerEmail:'chairman@kerzner.com',ownerPhone:'+971 50 100 0001',ownerAddress:'Palm Jumeirah, Dubai, UAE',director2:'Helen Murray',director2Role:'CEO',director2Passport:'GBR-P-9921441',director2Nationality:'British',bankName:'Emirates NBD',bankAccount:'1234567890',bankSort:'EBILAEAD',bankIBAN:'AE070331234567890123456',bankSwift:'EBILAEAD',bankCurrency:'GBP',bankBeneficiary:'Kerzner International Ltd',bankBranch:'DIFC Branch, Dubai',ornManager:'Ajay Kawa',ornManagerId:'T01',ornContractOwner:'Layla Hassan',ornContractOwnerId:'T06',ornRegionalLead:'Omar Al Farsi',ornRegionalLeadId:'T07',complianceScore:94,insuranceExpiry:'Dec 2025',vatExpiry:'Dec 2026',notes:'Premier partner. VIP relationship. Annual review due Q1.'},
+  {id:'SUP-0082',name:'Burj Al Arab Jumeirah',type:'Hotel',dest:'Dubai',region:'Gulf',tier:1,rating:4.9,status:'Active',tax:'AE-VAT-100284622',regNo:'DED-2016-44112',contract:'Nov 2025',contractStart:'Nov 2022',outstanding:0,commission:20,currency:'GBP',payTerms:'Net 30',contact:'Sara Khalid',email:'sara@burjalarab.com',phone:'+971 4 301 7777',contactRole:'GM',owner:'Jumeirah Group LLC',ownerPassport:'AE-CORP-448812',ownerNationality:'UAE Corp',ownerDOB:'—',ownerEmail:'legal@jumeirah.com',ownerPhone:'+971 4 366 6000',ownerAddress:'PO Box 11416, Dubai, UAE',director2:'Jose Silva',director2Role:'CFO',director2Passport:'PRT-P-7712344',director2Nationality:'Portuguese',bankName:'HSBC Middle East',bankAccount:'9876543210',bankSort:'BBMEAEAD',bankIBAN:'AE060330987654321098765',bankSwift:'BBMEAEAD',bankCurrency:'GBP',bankBeneficiary:'Jumeirah International LLC',bankBranch:'Dubai Main Branch',ornManager:'Ajay Kawa',ornManagerId:'T01',ornContractOwner:'Layla Hassan',ornContractOwnerId:'T06',ornRegionalLead:'Omar Al Farsi',ornRegionalLeadId:'T07',complianceScore:98,insuranceExpiry:'Mar 2026',vatExpiry:'Dec 2026',notes:'Flagship Dubai property. Handle all correspondence at GM level.'},
+  {id:'SUP-0083',name:'Desert Tracks Tours',type:'Tour',dest:'Dubai',region:'Gulf',tier:2,rating:4.5,status:'Active',tax:'AE-VAT-100512388',regNo:'DED-2019-22788',contract:'Mar 2026',contractStart:'Mar 2023',outstanding:0,commission:15,currency:'GBP',payTerms:'Net 15',contact:'Ahmed Hassan',email:'ahmed@deserttracks.ae',phone:'+971 50 222 3344',contactRole:'Operations Manager',owner:'Ahmed Hassan',ownerPassport:'UAE-P-6641289',ownerNationality:'UAE',ownerDOB:'05 Jul 1982',ownerEmail:'ahmed.hassan.private@gmail.com',ownerPhone:'+971 55 222 3344',ownerAddress:'Al Barsha, Dubai, UAE',director2:'Fatima Hassan',director2Role:'Finance Director',director2Passport:'UAE-P-6641290',director2Nationality:'UAE',bankName:'Abu Dhabi Islamic Bank',bankAccount:'5544332211',bankSort:'ADIBAEAA',bankIBAN:'AE280030005544332211000',bankSwift:'ADIBAEAA',bankCurrency:'GBP',bankBeneficiary:'Desert Tracks Tours LLC',bankBranch:'Al Barsha Branch',ornManager:'Priya Sharma',ornManagerId:'T02',ornContractOwner:'Layla Hassan',ornContractOwnerId:'T06',ornRegionalLead:'Omar Al Farsi',ornRegionalLeadId:'T07',complianceScore:78,insuranceExpiry:'Aug 2025',vatExpiry:'Dec 2025',notes:'Key tour partner Dubai. Insurance renewal overdue.'},
+  {id:'SUP-0084',name:'Nile Tours Egypt',type:'Tour',dest:'Egypt',region:'Africa',tier:2,rating:4.2,status:'Pending',tax:'EG-TAX-302847',regNo:'CAI-2021-99821',contract:'Awaiting',contractStart:'—',outstanding:0,commission:12,currency:'GBP',payTerms:'Net 30',contact:'Mona Farouk',email:'mona@niletours.eg',phone:'+20 2 2345 6789',contactRole:'CEO',owner:'Karim Farouk',ownerPassport:'EGY-P-3321456',ownerNationality:'Egyptian',ownerDOB:'18 Nov 1979',ownerEmail:'karim.farouk@niletours.eg',ownerPhone:'+20 10 2345 6789',ownerAddress:'Zamalek, Cairo, Egypt',director2:'Mona Farouk',director2Role:'CEO',director2Passport:'EGY-P-3321457',director2Nationality:'Egyptian',bankName:'Banque Misr',bankAccount:'',bankSort:'',bankIBAN:'',bankSwift:'BMISEGCX',bankCurrency:'GBP',bankBeneficiary:'Nile Tours Egypt SAE',bankBranch:'Zamalek Branch — Pending',ornManager:'Ravi Patel',ornManagerId:'T03',ornContractOwner:'Layla Hassan',ornContractOwnerId:'T06',ornRegionalLead:'Ravi Patel',ornRegionalLeadId:'T03',complianceScore:35,insuranceExpiry:'Pending',vatExpiry:'Pending',notes:'Onboarding in progress. Bank not yet verified.'},
+  {id:'SUP-0085',name:'Jordan Transfer Co',type:'Transport',dest:'Jordan',region:'Middle East',tier:2,rating:4.1,status:'Active',tax:'JO-TAX-884421',regNo:'AMM-2017-55512',contract:'Sep 2025',contractStart:'Sep 2022',outstanding:6800,commission:12,currency:'GBP',payTerms:'Net 30',contact:'Khalid Nassar',email:'khalid@jordantransfer.jo',phone:'+962 6 567 8901',contactRole:'Managing Director',owner:'Khalid Nassar',ownerPassport:'JOR-P-4412876',ownerNationality:'Jordanian',ownerDOB:'22 Feb 1974',ownerEmail:'khalid.nassar.private@outlook.com',ownerPhone:'+962 79 567 8901',ownerAddress:'Abdali, Amman, Jordan',director2:'Rania Nassar',director2Role:'Finance Director',director2Passport:'JOR-P-4412877',director2Nationality:'Jordanian',bankName:'Arab Bank Jordan',bankAccount:'JO-ARB-778812345',bankSort:'ARABJOAX',bankIBAN:'JO94ARAB0200000001234567891234',bankSwift:'ARABJOAX',bankCurrency:'GBP',bankBeneficiary:'Jordan Transfer Company LLC',bankBranch:'Abdali Branch, Amman',ornManager:'Ravi Patel',ornManagerId:'T03',ornContractOwner:'Layla Hassan',ornContractOwnerId:'T06',ornRegionalLead:'Ravi Patel',ornRegionalLeadId:'T03',complianceScore:62,insuranceExpiry:'Sep 2025',vatExpiry:'Sep 2026',notes:'Outstanding £6,800. Contract expires Sep 2025. Renewal required.'},
+  {id:'SUP-0086',name:'Oman Luxury Resorts',type:'Hotel',dest:'Oman',region:'Gulf',tier:1,rating:4.6,status:'Active',tax:'OM-VAT-729341',regNo:'MCT-2015-11234',contract:'Jun 2026',contractStart:'Jun 2023',outstanding:0,commission:16,currency:'GBP',payTerms:'Net 30',contact:'Fatima Al Balushi',email:'fatima@omanluxury.om',phone:'+968 2 456 7890',contactRole:'Revenue Director',owner:'Sultan Al Busaidi',ownerPassport:'OMN-P-9921334',ownerNationality:'Omani',ownerDOB:'14 Sep 1968',ownerEmail:'sultan.albusaidi@omanluxury.om',ownerPhone:'+968 91 456 7890',ownerAddress:'Qurum, Muscat, Oman',director2:'Fatima Al Balushi',director2Role:'Revenue Director',director2Passport:'OMN-P-8812345',director2Nationality:'Omani',bankName:'Bank Muscat',bankAccount:'OM-BM-5512348901',bankSort:'BMUSOMRX',bankIBAN:'OM810080000055123489010',bankSwift:'BMUSOMRX',bankCurrency:'GBP',bankBeneficiary:'Oman Luxury Resorts SAOG',bankBranch:'Qurum Branch, Muscat',ornManager:'Omar Al Farsi',ornManagerId:'T07',ornContractOwner:'Layla Hassan',ornContractOwnerId:'T06',ornRegionalLead:'Omar Al Farsi',ornRegionalLeadId:'T07',complianceScore:91,insuranceExpiry:'Jun 2026',vatExpiry:'Jun 2027',notes:'Strong long-term partner. Oman market leader.'},
 ];
 
-const payments = [
-  {id:'INV-2026-0281',supplier:'Atlantis The Palm',dest:'Dubai',desc:'April accommodation services',amount:42000,due:'30 Apr 2026',status:'Pending Approval',currency:'GBP'},
-  {id:'INV-2026-0279',supplier:'Desert Tracks Tours',dest:'Dubai',desc:'April tour operations',amount:8500,due:'25 Apr 2026',status:'Approved',currency:'GBP'},
-  {id:'INV-2026-0265',supplier:'Jordan Transfer Co',dest:'Jordan',desc:'March transfers – overdue',amount:5200,due:'31 Mar 2026',status:'Overdue',currency:'GBP'},
-  {id:'INV-2026-0280',supplier:'Oman Luxury Resorts',dest:'Oman',desc:'April accommodation',amount:28000,due:'30 Apr 2026',status:'Paid',currency:'GBP'},
-  {id:'INV-2026-0274',supplier:'Abu Dhabi Experiences',dest:'Abu Dhabi',desc:'April activity packages',amount:6800,due:'28 Apr 2026',status:'Approved',currency:'GBP'},
-  {id:'INV-2026-0260',supplier:'Pyramids View Hotel',dest:'Egypt',desc:'February accommodation – overdue',amount:9200,due:'28 Feb 2026',status:'Overdue',currency:'GBP'},
-  {id:'INV-2026-0278',supplier:'Marrakech Riad Collection',dest:'Morocco',desc:'April riad bookings',amount:18400,due:'30 Apr 2026',status:'Paid',currency:'GBP'},
-  {id:'INV-2026-0282',supplier:'Cappadocia Balloon Tours',dest:'Turkey',desc:'March balloon tours',amount:14200,due:'15 Apr 2026',status:'Paid',currency:'GBP'},
+const contracts=[
+  {id:'CTR-2024-0081',supplier:'Atlantis The Palm',type:'Service Contract',dest:'Dubai',uploaded:'15 Jan 2024',start:'01 Jan 2024',expiry:'31 Dec 2025',status:'Valid',value:'£840,000',annualValue:'£420,000',file:'atlantis_contract_2024.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Ajay Kawa',ornManagerId:'T01',renewalNotice:'90 days',autoRenew:'No',governingLaw:'English Law',exclusivity:'Non-exclusive',reviewDate:'01 Oct 2025',notes:'Annual rolling contract. Room block 200 rooms peak season.'},
+  {id:'CTR-2023-0083',supplier:'Desert Tracks Tours',type:'Service Contract',dest:'Dubai',uploaded:'01 Mar 2023',start:'01 Mar 2023',expiry:'28 Feb 2024',status:'Expired',value:'£120,000',annualValue:'£120,000',file:'deserttracks_2023.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Priya Sharma',ornManagerId:'T02',renewalNotice:'60 days',autoRenew:'No',governingLaw:'English Law',exclusivity:'Non-exclusive',reviewDate:'Overdue',notes:'Expired. Renewal in progress.'},
+  {id:'INS-2024-0085',supplier:'Jordan Transfer Co',type:'Insurance Certificate',dest:'Jordan',uploaded:'10 Sep 2024',start:'10 Sep 2024',expiry:'09 Sep 2025',status:'Expiring',value:'—',annualValue:'—',file:'jordan_transfer_insurance.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Ravi Patel',ornManagerId:'T03',renewalNotice:'30 days',autoRenew:'N/A',governingLaw:'Jordanian Law',exclusivity:'N/A',reviewDate:'10 Aug 2025',notes:'Public liability £5M. Renewal reminder sent.'},
+  {id:'CTR-2023-0086',supplier:'Oman Luxury Resorts',type:'Service Contract',dest:'Oman',uploaded:'01 Jun 2023',start:'01 Jun 2023',expiry:'31 May 2026',status:'Valid',value:'£580,000',annualValue:'£193,000',file:'oman_luxury_2023.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Omar Al Farsi',ornManagerId:'T07',renewalNotice:'90 days',autoRenew:'Yes',governingLaw:'English Law',exclusivity:'Preferred',reviewDate:'01 Mar 2026',notes:'3-year contract. Preferred supplier status.'},
+  {id:'ID-2024-0083',supplier:'Desert Tracks Tours',type:'Owner ID / Passport',dest:'Dubai',uploaded:'01 Mar 2024',start:'01 Mar 2024',expiry:'28 Feb 2029',status:'Valid',value:'—',annualValue:'—',file:'dt_owner_passport.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Priya Sharma',ornManagerId:'T02',renewalNotice:'N/A',autoRenew:'N/A',governingLaw:'N/A',exclusivity:'N/A',reviewDate:'N/A',notes:'Passport copy on file. UK national.'},
 ];
 
-const auditLog = [
-  {ts:'26 Apr 2026 14:32',user:'Ajay Kawa',action:'Contract Uploaded',supplier:'Atlantis The Palm',detail:'Uploaded new service contract CTR-2024-0081 (PDF, 2.4MB)',type:'contract',color:'#1a6faf'},
-  {ts:'26 Apr 2026 11:18',user:'Priya Sharma',action:'Payment Approved',supplier:'Desert Tracks Tours',detail:'Invoice INV-2026-0279 approved for payment. Amount: £8,500',type:'payment',color:'#1a7a5a'},
-  {ts:'25 Apr 2026 16:45',user:'Ajay Kawa',action:'Supplier Status Changed',supplier:'Pyramids View Hotel',detail:'Status changed from Active → Suspended. Reason: Outstanding balance £14,200 unpaid.',type:'status',color:'#c0392b'},
-  {ts:'25 Apr 2026 09:22',user:'Ravi Patel',action:'New Supplier Added',supplier:'Sahara Adventure Tours',detail:'New supplier application submitted. Onboarding pipeline stage 1.',type:'new',color:'#8e44ad'},
-  {ts:'24 Apr 2026 15:10',user:'Priya Sharma',action:'Rate Updated',supplier:'Oman Luxury Resorts',detail:'High season rate updated: £320/night → £345/night. Effective 01 Jun 2026.',type:'rate',color:'#d68910'},
-  {ts:'24 Apr 2026 11:55',user:'Ajay Kawa',action:'Contract Renewed',supplier:'Marrakech Riad Collection',detail:'Contract CTR-2024-0097 renewed for 2 years. New expiry: 30 Jun 2026.',type:'contract',color:'#1a6faf'},
-  {ts:'23 Apr 2026 14:00',user:'Ravi Patel',action:'Payment Processed',supplier:'Oman Luxury Resorts',detail:'Invoice INV-2026-0280 paid. £28,000 transferred via BACS. Ref: ORN-PAY-20260423.',type:'payment',color:'#1a7a5a'},
-  {ts:'22 Apr 2026 10:30',user:'Ajay Kawa',action:'Tier Changed',supplier:'Desert Tracks Tours',detail:'Tier changed from Tier 3 → Tier 2. Commission updated 10% → 15%.',type:'tier',color:'#856404'},
-  {ts:'21 Apr 2026 16:20',user:'Priya Sharma',action:'Document Expiry Alert',supplier:'Jordan Transfer Co',detail:'Insurance certificate INS-2024-0089 expiring in 30 days (09 Sep 2025). Reminder sent.',type:'alert',color:'#c0392b'},
-  {ts:'20 Apr 2026 09:15',user:'System',action:'Auto-Reminder Sent',supplier:'Red Sea Divers',detail:'Automated contract renewal reminder sent to tarek@redseadivers.eg',type:'system',color:'#718096'},
-  {ts:'19 Apr 2026 13:40',user:'Ajay Kawa',action:'Supplier Edited',supplier:'Atlantis The Palm',detail:'Contact details updated. New contact: James Al Rashid (+971 4 426 0000)',type:'edit',color:'#1a6faf'},
-  {ts:'18 Apr 2026 11:05',user:'Ravi Patel',action:'Notes Added',supplier:'Jordan Transfer Co',detail:'Note: Client requested preferred vehicle upgrade for airport transfers from May.',type:'note',color:'#718096'},
+const payments=[
+  {id:'INV-2026-0281',supplier:'Atlantis The Palm',dest:'Dubai',desc:'April accommodation services',amount:42000,due:'30 Apr 2026',status:'Pending Approval',currency:'GBP',approver:'Ajay Kawa',poRef:'PO-2026-0281'},
+  {id:'INV-2026-0279',supplier:'Desert Tracks Tours',dest:'Dubai',desc:'April tour operations',amount:8500,due:'25 Apr 2026',status:'Approved',currency:'GBP',approver:'Priya Sharma',poRef:'PO-2026-0279'},
+  {id:'INV-2026-0265',supplier:'Jordan Transfer Co',dest:'Jordan',desc:'March transfers – overdue',amount:5200,due:'31 Mar 2026',status:'Overdue',currency:'GBP',approver:'—',poRef:'PO-2026-0265'},
+  {id:'INV-2026-0280',supplier:'Oman Luxury Resorts',dest:'Oman',desc:'April accommodation',amount:28000,due:'30 Apr 2026',status:'Paid',currency:'GBP',approver:'Ajay Kawa',poRef:'PO-2026-0280'},
 ];
 
-const rates = [
-  {supplier:'Atlantis The Palm',dest:'Dubai',type:'Hotel',season:'Peak',period:'Jun–Aug 2026',net:'£285',gross:'£336',commission:'18%',currency:'GBP',status:'Active',lastUpdated:'15 Mar 2026'},
-  {supplier:'Atlantis The Palm',dest:'Dubai',type:'Hotel',season:'High',period:'Dec 2025–Jan 2026',net:'£320',gross:'£378',commission:'18%',currency:'GBP',status:'Active',lastUpdated:'15 Mar 2026'},
-  {supplier:'Atlantis The Palm',dest:'Dubai',type:'Hotel',season:'Low',period:'Sep–Nov 2025',net:'£195',gross:'£230',commission:'18%',currency:'GBP',status:'Active',lastUpdated:'15 Mar 2026'},
-  {supplier:'Oman Luxury Resorts',dest:'Oman',type:'Hotel',season:'Peak',period:'Nov–Feb 2026',net:'£290',gross:'£336',commission:'16%',currency:'GBP',status:'Active',lastUpdated:'10 Mar 2026'},
-  {supplier:'Desert Tracks Tours',dest:'Dubai',type:'Tour',season:'All Year',period:'Jan–Dec 2026',net:'£85',gross:'£98',commission:'15%',currency:'GBP',status:'Active',lastUpdated:'01 Apr 2026'},
-  {supplier:'Jordan Transfer Co',dest:'Jordan',type:'Transport',season:'All Year',period:'Jan–Dec 2026',net:'£45',gross:'£52',commission:'12%',currency:'GBP',status:'Active',lastUpdated:'20 Mar 2026'},
-  {supplier:'Cappadocia Balloon Tours',dest:'Turkey',type:'Activity',season:'High',period:'Apr–Oct 2026',net:'£180',gross:'£211',commission:'17%',currency:'GBP',status:'Active',lastUpdated:'05 Apr 2026'},
-  {supplier:'Marrakech Riad Collection',dest:'Morocco',type:'Hotel',season:'Peak',period:'Mar–May 2026',net:'£145',gross:'£168',commission:'16%',currency:'GBP',status:'Active',lastUpdated:'12 Mar 2026'},
+const rates=[
+  {supplier:'Atlantis The Palm',dest:'Dubai',type:'Hotel',room:'Deluxe Room',season:'Peak',period:'Jun–Aug 2026',net:'£285',gross:'£336',commission:'18%',currency:'GBP',status:'Active',lastUpdated:'15 Mar 2026',updatedBy:'Priya Sharma'},
+  {supplier:'Atlantis The Palm',dest:'Dubai',type:'Hotel',room:'Ocean Suite',season:'High',period:'Dec 2025–Jan 2026',net:'£680',gross:'£802',commission:'18%',currency:'GBP',status:'Active',lastUpdated:'15 Mar 2026',updatedBy:'Priya Sharma'},
+  {supplier:'Oman Luxury Resorts',dest:'Oman',type:'Hotel',room:'Beach Villa',season:'Peak',period:'Nov–Feb 2026',net:'£290',gross:'£336',commission:'16%',currency:'GBP',status:'Active',lastUpdated:'10 Mar 2026',updatedBy:'Omar Al Farsi'},
+  {supplier:'Desert Tracks Tours',dest:'Dubai',type:'Tour',room:'Desert Safari',season:'All Year',period:'Jan–Dec 2026',net:'£85',gross:'£98',commission:'15%',currency:'GBP',status:'Active',lastUpdated:'01 Apr 2026',updatedBy:'Priya Sharma'},
 ];
 
-// ── RENDER HELPERS ───────────────────────────────────────────────
-const sc = s => s==='Active'||s==='Valid'||s==='Paid'?'p-green':s==='Pending'||s==='Expiring'||s==='Pending Approval'?'p-orange':s==='Suspended'||s==='Expired'||s==='Overdue'?'p-red':s==='Approved'?'p-blue':'p-gray';
-const fmtGbp = n => n > 0 ? '£'+n.toLocaleString() : '£0';
+const auditLog=[
+  {ts:'26 Apr 2026 14:32',user:'Ajay Kawa',action:'Contract Uploaded',supplier:'Atlantis The Palm',detail:'Uploaded new service contract CTR-2024-0081 (PDF, 2.4MB)',color:'#1a6faf'},
+  {ts:'26 Apr 2026 11:18',user:'Priya Sharma',action:'Payment Approved',supplier:'Desert Tracks Tours',detail:'Invoice INV-2026-0279 approved. Amount: £8,500',color:'#1a7a5a'},
+  {ts:'25 Apr 2026 16:45',user:'Ajay Kawa',action:'Supplier Suspended',supplier:'Oman Luxury Resorts',detail:'Status Active → Suspended. Outstanding £14,200.',color:'#c0392b'},
+  {ts:'25 Apr 2026 09:22',user:'Ravi Patel',action:'New Supplier Added',supplier:'Nile Tours Egypt',detail:'New application submitted. Onboarding stage 1.',color:'#8e44ad'},
+  {ts:'24 Apr 2026 15:10',user:'Priya Sharma',action:'Rate Updated',supplier:'Oman Luxury Resorts',detail:'High season rate updated: £320/night → £345/night effective 01 Jun 2026.',color:'#d68910'},
+  {ts:'24 Apr 2026 11:55',user:'Layla Hassan',action:'Contract Owner Assigned',supplier:'Jordan Transfer Co',detail:'Contract ownership assigned to Layla Hassan. ORN Manager: Ravi Patel.',color:'#1a6faf'},
+  {ts:'23 Apr 2026 14:00',user:'Ravi Patel',action:'Payment Processed',supplier:'Oman Luxury Resorts',detail:'Invoice INV-2026-0280 paid. £28,000 via BACS. Ref: ORN-PAY-20260423.',color:'#1a7a5a'},
+  {ts:'22 Apr 2026 10:30',user:'Ajay Kawa',action:'Tier Changed',supplier:'Desert Tracks Tours',detail:'Tier 3 → Tier 2. Commission 10% → 15%. Approved: James Thornton.',color:'#856404'},
+  {ts:'19 Apr 2026 13:40',user:'Nina Kowalski',action:'Bank Details Verified',supplier:'Atlantis The Palm',detail:'Bank IBAN verified by Finance. IBAN: AE070331234567890123456.',color:'#1a6faf'},
+  {ts:'18 Apr 2026 11:05',user:'Omar Al Farsi',action:'Owner Details Added',supplier:'Oman Luxury Resorts',detail:'Owner passport uploaded. KYC completed by compliance team.',color:'#8e44ad'},
+  {ts:'17 Apr 2026 09:00',user:'System',action:'Auto-Reminder: Expiry',supplier:'Jordan Transfer Co',detail:'Insurance expiry alert sent to ravi.patel@orn.com and layla.hassan@orn.com',color:'#c0392b'},
+];
 
-function toolbar(...items){ return `<div class="toolbar">${items.join('')}</div>`; }
-function ti(ph,id='',w=160,extra=''){ return `<input class="ti" type="text" placeholder="${ph}" id="${id}" style="width:${w}px" ${extra}>`; }
-function sel(opts,id='',extra=''){
-  return `<select class="ti" id="${id}" ${extra}>${opts.map(o=>typeof o==='string'?`<option>${o}</option>`:`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`;
-}
-function btn(label,cls='btn-navy',onclick='',extra=''){return `<button class="btn ${cls}" onclick="${onclick}" ${extra}>${label}</button>`;}
-function thdr(...cols){ return `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>`; }
-function frow(...cols){ return `<tr class="frow">${cols.map(c=>`<th>${c?`<input placeholder="">`:'&nbsp;'}</th>`).join('')}</tr>`; }
-function pgfoot(show,total,pages=3){
-  return `<div class="tbl-foot"><span>Showing ${show} of ${total}</span><div class="pgn">${Array.from({length:pages},(_,i)=>`<button class="${i===0?'active':''}" onclick="toast('Page ${i+1}')">${i+1}</button>`).join('')}${pages>3?'<span>...</span><button onclick="toast(\'Last page\')">'+Math.ceil(total/20)+'</button>':''}</div></div>`;
-}
+// ─── HELPERS ───────────────────────────────────────────────────────
+const sc=s=>s==='Active'||s==='Valid'||s==='Paid'?'p-green':s==='Pending'||s==='Expiring'||s==='Pending Approval'?'p-orange':s==='Suspended'||s==='Expired'||s==='Overdue'?'p-red':s==='Approved'?'p-blue':'p-gray';
+const fmtGbp=n=>n>0?'£'+n.toLocaleString():'£0';
+const btn=(l,c='btn-navy',oc='',ex='')=>`<button class="btn ${c}" onclick="${oc}" ${ex}>${l}</button>`;
+const ti=(ph,id='',w=160,ex='')=>`<input class="ti" type="text" placeholder="${ph}" id="${id}" style="width:${w}px" ${ex}>`;
+const sel=(opts,id='',ex='')=>`<select class="ti" id="${id}" ${ex}>${opts.map(o=>typeof o==='string'?`<option>${o}</option>`:`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`;
+const thdr=(...c)=>`<tr>${c.map(x=>`<th>${x}</th>`).join('')}</tr>`;
+const frow=(...c)=>`<tr class="frow">${c.map(x=>`<th>${x?'<input placeholder="">':'&nbsp;'}</th>`).join('')}</tr>`;
+const pgfoot=(show,total,pages=3)=>`<div class="tbl-foot"><span>Showing ${show} of ${total}</span><div class="pgn">${Array.from({length:Math.min(pages,3)},(_,i)=>`<button class="${i===0?'active':''}" onclick="toast('Page ${i+1}')">${i+1}</button>`).join('')}${total>60?'<span style="padding:0 4px">...</span><button onclick="toast(\'Last\')">'+Math.ceil(total/20)+'</button>':''}</div></div>`;
+const ornTeamSel=()=>ornTeam.map(t=>`<option value="${t.id}">${t.name} — ${t.role}</option>`).join('');
+const compliancePill=score=>score>=85?`<span class="pill p-green">${score}%</span>`:score>=60?`<span class="pill p-orange">${score}%</span>`:`<span class="pill p-red">${score}%</span>`;
+const esc=obj=>JSON.stringify(obj).replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+window.esc=esc;
 
-// ── PAGE: SUPPLIER DASHBOARD ─────────────────────────────────────
+// ─── PAGE: DASHBOARD ───────────────────────────────────────────────
 function pg_sup_dash(){
-  const destData = [
-    ['🇦🇪 Dubai',38,18,12,6,2,'£842K','£48K',0,14,5,22],
-    ['🇦🇪 Abu Dhabi',24,10,8,4,1,'£521K','£31K',1200,8,3,14],
-    ['🇴🇲 Oman',18,8,5,3,0,'£398K','£28K',0,6,2,9],
-    ['🇪🇬 Egypt',14,5,4,2,3,'£287K','£14K',14200,4,1,7],
-    ['🇯🇴 Jordan',10,3,3,2,0,'£198K','£11K',6800,3,1,5],
-    ['🇲🇦 Morocco',8,3,2,1,1,'£164K','£8K',0,2,0,3],
-    ['🇹🇷 Turkey',6,2,1,2,2,'£142K','£5K',0,1,0,2],
-    ['🇲🇻 Maldives',4,2,1,0,1,'£98K','£3K',0,2,0,1],
-  ];
-  return `
-    <div class="page-title">Supplier Dashboard</div>
-    ${toolbar(
-      `<input type="date" class="ti" value="2026-04-23">`,
-      `<span style="font-size:12px;color:var(--text3)">–</span>`,
-      `<input type="date" class="ti" value="2026-04-26">`,
-      sel(['All Supplier Types','Hotels','Tours & Activities','Transport','Restaurants','Experiences'],''),
-      sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco','Turkey','Maldives'],''),
-      sel(['All Tiers','Tier 1 – Premium','Tier 2 – Standard','Tier 3 – Budget'],''),
-      sel(['All Status','Active','Pending','Suspended'],''),
-      btn('Show','btn-navy','toast(\'Filters applied\')'),
-      btn('&#8595; Export','btn-white','toast(\'Exporting...\')'),
-      `<div class="toolbar-r">${btn('+ New Supplier','btn-navy','setSecondary(2)')}</div>`
-    )}
-    <div class="kpi-strip">
-      ${[['Total Suppliers','142',''],['Active','118','blue'],['Pending Onboard','7','orange'],['Suspended','2','red'],['Contracts Expiring','3','orange'],['Payments MTD','£248K','green'],['Overdue','£12K','red'],['YTD Total','£2.1M',''],['Destinations','18','blue']].map(([l,v,c])=>`<div class="kpi-cell"><div class="kpi-lbl">${l}</div><div class="kpi-val ${c}">${v}</div></div>`).join('')}
-    </div>
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','Destination ↕','Active Suppliers ↕','Hotels ↕','Tours & Act. ↕','Transport ↕','Pending ↕','Contract Value ↕','Payments MTD ↕','Outstanding ↕','Tier 1 ↕','Today ↕','This Week ↕')}
-        ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1)}
-        <tbody>${destData.map((r,i)=>`<tr>
-          <td class="rn">${i+1}</td>
-          <td class="lnk">${r[0]}</td>
-          <td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td>
-          <td>${r[5]>0?`<span class="badge-teal">${r[5]}</span>`:'0'}</td>
-          <td>${r[6]}</td><td><b>${r[7]}</b></td>
-          <td style="color:${r[8]>0?'var(--red)':'inherit'};font-weight:${r[8]>0?700:400}">${r[8]>0?'£'+r[8].toLocaleString():'£0'}</td>
-          <td class="lnk" style="color:var(--teal)">${r[9]}</td>
-          <td class="lnk">${r[10]}</td><td class="lnk">${r[11]}</td>
-        </tr>`).join('')}</tbody>
-      </table>
-      ${pgfoot('1–8',18,2)}
-    </div>`;
+  const dr=[['🇦🇪 Dubai',38,18,12,6,2,'£842K','£48K',0,14,94,'Omar Al Farsi'],['🇦🇪 Abu Dhabi',24,10,8,4,1,'£521K','£31K',1200,8,88,'Omar Al Farsi'],['🇴🇲 Oman',18,8,5,3,0,'£398K','£28K',0,6,91,'Omar Al Farsi'],['🇪🇬 Egypt',14,5,4,2,3,'£287K','£14K',14200,4,58,'Ravi Patel'],['🇯🇴 Jordan',10,3,3,2,0,'£198K','£11K',6800,3,72,'Ravi Patel'],['🇲🇦 Morocco',8,3,2,1,1,'£164K','£8K',0,2,85,'Sarah Mitchell'],['🇹🇷 Turkey',6,2,1,2,2,'£142K','£5K',0,1,79,'Sarah Mitchell'],['🇲🇻 Maldives',4,2,1,0,1,'£98K','£3K',0,2,67,'Priya Sharma']];
+  return `<div class="page-title">Supplier Dashboard</div>
+    <div class="toolbar"><input type="date" class="ti" value="2026-04-23"><span style="font-size:12px;color:var(--text3)">–</span><input type="date" class="ti" value="2026-04-26">
+    ${sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco','Turkey','Maldives'])}
+    ${sel(['All Types','Hotels','Tours','Transport','Activities','Restaurants','Cruises'])}
+    ${sel(['All Tiers','Tier 1 – Premium','Tier 2 – Standard','Tier 3 – Budget'])}
+    ${sel(['All Status','Active','Pending','Suspended'])}
+    ${sel(['All ORN Managers',...ornTeam.map(t=>t.name)])}
+    ${btn('Show','btn-navy',"toast('Filters applied')")} ${btn('&#8595; Export','btn-white',"toast('Exporting...')")}
+    <div class="toolbar-r">${btn('+ New Supplier','btn-navy','openNewSupModal()')}</div></div>
+    <div class="kpi-strip">${[['Total Suppliers','142',''],['Active','118','blue'],['Pending Onboard','7','orange'],['Suspended','2','red'],['Contracts Expiring','3','orange'],['KYC Incomplete','12','red'],['Payments MTD','£248K','green'],['Overdue','£12K','red'],['YTD Total','£2.1M',''],['Avg Compliance','76%','orange'],['Destinations','18','blue'],['ORN Team','8','']].map(([l,v,c])=>`<div class="kpi-cell"><div class="kpi-lbl">${l}</div><div class="kpi-val ${c}">${v}</div></div>`).join('')}</div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','Destination ↕','Suppliers ↕','Hotels ↕','Tours ↕','Transport ↕','Pending ↕','Contract Value ↕','Payments MTD ↕','Outstanding ↕','Tier 1 ↕','Compliance ↕','ORN Lead ↕')}
+      ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1)}
+      <tbody>${dr.map((r,i)=>`<tr><td class="rn">${i+1}</td><td class="lnk">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]>0?`<span class="badge-teal">${r[5]}</span>`:'0'}</td><td>${r[6]}</td><td><b>${r[7]}</b></td><td style="color:${r[8]>0?'var(--red)':'inherit'};font-weight:${r[8]>0?700:400}">${r[8]>0?'£'+r[8].toLocaleString():'£0'}</td><td class="lnk" style="color:var(--teal)">${r[9]}</td><td>${compliancePill(r[10])}</td><td style="font-size:11.5px">${r[11]}</td></tr>`).join('')}</tbody>
+    </table>${pgfoot('1–8',18,2)}</div>`;
 }
 
-// ── PAGE: ALL SUPPLIERS ──────────────────────────────────────────
+// ─── PAGE: ALL SUPPLIERS ───────────────────────────────────────────
 function pg_sup_all(){
-  return `
-    <div class="page-title">All Suppliers</div>
-    ${toolbar(
-      ti('Search name or ID...','s-q',200,'oninput="supFilter()"'),
-      sel([['','All Destinations'],'Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco','Turkey','Maldives'],'s-dest','onchange="supFilter()"'),
-      sel([['','All Types'],'Hotel','Tour','Transport','Activity','Restaurant','Cruise'],'s-type','onchange="supFilter()"'),
-      sel([['','All Tiers'],['1','Tier 1'],['2','Tier 2'],['3','Tier 3']],'s-tier','onchange="supFilter()"'),
-      sel([['','All Status'],'Active','Pending','Suspended'],'s-status','onchange="supFilter()"'),
-      btn('Search','btn-navy','supFilter()'),
-      btn('Clear','btn-white','supClear()'),
-      `<div class="toolbar-r">${btn('&#8595; Export CSV','btn-white','toast(\'Exporting...\')')} ${btn('+ Add Supplier','btn-navy','openNewSupModal()')}</div>`
-    )}
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','✓','ID ↕','Supplier ↕','Type ↕','Destination ↕','Tier ↕','Rating ↕','Status ↕','TAX/VAT No. ↕','Reg. No. ↕','Contact ↕','Contract End ↕','Commission ↕','Outstanding ↕','Manage')}
-        ${frow(0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0)}
-        <tbody id="sup-tbody"></tbody>
-      </table>
-      <div id="sup-foot"></div>
-    </div>`;
+  return `<div class="page-title">All Suppliers</div>
+    <div class="toolbar">
+      ${ti('Search name, ID, owner...','s-q',210,'oninput="supFilter()"')}
+      ${sel([['','All Destinations'],'Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco','Turkey','Maldives'],'s-dest','onchange="supFilter()"')}
+      ${sel([['','All Types'],'Hotel','Tour','Transport','Activity','Restaurant','Cruise'],'s-type','onchange="supFilter()"')}
+      ${sel([['','All Tiers'],['1','Tier 1'],['2','Tier 2'],['3','Tier 3']],'s-tier','onchange="supFilter()"')}
+      ${sel([['','All Status'],'Active','Pending','Suspended'],'s-status','onchange="supFilter()"')}
+      ${sel([['','All ORN Managers'],...ornTeam.map(t=>[t.id,t.name])],'s-mgr','onchange="supFilter()"')}
+      ${btn('Search','btn-navy','supFilter()')} ${btn('Clear','btn-white','supClear()')}
+      <div class="toolbar-r">${btn('&#8595; Export CSV','btn-white',"toast('Exporting...')")} ${btn('+ Add Supplier','btn-navy','openNewSupModal()')}</div>
+    </div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','✓','ID ↕','Supplier ↕','Type ↕','Destination ↕','Tier ↕','Status ↕','ORN Manager ↕','Contract Owner ↕','Owner ↕','TAX/VAT ↕','Contract End ↕','Compliance ↕','Outstanding ↕','Manage')}
+      ${frow(0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0)}
+      <tbody id="sup-tbody"></tbody></table><div id="sup-foot"></div></div>`;
 }
 function renderSupTable(data){
-  const tbody=document.getElementById('sup-tbody');
-  if(!tbody)return;
-  tbody.innerHTML=data.map((s,i)=>`<tr>
-    <td class="rn">${i+1}</td>
-    <td><input type="checkbox"></td>
-    <td class="mono">${s.id}</td>
-    <td><a class="lnk" onclick='openSupModal(${JSON.stringify(s).replace(/'/g,"&#39;")})'>${s.name}</a></td>
-    <td>${s.type}</td><td>${s.dest}</td>
-    <td><span class="tbadge t${s.tier}">Tier ${s.tier}</span></td>
-    <td>&#11088; ${s.rating}</td>
+  const tb=document.getElementById('sup-tbody');if(!tb)return;
+  tb.innerHTML=data.map((s,i)=>`<tr><td class="rn">${i+1}</td><td><input type="checkbox"></td><td class="mono">${s.id}</td>
+    <td><a class="lnk" onclick='openSupModal(${esc(s)})'>${s.name}</a></td>
+    <td>${s.type}</td><td>${s.dest}</td><td><span class="tbadge t${s.tier}">Tier ${s.tier}</span></td>
     <td><span class="pill ${sc(s.status)}">${s.status}</span></td>
-    <td class="mono">${s.tax}</td>
-    <td class="mono">${s.regNo}</td>
-    <td>${s.contact}</td>
-    <td>${s.contract}</td>
-    <td>${s.commission}%</td>
+    <td style="font-size:11.5px">${s.ornManager}</td>
+    <td style="font-size:11.5px">${s.ornContractOwner}</td>
+    <td style="font-size:11.5px">${s.owner||'—'}</td>
+    <td class="mono">${s.tax}</td><td>${s.contract}</td>
+    <td>${compliancePill(s.complianceScore||0)}</td>
     <td style="color:${s.outstanding>0?'var(--red)':'inherit'};font-weight:${s.outstanding>0?700:400}">${fmtGbp(s.outstanding)}</td>
-    <td class="act">
-      <a onclick='openSupModal(${JSON.stringify(s).replace(/'/g,"&#39;")})'>View</a>
-      <a onclick='openEditSupModal(${JSON.stringify(s).replace(/'/g,"&#39;")})'>Edit</a>
-      <a onclick='openDocsModal("${s.name}")'>Docs</a>
-      <a onclick='openAuditModal("${s.name}")'>Audit</a>
-      <a class="red" onclick="toast('Confirm delete: ${s.name}?')">Delete</a>
-    </td>
+    <td class="act"><a onclick='openSupModal(${esc(s)})'>View</a><a onclick='openEditSupModal(${esc(s)})'>Edit</a><a onclick='openDocsModal("${s.name}")'>Docs</a><a onclick='openAuditModal("${s.name}")'>Audit</a><a class="red" onclick="if(confirm('Delete ${s.name}?'))toast('Deleted')">Del</a></td>
   </tr>`).join('');
-  const foot=document.getElementById('sup-foot');
-  if(foot)foot.innerHTML=pgfoot(`1–${data.length}`,suppliers.length,Math.ceil(suppliers.length/20));
+  const f=document.getElementById('sup-foot');if(f)f.innerHTML=pgfoot(`1–${data.length}`,suppliers.length,Math.ceil(suppliers.length/20));
 }
-function supFilter(){
-  const q=(document.getElementById('s-q')?.value||'').toLowerCase();
-  const dest=document.getElementById('s-dest')?.value||'';
-  const type=document.getElementById('s-type')?.value||'';
-  const tier=document.getElementById('s-tier')?.value||'';
-  const status=document.getElementById('s-status')?.value||'';
-  const filtered=suppliers.filter(s=>
-    (!q||s.name.toLowerCase().includes(q)||s.id.toLowerCase().includes(q))&&
-    (!dest||s.dest===dest)&&(!type||s.type===type)&&
-    (!tier||s.tier===+tier)&&(!status||s.status===status));
-  renderSupTable(filtered);
-}
-function supClear(){['s-q','s-dest','s-type','s-tier','s-status'].forEach(id=>{const el=document.getElementById(id);if(el)el.tagName==='SELECT'?el.selectedIndex=0:el.value='';});renderSupTable(suppliers);toast('Filters cleared');}
+function supFilter(){const q=(document.getElementById('s-q')?.value||'').toLowerCase();const dest=document.getElementById('s-dest')?.value||'';const type=document.getElementById('s-type')?.value||'';const tier=document.getElementById('s-tier')?.value||'';const status=document.getElementById('s-status')?.value||'';const mgr=document.getElementById('s-mgr')?.value||'';const filtered=suppliers.filter(s=>(!q||s.name.toLowerCase().includes(q)||s.id.toLowerCase().includes(q)||(s.owner||'').toLowerCase().includes(q))&&(!dest||s.dest===dest)&&(!type||s.type===type)&&(!tier||s.tier===+tier)&&(!status||s.status===status)&&(!mgr||s.ornManagerId===mgr));renderSupTable(filtered);}
+function supClear(){['s-q','s-dest','s-type','s-tier','s-status','s-mgr'].forEach(id=>{const el=document.getElementById(id);if(el)el.tagName==='SELECT'?el.selectedIndex=0:el.value='';});renderSupTable(suppliers);toast('Filters cleared');}
 window.supFilter=supFilter;window.supClear=supClear;
-
-// ── PAGE: ONBOARDING ─────────────────────────────────────────────
-function pg_sup_onboard(){
-  const stages=[
-    {label:'Application Submitted',cls:'s1',count:3,cards:[
-      {t:'Blue Waters Hotel Group',m:'Dubai · Hotel · 2 days ago',docs:[],pct:25,btn:'Review'},
-      {t:'Sahara Adventure Tours',m:'Morocco · Tour · 4 days ago',docs:[],pct:25,btn:'Review'},
-      {t:'Istanbul Express',m:'Turkey · Transport · 1 day ago',docs:[],pct:25,btn:'Review'},
-    ]},
-    {label:'Document Verification',cls:'s2',count:2,cards:[
-      {t:'Red Sea Divers',m:'Egypt · Activity',docs:[{l:'Company Reg',ok:true},{l:'TAX/VAT',ok:true},{l:'Insurance',ok:false}],pct:60,btn:'Chase Docs'},
-      {t:'Petra Tours',m:'Jordan · Tour',docs:[{l:'Company Reg',ok:true},{l:'TAX/VAT',ok:true},{l:'Insurance',ok:true},{l:'Contract',ok:false}],pct:75,btn:'Send Contract'},
-    ]},
-    {label:'Contract Signing',cls:'s3',count:1,cards:[
-      {t:'Maldives Sunset Cruises',m:'Maldives · Cruise',docs:[{l:'All docs verified',ok:true},{l:'Awaiting signature',ok:false}],pct:85,btn:'Resend Contract'},
-    ]},
-    {label:'Payment Setup',cls:'s4',count:1,cards:[
-      {t:'Arabian Nights Dining',m:'Dubai · Restaurant',docs:[{l:'Bank details pending',ok:false}],pct:92,btn:'Follow Up'},
-    ]},
-    {label:'Live on Platform',cls:'s5',count:118,cards:[
-      {t:'✓ 118 suppliers live',m:'All fully onboarded and active',docs:[],pct:100,btn:'View All'},
-    ]},
-  ];
-  return `
-    <div class="page-title">Supplier Onboarding</div>
-    <div class="toolbar">
-      <span style="font-size:12.5px;color:var(--text2);font-weight:600">Onboarding Pipeline — ${stages.reduce((a,s)=>a+s.count,0)} active applications</span>
-      <div class="toolbar-r">${btn('&#8595; Export','btn-white','toast(\'Exporting...\')')} ${btn('+ New Application','btn-navy','openNewSupModal()')}</div>
-    </div>
-    <div class="pipeline">${stages.map(s=>`
-      <div class="pipe-col">
-        <div class="pipe-hd ${s.cls}"><span class="pipe-ht">${s.label}</span><span class="pipe-cnt">${s.count}</span></div>
-        <div class="pipe-body">${s.cards.map(c=>`
-          <div class="pcard">
-            <div class="pcard-t">${c.t}</div>
-            <div class="pcard-m">${c.m}</div>
-            ${c.docs.length?`<div class="doc-row">${c.docs.map(d=>`<span class="dc ${d.ok?'ok':'miss'}">${d.ok?'✓':'✗'} ${d.l}</span>`).join('')}</div>`:''}
-            <div class="pbar"><div style="width:${c.pct}%"></div></div>
-            <div class="pcard-foot">${btn(c.btn,'btn-white btn-sm','toast(\'Opening...\')','')}</div>
-          </div>`).join('')}
-        </div>
-      </div>`).join('')}
-    </div>
-    <div id="new-sup-form-wrap" style="display:none">${supplierFormHTML()}</div>
-    ${btn('+ Start New Application Form','btn-navy','toggleNewSupForm()')}`;
-}
-function toggleNewSupForm(){const w=document.getElementById('new-sup-form-wrap');if(w){w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')w.scrollIntoView({behavior:'smooth'});}}
-window.toggleNewSupForm=toggleNewSupForm;
-
-// ── PAGE: CONTRACTS ──────────────────────────────────────────────
-function pg_sup_contracts(){
-  return `
-    <div class="page-title">Contracts &amp; Documents</div>
-    <div class="sum-cards">
-      <div class="sum-card green"><div class="sc-lbl">Active Contracts</div><div class="sc-val green">131</div></div>
-      <div class="sum-card orange"><div class="sc-lbl">Expiring (30 days)</div><div class="sc-val orange">3</div><div class="sc-sub">Renewal action required</div></div>
-      <div class="sum-card red"><div class="sc-lbl">Expired</div><div class="sc-val red">2</div><div class="sc-sub">Immediate action needed</div></div>
-      <div class="sum-card"><div class="sc-lbl">Total Documents</div><div class="sc-val">486</div></div>
-    </div>
-    ${toolbar(
-      ti('Search supplier or document...','',200),
-      sel(['All Document Types','Service Contract','Insurance Certificate','VAT Certificate','Company Registration','Owner ID / Passport','Other'],''),
-      sel(['All Status','Valid','Expiring','Expired'],''),
-      sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco'],''),
-      btn('Search','btn-navy','toast(\'Searching...\')'),
-      `<div class="toolbar-r">${btn('+ Upload Document','btn-navy','openUploadModal()')} ${btn('+ New Contract','btn-white','openNewContractModal()')}</div>`
-    )}
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','Supplier ↕','Document Type ↕','Document No. ↕','Destination ↕','Uploaded ↕','Expiry ↕','Contract Value ↕','Status ↕','Manage')}
-        ${frow(0,1,1,1,1,1,1,1,1,0)}
-        <tbody>${contracts.map((c,i)=>`<tr>
-          <td class="rn">${i+1}</td>
-          <td><a class="lnk" onclick='openContractModal(${JSON.stringify(c).replace(/'/g,"&#39;")})'>${c.supplier}</a></td>
-          <td>${c.type}</td>
-          <td class="mono">${c.id}</td>
-          <td>${c.dest}</td>
-          <td>${c.uploaded}</td>
-          <td style="color:${c.status==='Expired'?'var(--red)':c.status==='Expiring'?'var(--orange)':'inherit'}">${c.expiry}</td>
-          <td>${c.value}</td>
-          <td><span class="pill ${sc(c.status)}">${c.status}</span></td>
-          <td class="act">
-            <a onclick='openContractModal(${JSON.stringify(c).replace(/'/g,"&#39;")})'>View</a>
-            <a onclick='openEditContractModal(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Edit</a>
-            <a onclick="toast('Downloading ${c.id}...')">&#8595; Download</a>
-            <a onclick="toast('Renewal started for ${c.id}')">Renew</a>
-            <a class="red" onclick="toast('Delete ${c.id}?')">Delete</a>
-          </td>
-        </tr>`).join('')}</tbody>
-      </table>
-      ${pgfoot(`1–${contracts.length}`,486,5)}
-    </div>`;
-}
-
-// ── PAGE: PAYMENTS ───────────────────────────────────────────────
-function pg_sup_payments(){
-  return `
-    <div class="page-title">Payment Management</div>
-    <div class="sum-cards">
-      <div class="sum-card green"><div class="sc-lbl">Paid This Month</div><div class="sc-val green">£248,000</div><div class="sc-sub">↑ 12% vs last month</div></div>
-      <div class="sum-card orange"><div class="sc-lbl">Pending Approval</div><div class="sc-val orange">£34,000</div><div class="sc-sub">3 invoices awaiting</div></div>
-      <div class="sum-card red"><div class="sc-lbl">Overdue</div><div class="sc-val red">£14,400</div><div class="sc-sub">2 suppliers</div></div>
-      <div class="sum-card"><div class="sc-lbl">YTD Total</div><div class="sc-val">£2,100,000</div><div class="sc-sub">↑ 18% vs last year</div></div>
-    </div>
-    ${toolbar(
-      ti('Search supplier or invoice...','',200),
-      sel(['All Status','Pending Approval','Approved','Paid','Overdue'],''),
-      sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan'],''),
-      `<input type="date" class="ti" value="2026-04-01">`,
-      `<span style="font-size:12px;color:var(--text3)">–</span>`,
-      `<input type="date" class="ti" value="2026-04-30">`,
-      btn('Search','btn-navy','toast(\'Searching...\')'),
-      `<div class="toolbar-r">${btn('Bulk Pay Selected','btn-white','toast(\'Select rows first...\')')} ${btn('+ New Invoice','btn-navy','openNewPaymentModal()')}</div>`
-    )}
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','✓','Supplier ↕','Invoice No. ↕','Description ↕','Destination ↕','Amount ↕','Due Date ↕','Status ↕','Manage')}
-        ${frow(0,0,1,1,1,1,1,1,1,0)}
-        <tbody>${payments.map((p,i)=>{
-          const actions = p.status==='Pending Approval'
-            ? `<a onclick="toast('Payment approved!')">Approve</a><a onclick="toast('Viewing invoice...')">View</a>`
-            : p.status==='Approved'
-            ? `<a onclick="toast('Processing £${p.amount.toLocaleString()} payment...')">Pay Now</a><a onclick="toast('Viewing...')">View</a>`
-            : p.status==='Overdue'
-            ? `<a onclick="toast('Processing overdue payment...')">Pay Now</a><a onclick="toast('Chasing supplier')">Chase</a>`
-            : `<a onclick="toast('Downloading receipt...')">&#8595; Receipt</a><a onclick="toast('Viewing...')">View</a>`;
-          return `<tr>
-            <td class="rn">${i+1}</td>
-            <td><input type="checkbox"></td>
-            <td class="lnk">${p.supplier}</td>
-            <td class="mono">${p.id}</td>
-            <td>${p.desc}</td>
-            <td>${p.dest}</td>
-            <td><b>£${p.amount.toLocaleString()}</b></td>
-            <td style="color:${p.status==='Overdue'?'var(--red)':'inherit'}">${p.due}</td>
-            <td><span class="pill ${sc(p.status)}">${p.status}</span></td>
-            <td class="act">${actions}</td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table>
-      ${pgfoot(`1–${payments.length}`,142,5)}
-    </div>`;
-}
-
-// ── PAGE: RATES & PRICING ────────────────────────────────────────
-function pg_sup_rates(){
-  return `
-    <div class="page-title">Rates &amp; Pricing</div>
-    <p class="page-subtitle">Manage all supplier net rates, gross rates, commissions and seasonal pricing</p>
-    ${toolbar(
-      ti('Search supplier...','',180),
-      sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco','Turkey'],''),
-      sel(['All Types','Hotel','Tour','Transport','Activity','Restaurant','Cruise'],''),
-      sel(['All Seasons','Peak','High','Low','All Year'],''),
-      sel(['All Status','Active','Inactive','Draft'],''),
-      btn('Search','btn-navy','toast(\'Searching...\')'),
-      `<div class="toolbar-r">${btn('&#8595; Export Rates','btn-white','toast(\'Exporting...\')')} ${btn('+ Add Rate','btn-navy','openNewRateModal()')}</div>`
-    )}
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','Supplier ↕','Destination ↕','Type ↕','Season ↕','Period ↕','Net Rate ↕','Gross Rate ↕','Commission ↕','Currency ↕','Status ↕','Last Updated ↕','Manage')}
-        ${frow(0,1,1,1,1,1,1,1,1,1,1,1,0)}
-        <tbody>${rates.map((r,i)=>`<tr>
-          <td class="rn">${i+1}</td>
-          <td class="lnk">${r.supplier}</td>
-          <td>${r.dest}</td><td>${r.type}</td>
-          <td><span class="pill ${r.season==='Peak'?'p-red':r.season==='High'?'p-orange':r.season==='Low'?'p-blue':'p-gray'}">${r.season}</span></td>
-          <td>${r.period}</td>
-          <td><b>${r.net}</b></td><td>${r.gross}</td><td>${r.commission}</td><td>${r.currency}</td>
-          <td><span class="pill p-green">${r.status}</span></td>
-          <td style="color:var(--text3)">${r.lastUpdated}</td>
-          <td class="act">
-            <a onclick="openEditRateModal('${r.supplier}','${r.season}')">Edit</a>
-            <a onclick="toast('Duplicating rate...')">Duplicate</a>
-            <a class="red" onclick="toast('Delete rate?')">Delete</a>
-          </td>
-        </tr>`).join('')}</tbody>
-      </table>
-      ${pgfoot(`1–${rates.length}`,rates.length)}
-    </div>`;
-}
-
-// ── PAGE: AUDIT TRAIL ────────────────────────────────────────────
-function pg_sup_audit(){
-  return `
-    <div class="page-title">Audit Trail</div>
-    <p class="page-subtitle">Complete log of all changes, approvals and actions across all suppliers</p>
-    ${toolbar(
-      ti('Search supplier or action...','',200),
-      sel(['All Action Types','Contract Uploaded','Payment Approved','Payment Processed','Status Changed','Supplier Added','Supplier Edited','Rate Updated','Tier Changed','Document Expiry Alert','Auto-Reminder Sent','Notes Added'],''),
-      sel(['All Users','Ajay Kawa','Priya Sharma','Ravi Patel','System'],''),
-      `<input type="date" class="ti" value="2026-04-01">`,
-      `<span style="font-size:12px;color:var(--text3)">–</span>`,
-      `<input type="date" class="ti" value="2026-04-26">`,
-      btn('Search','btn-navy','toast(\'Filtering audit...\')'),
-      `<div class="toolbar-r">${btn('&#8595; Export Log','btn-white','toast(\'Exporting audit log...\')','')}</div>`
-    )}
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','Timestamp ↕','User ↕','Action ↕','Supplier ↕','Detail ↕')}
-        ${frow(0,1,1,1,1,1)}
-        <tbody>${auditLog.map((a,i)=>`<tr>
-          <td class="rn">${i+1}</td>
-          <td class="mono" style="white-space:nowrap">${a.ts}</td>
-          <td><span style="font-weight:600">${a.user}</span></td>
-          <td><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${a.color}22;color:${a.color}">${a.action}</span></td>
-          <td class="lnk">${a.supplier}</td>
-          <td style="font-size:12px;color:var(--text2);max-width:400px">${a.detail}</td>
-        </tr>`).join('')}</tbody>
-      </table>
-      ${pgfoot(`1–${auditLog.length}`,1247,5)}
-    </div>`;
-}
-
-// ── PAGE: TIER MANAGEMENT ─────────────────────────────────────────
-function pg_sup_tiers(){
-  const tiers=[
-    {cls:'tc1',label:'Tier 1',title:'Premium',hotels:50,tours:18,other:8,features:['Homepage featured placement','Priority in all search results','Gold badge on listing','Commission: 15–20%','Dedicated account manager','Featured in email campaigns','Exclusive promotional offers','Priority support SLA 4hrs']},
-    {cls:'tc2',label:'Tier 2',title:'Standard',hotels:42,tours:31,other:14,features:['Standard search listing','Appears on category pages','Silver badge on listing','Commission: 10–15%','Shared account manager','Standard email campaigns','Priority support SLA 24hrs','Access to supplier portal']},
-    {cls:'tc3',label:'Tier 3',title:'Budget',hotels:10,tours:12,other:8,features:['Basic listing only','Searchable on platform','No badge','Commission: 8–12%','Self-service portal only','No email campaign inclusion','Email support SLA 48hrs','Basic reporting only']},
-  ];
-  return `
-    <div class="page-title">Tier Management</div>
-    <p class="page-subtitle">Configure supplier tiers, website display priority and commission rules</p>
-    <div class="tier-grid">${tiers.map(t=>`
-      <div class="tier-card ${t.cls}">
-        <div class="tier-hd">
-          <span>${t.label} — ${t.title}</span>
-          ${btn('Edit Rules','btn-white btn-sm',`toast('Editing ${t.label} rules...')`)}
-        </div>
-        <div class="tier-body">
-          <div class="tier-stats">
-            <div><div class="ts-val">${t.hotels}</div><div class="ts-lbl">Hotels</div></div>
-            <div><div class="ts-val">${t.tours}</div><div class="ts-lbl">Tours</div></div>
-            <div><div class="ts-val">${t.other}</div><div class="ts-lbl">Other</div></div>
-          </div>
-          ${t.features.map((f,i)=>`<div class="tf ${i<(t.cls==='tc3'?2:5)?'yes':'no'}">${f}</div>`).join('')}
-          <div style="margin-top:12px">${btn(`View All ${t.label} Suppliers`,'btn-navy',`supTierFilter(${t.cls==='tc1'?1:t.cls==='tc2'?2:3})`,'style="width:100%"')}</div>
-        </div>
-      </div>`).join('')}
-    </div>`;
-}
 function supTierFilter(tier){setSecondary(1);setTimeout(()=>{const el=document.getElementById('s-tier');if(el){el.value=tier;supFilter();}},100);}
 window.supTierFilter=supTierFilter;
 
-// ── PAGE: DESTINATIONS ────────────────────────────────────────────
-function pg_sup_dest(){
-  const dests=[
-    {flag:'🇦🇪',name:'Dubai',sup:38,t1:14,active:36,value:'£842K'},
-    {flag:'🇦🇪',name:'Abu Dhabi',sup:24,t1:8,active:23,value:'£521K'},
-    {flag:'🇴🇲',name:'Oman',sup:18,t1:6,active:18,value:'£398K'},
-    {flag:'🇪🇬',name:'Egypt',sup:14,t1:4,active:11,value:'£287K'},
-    {flag:'🇯🇴',name:'Jordan',sup:10,t1:3,active:10,value:'£198K'},
-    {flag:'🇲🇦',name:'Morocco',sup:8,t1:2,active:7,value:'£164K'},
-    {flag:'🇹🇷',name:'Turkey',sup:6,t1:1,active:4,value:'£142K'},
-    {flag:'🇲🇻',name:'Maldives',sup:4,t1:2,active:3,value:'£98K'},
-  ];
+
+// ─── FULL SUPPLIER FORM ────────────────────────────────────────────
+function fullSupplierFormHTML(s={}){
   return `
-    <div class="page-title">Destinations</div>
-    <p class="page-subtitle">Manage destination coverage, regional settings and supplier grouping</p>
-    <div class="toolbar"><div class="toolbar-r">${btn('+ Add Destination','btn-navy','openNewDestModal()')}</div></div>
-    <div class="dest-grid">${dests.map(d=>`
-      <div class="dest-card">
-        <div class="dest-flag">${d.flag}</div>
-        <div class="dest-info" style="flex:1">
-          <h4>${d.name}</h4>
-          <span>${d.sup} suppliers · Tier 1: ${d.t1} · Active: ${d.active}</span>
-          <span style="color:var(--green);font-weight:600">${d.value} MTD</span>
-        </div>
-        ${btn('Manage','btn-white btn-sm',`toast('Opening ${d.name}...')`)}
-      </div>`).join('')}
-    </div>`;
+  <div class="form-panel"><div class="form-head">1. Company Information</div><div class="form-body"><div class="fgrid">
+    <div class="fg"><label>Legal Company Name <span class="req">*</span></label><input class="fc" value="${s.name||''}" placeholder="Full registered name"></div>
+    <div class="fg"><label>Trading / DBA Name</label><input class="fc" placeholder="If different from legal name"></div>
+    <div class="fg"><label>Supplier Type <span class="req">*</span></label><select class="fc"><option>Hotel / Accommodation</option><option>Tour Operator</option><option>Activity Provider</option><option>Transport / Transfer</option><option>Restaurant / Dining</option><option>Cruise / Boat</option></select></div>
+    <div class="fg"><label>Destination <span class="req">*</span></label><select class="fc"><option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option><option>Morocco</option><option>Turkey</option><option>Maldives</option><option>Saudi Arabia</option><option>Kenya</option></select></div>
+    <div class="fg"><label>Country of Registration <span class="req">*</span></label><input class="fc" placeholder="e.g. UAE"></div>
+    <div class="fg"><label>Company Reg. No. <span class="req">*</span></label><input class="fc" value="${s.regNo||''}" placeholder="Official registration number"></div>
+    <div class="fg"><label>TAX / VAT Number <span class="req">*</span></label><input class="fc" value="${s.tax||''}" placeholder="TAX/VAT registration number"></div>
+    <div class="fg"><label>Website</label><input class="fc" type="url" placeholder="https://..."></div>
+    <div class="fg"><label>Years in Operation</label><input class="fc" type="number" placeholder="e.g. 5" min="0"></div>
+    <div class="fg"><label>No. of Employees</label><input class="fc" type="number" placeholder="e.g. 50"></div>
+    <div class="fg"><label>Annual Turnover (approx.)</label><input class="fc" placeholder="e.g. £500,000"></div>
+    <div class="fg"><label>Region</label><select class="fc"><option>Gulf</option><option>Middle East</option><option>Africa</option><option>Asia</option><option>Europe</option><option>Americas</option></select></div>
+  </div>
+  <div class="fgrid-2" style="margin-top:12px">
+    <div class="fg"><label>Registered Address <span class="req">*</span></label><textarea class="fc" style="height:60px" placeholder="Full registered address"></textarea></div>
+    <div class="fg"><label>Operational Address (if different)</label><textarea class="fc" style="height:60px" placeholder="Trading address"></textarea></div>
+  </div></div></div>
+
+  <div class="form-panel"><div class="form-head">2. Primary Business Contact</div><div class="form-body"><div class="fgrid">
+    <div class="fg"><label>Contact Name <span class="req">*</span></label><input class="fc" value="${s.contact||''}" placeholder="Full name"></div>
+    <div class="fg"><label>Job Title <span class="req">*</span></label><input class="fc" value="${s.contactRole||''}" placeholder="e.g. Director of Revenue"></div>
+    <div class="fg"><label>Email <span class="req">*</span></label><input class="fc" type="email" value="${s.email||''}" placeholder="business@company.com"></div>
+    <div class="fg"><label>Direct Phone <span class="req">*</span></label><input class="fc" type="tel" value="${s.phone||''}" placeholder="+971..."></div>
+    <div class="fg"><label>Mobile / WhatsApp</label><input class="fc" type="tel" placeholder="+971 50 ..."></div>
+    <div class="fg"><label>Preferred Contact</label><select class="fc"><option>Email</option><option>Phone</option><option>WhatsApp</option></select></div>
+    <div class="fg"><label>Finance Contact Name</label><input class="fc" placeholder="Accounts contact"></div>
+    <div class="fg"><label>Finance Contact Email</label><input class="fc" type="email" placeholder="finance@company.com"></div>
+  </div></div></div>
+
+  <div class="form-panel"><div class="form-head">3. Owner &amp; Director Details (KYC / AML)</div><div class="form-body">
+    <div style="background:#fff8e6;border:1px solid #ffe082;border-radius:3px;padding:9px 12px;margin-bottom:12px;font-size:12px;color:#6d4c00">⚠️ <b>Required for KYC / AML compliance.</b> All beneficial owners with 25%+ shareholding must be declared. Stored securely for due diligence only.</div>
+    <div style="font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Director / Owner 1 (Primary)</div>
+    <div class="fgrid">
+      <div class="fg"><label>Full Legal Name <span class="req">*</span></label><input class="fc" value="${s.owner||''}" placeholder="As on passport"></div>
+      <div class="fg"><label>Role / Title</label><input class="fc" placeholder="e.g. Chairman, Sole Owner"></div>
+      <div class="fg"><label>Nationality <span class="req">*</span></label><input class="fc" value="${s.ownerNationality||''}" placeholder="e.g. UAE, British"></div>
+      <div class="fg"><label>Date of Birth <span class="req">*</span></label><input class="fc" type="date"></div>
+      <div class="fg"><label>Passport / ID Number <span class="req">*</span></label><input class="fc" value="${s.ownerPassport||''}" placeholder="Passport number"></div>
+      <div class="fg"><label>Passport Expiry</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Personal Email</label><input class="fc" type="email" value="${s.ownerEmail||''}" placeholder="Personal email"></div>
+      <div class="fg"><label>Personal Mobile</label><input class="fc" type="tel" value="${s.ownerPhone||''}" placeholder="+44 / +971..."></div>
+      <div class="fg"><label>% Shareholding</label><input class="fc" type="number" placeholder="e.g. 100" min="0" max="100"></div>
+      <div class="fg"><label>Country of Residence</label><input class="fc" placeholder="Tax residence country"></div>
+      <div class="fg"><label>PEP Status</label><select class="fc"><option>Not a PEP</option><option>PEP</option><option>Related to PEP</option></select></div>
+      <div class="fg"><label>Sanctions Check</label><select class="fc"><option>Clear</option><option>Flagged – Review</option><option>Pending Check</option></select></div>
+    </div>
+    <div style="font-size:11.5px;font-weight:700;color:var(--navy);margin:12px 0 8px;text-transform:uppercase;letter-spacing:.5px">Director / Owner 2 (if applicable)</div>
+    <div class="fgrid">
+      <div class="fg"><label>Full Legal Name</label><input class="fc" value="${s.director2||''}" placeholder="As on passport"></div>
+      <div class="fg"><label>Role / Title</label><input class="fc" value="${s.director2Role||''}" placeholder="e.g. CFO, Director"></div>
+      <div class="fg"><label>Nationality</label><input class="fc" value="${s.director2Nationality||''}" placeholder="Nationality"></div>
+      <div class="fg"><label>Passport / ID No.</label><input class="fc" value="${s.director2Passport||''}" placeholder="Passport number"></div>
+      <div class="fg"><label>Personal Email</label><input class="fc" type="email" placeholder="Personal email"></div>
+      <div class="fg"><label>% Shareholding</label><input class="fc" type="number" placeholder="e.g. 50" min="0" max="100"></div>
+    </div>
+  </div></div>
+
+  <div class="form-panel"><div class="form-head">4. Bank &amp; Payment Details</div><div class="form-body">
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 12px;margin-bottom:12px;font-size:12px;color:#0d47a1">🏦 <b>Bank details must be verified by Finance before first payment.</b> All changes require dual authorisation and are fully audited.</div>
+    <div class="fgrid">
+      <div class="fg"><label>Bank Name <span class="req">*</span></label><input class="fc" value="${s.bankName||''}" placeholder="Full bank name"></div>
+      <div class="fg"><label>Bank Branch</label><input class="fc" value="${s.bankBranch||''}" placeholder="Branch name and location"></div>
+      <div class="fg"><label>Beneficiary Name <span class="req">*</span></label><input class="fc" value="${s.bankBeneficiary||''}" placeholder="Name as on account"></div>
+      <div class="fg"><label>Account Number <span class="req">*</span></label><input class="fc" value="${s.bankAccount||''}" placeholder="Account number"></div>
+      <div class="fg"><label>Sort Code / Routing</label><input class="fc" value="${s.bankSort||''}" placeholder="Sort code or routing number"></div>
+      <div class="fg"><label>IBAN <span class="req">*</span></label><input class="fc" value="${s.bankIBAN||''}" placeholder="IBAN"></div>
+      <div class="fg"><label>SWIFT / BIC <span class="req">*</span></label><input class="fc" value="${s.bankSwift||''}" placeholder="SWIFT code"></div>
+      <div class="fg"><label>Payment Currency <span class="req">*</span></label><select class="fc"><option ${s.bankCurrency==='GBP'?'selected':''}>GBP (£)</option><option>USD ($)</option><option>AED (د.إ)</option><option>EUR (€)</option><option>OMR (﷼)</option><option>EGP</option><option>JOD</option></select></div>
+      <div class="fg"><label>Verification Status</label><select class="fc"><option>Pending Verification</option><option>Verified — Finance Approved</option><option>Failed Verification</option></select></div>
+      <div class="fg"><label>Verified By</label><input class="fc" placeholder="ORN Finance team member"></div>
+      <div class="fg"><label>Verified Date</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Bank Letter / Voided Cheque</label><input class="fc" placeholder="Reference or filename"></div>
+    </div>
+    <div class="fg" style="margin-top:10px"><label>Additional Payment Instructions</label>
+      <textarea class="fc" style="height:55px;width:100%" placeholder="e.g. include PO reference, intermediary bank details..."></textarea></div>
+  </div></div>
+
+  <div class="form-panel"><div class="form-head">5. ORN Team Assignment &amp; Responsibility</div><div class="form-body">
+    <div class="fgrid">
+      <div class="fg"><label>ORN Account Manager <span class="req">*</span></label><select class="fc"><option value="">Assign manager...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Contract Owner <span class="req">*</span></label><select class="fc"><option value="">Assign contract owner...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Regional Lead</label><select class="fc"><option value="">Assign regional lead...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Finance Contact</label><select class="fc"><option value="">Assign...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Account Priority</label><select class="fc"><option>Standard</option><option>Strategic</option><option>VIP</option><option>Watch List</option></select></div>
+      <div class="fg"><label>Review Frequency</label><select class="fc"><option>Annual</option><option>6-Monthly</option><option>Quarterly</option></select></div>
+      <div class="fg"><label>Relationship Start Date</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Internal Channel / Ref</label><input class="fc" placeholder="e.g. #sup-dubai-atlantis"></div>
+    </div>
+    <div class="fg" style="margin-top:10px"><label>Internal Notes (ORN eyes only)</label>
+      <textarea class="fc" style="height:70px;width:100%" placeholder="Internal notes, history, special considerations...">${s.notes||''}</textarea></div>
+  </div></div>
+
+  <div class="form-panel"><div class="form-head">6. Commercial Settings</div><div class="form-body"><div class="fgrid">
+    <div class="fg"><label>Assign Tier <span class="req">*</span></label><select class="fc"><option>Tier 1 – Premium</option><option>Tier 2 – Standard</option><option>Tier 3 – Budget</option></select></div>
+    <div class="fg"><label>Commission Rate (%) <span class="req">*</span></label><input class="fc" type="number" value="${s.commission||''}" placeholder="e.g. 15" min="0" max="50"></div>
+    <div class="fg"><label>Payment Terms <span class="req">*</span></label><select class="fc"><option>Net 30</option><option>Net 15</option><option>Net 60</option><option>On Completion</option><option>Advance Payment</option></select></div>
+    <div class="fg"><label>Credit Limit (£)</label><input class="fc" type="number" placeholder="e.g. 50000"></div>
+    <div class="fg"><label>Currency <span class="req">*</span></label><select class="fc"><option>GBP (£)</option><option>USD ($)</option><option>AED</option><option>EUR (€)</option></select></div>
+    <div class="fg"><label>Exclusivity</label><select class="fc"><option>Non-exclusive</option><option>Preferred Supplier</option><option>Exclusive</option></select></div>
+    <div class="fg"><label>Featured on Website</label><select class="fc"><option>Yes</option><option>No</option></select></div>
+    <div class="fg"><label>VAT Applicable?</label><select class="fc"><option>Yes</option><option>No</option><option>Reverse Charge</option></select></div>
+  </div></div></div>
+
+  <div class="form-panel"><div class="form-head">7. Document Uploads</div><div class="form-body">
+    <div class="up-grid">
+      ${[['📄','Company Registration','PDF, JPG'],['🧾','TAX/VAT Certificate','PDF, JPG'],['🛡️','Insurance Certificate','PDF'],['✍️','Signed Contract','PDF'],['🪪','Owner Passport / ID','PDF, JPG'],['🏦','Bank Confirmation Letter','PDF'],['📋','Director 2 Passport','PDF, JPG'],['✅','KYC / AML Form','PDF'],['🔏','Beneficial Ownership Form','PDF'],['📊','Sanctions Clearance','PDF'],['📎','Public Liability Insurance','PDF'],['📌','Other Documents','Any files']].map(([ic,l,su])=>`
+      <div class="up-zone" onclick="this.querySelector('input').click()"><input type="file" hidden onchange="markUpload(this)">
+        <div class="up-icon">${ic}</div><div class="up-lbl">${l}</div><div class="up-sub">${su}</div></div>`).join('')}
+    </div>
+  </div></div>
+  <div class="form-actions">
+    ${btn('Cancel','btn-white','closeModal?closeModal():toast(\"Cancelled\")')}
+    ${btn('Save as Draft','btn-white',"toast('Draft saved')")}
+    ${btn('Submit Application','btn-navy',"toast('Application submitted!')")}
+  </div>`;
 }
 
-// ── PAGE: HOTEL CONTENT ──────────────────────────────────────────
-function pg_hotel_content(){
-  const hotels=[
-    {id:'H-0081',name:'Atlantis The Palm',star:'5',area:'Palm Jumeirah',type:'Resort',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:1},
-    {id:'H-0082',name:'Burj Al Arab Jumeirah',star:'7',area:'Jumeirah',type:'Luxury',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:2},
-    {id:'H-0083',name:'Al Maha Desert Resort',star:'5',area:'Dubai Desert',type:'Desert Resort',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:3},
-    {id:'H-0086',name:'Oman Luxury Resorts',star:'5',area:'Muscat',type:'Resort',status:'Active',mapping:'Mapped',supp:'No',tier:1,rank:4},
-    {id:'H-0091',name:'Jumeirah Beach Resort',star:'5',area:'JBR',type:'Beach Resort',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:5},
-    {id:'H-0097',name:'Marrakech Riad Collection',star:'4',area:'Medina',type:'Boutique',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:6},
-    {id:'H-0096',name:'Pyramids View Hotel',star:'4',area:'Giza',type:'Hotel',status:'Suspended',mapping:'Not Mapped',supp:'No',tier:2,rank:7},
-    {id:'H-0094',name:'Blue Waters Hotel Group',star:'5',area:'Blue Waters',type:'Hotel',status:'Pending',mapping:'Pending',supp:'No',tier:2,rank:8},
-  ];
-  return `
-    <div class="page-title">Manage Hotels</div>
+// ─── PAGES: Onboarding, Contracts, Payments, Rates, Compliance, Audit, Tiers, Dest ───
+function pg_sup_onboard(){
+  const stages=[{label:'Application Submitted',cls:'s1',count:3,cards:[{t:'Blue Waters Hotel Group',m:'Dubai · Hotel · 2 days ago',docs:[],pct:20,btn:'Review'},{t:'Sahara Adventure Tours',m:'Morocco · Tour · 4 days ago',docs:[],pct:20,btn:'Review'},{t:'Istanbul Express',m:'Turkey · Transport · 1 day ago',docs:[],pct:20,btn:'Review'}]},{label:'KYC & Owner Verification',cls:'s2',count:2,cards:[{t:'Red Sea Divers',m:'Egypt · Activity',docs:[{l:'Company Reg',ok:true},{l:'Owner ID',ok:true},{l:'KYC Form',ok:false},{l:'Beneficiary Form',ok:false}],pct:40,btn:'Chase KYC'},{t:'Nile Tours Egypt',m:'Egypt · Tour',docs:[{l:'Company Reg',ok:true},{l:'Owner ID',ok:false},{l:'Director ID',ok:false}],pct:30,btn:'Send KYC Form'}]},{label:'Document Verification',cls:'s3',count:2,cards:[{t:'Petra Tours',m:'Jordan · Tour',docs:[{l:'TAX/VAT',ok:true},{l:'Insurance',ok:true},{l:'Bank Letter',ok:false}],pct:60,btn:'Chase Docs'},{t:'Maldives Sunset Cruises',m:'Maldives · Cruise',docs:[{l:'TAX/VAT',ok:true},{l:'Insurance',ok:true},{l:'Bank verified',ok:true},{l:'Contract',ok:false}],pct:75,btn:'Send Contract'}]},{label:'Contract & Bank Setup',cls:'s4',count:1,cards:[{t:'Arabian Nights Dining',m:'Dubai · Restaurant',docs:[{l:'Contract signed',ok:true},{l:'Bank details verified',ok:false}],pct:85,btn:'Chase Bank'}]},{label:'ORN Final Approval',cls:'s5',count:1,cards:[{t:'Cappadocia Balloon Tours',m:'Turkey · All docs complete',docs:[{l:'All verified',ok:true},{l:'Awaiting ORN approval',ok:false}],pct:95,btn:'Approve Now'}]},{label:'Live on Platform',cls:'s6',count:118,cards:[{t:'✓ 118 suppliers live',m:'Fully onboarded and active',docs:[],pct:100,btn:'View All'}]}];
+  return `<div class="page-title">Supplier Onboarding</div>
+    <div class="toolbar"><span style="font-size:12.5px;font-weight:600;color:var(--text2)">Pipeline — ${stages.reduce((a,s)=>a+s.count,0)-118} active applications</span>
+    <div class="toolbar-r">${btn('&#8595; Export','btn-white',"toast('Exporting...')")} ${btn('+ New Application','btn-navy','showOnboardForm()')}</div></div>
+    <div class="pipeline">${stages.map(s=>`<div class="pipe-col"><div class="pipe-hd ${s.cls}"><span class="pipe-ht">${s.label}</span><span class="pipe-cnt">${s.count}</span></div>
+      <div class="pipe-body">${s.cards.map(c=>`<div class="pcard"><div class="pcard-t">${c.t}</div><div class="pcard-m">${c.m}</div>
+        ${c.docs.length?`<div class="doc-row">${c.docs.map(d=>`<span class="dc ${d.ok?'ok':'miss'}">${d.ok?'✓':'✗'} ${d.l}</span>`).join('')}</div>`:''}
+        <div class="pbar"><div style="width:${c.pct}%"></div></div>
+        <div class="pcard-foot">${btn(c.btn,'btn-white btn-sm',"toast('Opening...')")}</div></div>`).join('')}
+      </div></div>`).join('')}</div>
+    <div id="onboard-form-wrap" style="display:none"><h3 style="font-size:14px;font-weight:700;margin:16px 0 12px">New Supplier Application</h3>${fullSupplierFormHTML()}</div>`;
+}
+function showOnboardForm(){const w=document.getElementById('onboard-form-wrap');if(w){w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')w.scrollIntoView({behavior:'smooth'});}}
+window.showOnboardForm=showOnboardForm;
+
+function pg_sup_contracts(){
+  return `<div class="page-title">Contracts &amp; Documents</div>
+    <div class="sum-cards"><div class="sum-card green"><div class="sc-lbl">Active Contracts</div><div class="sc-val green">131</div></div><div class="sum-card orange"><div class="sc-lbl">Expiring (30 days)</div><div class="sc-val orange">3</div><div class="sc-sub">Renewal required</div></div><div class="sum-card red"><div class="sc-lbl">Expired</div><div class="sc-val red">2</div><div class="sc-sub">Immediate action</div></div><div class="sum-card"><div class="sc-lbl">Total Documents</div><div class="sc-val">486</div></div></div>
     <div class="toolbar">
-      <input class="ti" placeholder="Destination" style="width:180px">
-      ${btn('Search','btn-navy','toast(\'Searching hotels...\')')}
-      <div class="toolbar-r">${btn('+ Add Hotel','btn-navy','toast(\'Opening add hotel form...\')')}</div>
+      ${ti('Search supplier or document...','',200)}
+      ${sel(['All Document Types','Service Contract','Insurance Certificate','VAT Certificate','Company Registration','Owner ID / Passport','KYC Form','Bank Letter'])}
+      ${sel(['All Status','Valid','Expiring','Expired'])}
+      ${sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco'])}
+      ${sel(['All ORN Contract Owners',...ornTeam.map(t=>t.name)])}
+      ${btn('Search','btn-navy',"toast('Searching...')")}
+      <div class="toolbar-r">${btn('+ Upload Document','btn-navy','openUploadModal()')} ${btn('+ New Contract','btn-white','openNewContractModal()')}</div>
     </div>
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','✓','ID ↕','Hotel ↕','Star ↕','Area ↕','Type ↕','Status ↕','Online Mapping ↕','Supplements ↕','Tier ↕','Preferred Rank ↕','Featured ↕','Manage')}
-        ${frow(0,0,1,1,1,1,1,1,1,1,1,1,0,0)}
-        <tbody>${hotels.map((h,i)=>`<tr>
-          <td class="rn">${i+1}</td>
-          <td><input type="checkbox"></td>
-          <td class="mono">${h.id}</td>
-          <td class="lnk">${h.name}</td>
-          <td>${h.star}★</td>
-          <td>${h.area}</td>
-          <td>${h.type}</td>
-          <td><span class="pill ${sc(h.status)}">${h.status}</span></td>
-          <td><span class="pill ${h.mapping==='Mapped'?'p-green':h.mapping==='Pending'?'p-orange':'p-gray'}">${h.mapping}</span></td>
-          <td>${h.supp==='Yes'?'<span class="pill p-green">Yes</span>':'<span class="pill p-gray">No</span>'}</td>
-          <td><span class="tbadge t${h.tier}">Tier ${h.tier}</span></td>
-          <td style="text-align:center">${h.rank}</td>
-          <td style="text-align:center"><label class="tog"><input type="checkbox" ${h.supp==='Yes'?'checked':''}><span class="tog-sl"></span></label></td>
-          <td class="act">
-            <a onclick="toast('Editing ${h.name}...')">Edit</a>
-            <a onclick="toast('Opening rates...')">Rates</a>
-            <a onclick="toast('Opening contracts...')">Contracts</a>
-            <a onclick="toast('Opening content...')">Content</a>
-          </td>
-        </tr>`).join('')}</tbody>
-      </table>
-      ${pgfoot(`1–${hotels.length}`,50,3)}
-    </div>`;
+    <div class="tbl-wrap"><table>
+      ${thdr('#','Supplier ↕','Type ↕','Doc No. ↕','Destination ↕','Start ↕','Expiry ↕','Value ↕','Annual Value ↕','Status ↕','ORN Owner ↕','ORN Manager ↕','Governing Law ↕','Auto-Renew ↕','Review Due ↕','Manage')}
+      ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0)}
+      <tbody>${contracts.map((c,i)=>`<tr><td class="rn">${i+1}</td>
+        <td><a class="lnk" onclick='openContractModal(${esc(c)})'>${c.supplier}</a></td>
+        <td>${c.type}</td><td class="mono">${c.id}</td><td>${c.dest}</td>
+        <td style="font-size:11px">${c.start}</td>
+        <td style="color:${c.status==='Expired'?'var(--red)':c.status==='Expiring'?'var(--orange)':'inherit'};font-weight:${c.status!=='Valid'?700:400}">${c.expiry}</td>
+        <td>${c.value}</td><td>${c.annualValue}</td>
+        <td><span class="pill ${sc(c.status)}">${c.status}</span></td>
+        <td style="font-size:11.5px">${c.ornOwner}</td>
+        <td style="font-size:11.5px">${c.ornManager}</td>
+        <td style="font-size:11.5px">${c.governingLaw}</td>
+        <td style="font-size:11.5px">${c.autoRenew}</td>
+        <td style="font-size:11.5px;color:${c.reviewDate==='Overdue'?'var(--red)':'inherit'};font-weight:${c.reviewDate==='Overdue'?700:400}">${c.reviewDate}</td>
+        <td class="act"><a onclick='openContractModal(${esc(c)})'>View</a><a onclick='openEditContractModal(${esc(c)})'>Edit</a><a onclick="toast('Downloading...')">&#8595;</a><a onclick="toast('Renewal started')">Renew</a><a class="red" onclick="if(confirm('Delete?'))toast('Deleted')">Del</a></td>
+      </tr>`).join('')}</tbody>
+    </table>${pgfoot(`1–${contracts.length}`,486,5)}</div>`;
 }
 
-// ── PAGE: HOTEL RATES ─────────────────────────────────────────────
-function pg_hotel_rates(){
-  return `
-    <div class="page-title">Manage Rates and Inventory</div>
-    <p class="page-subtitle">Manage hotel room rates, seasonal pricing and allotments</p>
-    ${toolbar(
-      ti('Search hotel...','',180),
-      sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt'],''),
-      sel(['All Room Types','Standard','Deluxe','Suite','Villa','Penthouse'],''),
-      sel(['All Seasons','Peak','High','Low'],''),
-      btn('Search','btn-navy','toast(\'Searching...\')'),
-      `<div class="toolbar-r">${btn('+ Add Rate','btn-navy','openNewRateModal()')}</div>`
-    )}
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','Hotel ↕','Room Type ↕','Season ↕','Period ↕','Net Rate ↕','Gross Rate ↕','Commission ↕','Allotment ↕','Booked ↕','Available ↕','Status ↕','Manage')}
-        ${frow(0,1,1,1,1,1,1,1,1,1,1,1,0)}
-        <tbody>${[
-          ['Atlantis The Palm','Deluxe Room','Peak','Jun–Aug 2026','£285','£336','18%','200','147','53','Active'],
-          ['Atlantis The Palm','Ocean Suite','Peak','Jun–Aug 2026','£680','£802','18%','50','38','12','Active'],
-          ['Atlantis The Palm','Deluxe Room','Low','Sep–Nov 2025','£195','£230','18%','200','82','118','Active'],
-          ['Burj Al Arab Jumeirah','Duplex Suite','Peak','Dec 2025–Jan 2026','£1,850','£2,220','20%','100','89','11','Active'],
-          ['Oman Luxury Resorts','Beach Villa','Peak','Nov–Feb 2026','£490','£568','16%','80','62','18','Active'],
-          ['Jumeirah Beach Resort','Sea View Room','High','May–Aug 2026','£310','£362','19%','150','92','58','Active'],
-        ].map((r,i)=>`<tr>
-          <td class="rn">${i+1}</td>
-          <td class="lnk">${r[0]}</td><td>${r[1]}</td>
-          <td><span class="pill ${r[2]==='Peak'?'p-red':r[2]==='High'?'p-orange':'p-blue'}">${r[2]}</span></td>
-          <td>${r[3]}</td><td><b>${r[4]}</b></td><td>${r[5]}</td><td>${r[6]}</td>
-          <td>${r[7]}</td><td>${r[8]}</td>
-          <td style="color:+r[9]<20?'var(--red)':+r[9]<50?'var(--orange)':'inherit';font-weight:${+r[9]<20?700:400}">${r[9]}</td>
-          <td><span class="pill p-green">${r[10]}</span></td>
-          <td class="act"><a onclick="toast('Editing rate...')">Edit</a><a onclick="toast('Duplicating...')">Duplicate</a><a class="red" onclick="toast('Delete?')">Delete</a></td>
-        </tr>`).join('')}</tbody>
-      </table>
-    </div>`;
+function pg_sup_payments(){
+  return `<div class="page-title">Payment Management</div>
+    <div class="sum-cards"><div class="sum-card green"><div class="sc-lbl">Paid This Month</div><div class="sc-val green">£248,000</div><div class="sc-sub">↑ 12% vs last month</div></div><div class="sum-card orange"><div class="sc-lbl">Pending Approval</div><div class="sc-val orange">£34,000</div><div class="sc-sub">3 invoices</div></div><div class="sum-card red"><div class="sc-lbl">Overdue</div><div class="sc-val red">£14,400</div><div class="sc-sub">2 suppliers</div></div><div class="sum-card"><div class="sc-lbl">YTD Total</div><div class="sc-val">£2,100,000</div><div class="sc-sub">↑ 18% vs last year</div></div></div>
+    <div class="toolbar">${ti('Search supplier or invoice...','',200)} ${sel(['All Status','Pending Approval','Approved','Paid','Overdue'])} ${sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan'])} <input type="date" class="ti" value="2026-04-01"><span style="font-size:12px;color:var(--text3)">–</span><input type="date" class="ti" value="2026-04-30"> ${btn('Search','btn-navy',"toast('Searching...')")} <div class="toolbar-r">${btn('Bulk Pay','btn-white',"toast('Select rows first...')")} ${btn('+ New Invoice','btn-navy','openNewPaymentModal()')}</div></div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','✓','Supplier ↕','Invoice No. ↕','Description ↕','Destination ↕','Amount ↕','Due Date ↕','PO Ref ↕','Approver ↕','Status ↕','Manage')}
+      ${frow(0,0,1,1,1,1,1,1,1,1,1,0)}
+      <tbody>${payments.map((p,i)=>{const ac=p.status==='Pending Approval'?`<a onclick="toast('Approved!')">Approve</a><a>View</a>`:p.status==='Approved'?`<a onclick="toast('Processing £${p.amount.toLocaleString()}...')">Pay Now</a><a>View</a>`:p.status==='Overdue'?`<a onclick="toast('Processing...')">Pay Now</a><a onclick="toast('Chasing...')">Chase</a>`:`<a onclick="toast('Downloading...')">&#8595; Receipt</a><a>View</a>`;return `<tr><td class="rn">${i+1}</td><td><input type="checkbox"></td><td class="lnk">${p.supplier}</td><td class="mono">${p.id}</td><td>${p.desc}</td><td>${p.dest}</td><td><b>£${p.amount.toLocaleString()}</b></td><td style="color:${p.status==='Overdue'?'var(--red)':'inherit'}">${p.due}</td><td class="mono" style="font-size:11px">${p.poRef}</td><td style="font-size:11.5px">${p.approver}</td><td><span class="pill ${sc(p.status)}">${p.status}</span></td><td class="act">${ac}</td></tr>`;}).join('')}</tbody>
+    </table>${pgfoot(`1–${payments.length}`,142,5)}</div>`;
 }
 
-// ── PAGE: ACTIVITIES ─────────────────────────────────────────────
+function pg_sup_rates(){
+  return `<div class="page-title">Rates &amp; Pricing</div>
+    <div class="toolbar">${ti('Search supplier...','',180)} ${sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco','Turkey'])} ${sel(['All Types','Hotel','Tour','Transport','Activity'])} ${sel(['All Seasons','Peak','High','Low','All Year'])} ${btn('Search','btn-navy',"toast('Searching...')")} <div class="toolbar-r">${btn('&#8595; Export','btn-white',"toast('Exporting...')")} ${btn('+ Add Rate','btn-navy','openNewRateModal()')}</div></div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','Supplier ↕','Destination ↕','Type ↕','Room/Service ↕','Season ↕','Period ↕','Net Rate ↕','Gross Rate ↕','Commission ↕','Currency ↕','Status ↕','Last Updated ↕','Updated By ↕','Manage')}
+      ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1,1,0)}
+      <tbody>${rates.map((r,i)=>`<tr><td class="rn">${i+1}</td><td class="lnk">${r.supplier}</td><td>${r.dest}</td><td>${r.type}</td><td>${r.room}</td><td><span class="pill ${r.season==='Peak'?'p-red':r.season==='High'?'p-orange':r.season==='Low'?'p-blue':'p-gray'}">${r.season}</span></td><td>${r.period}</td><td><b>${r.net}</b></td><td>${r.gross}</td><td>${r.commission}</td><td>${r.currency}</td><td><span class="pill p-green">${r.status}</span></td><td style="font-size:11.5px;color:var(--text3)">${r.lastUpdated}</td><td style="font-size:11.5px">${r.updatedBy}</td><td class="act"><a onclick="openEditRateModal('${r.supplier}','${r.season}')">Edit</a><a onclick="toast('Duplicating...')">Duplicate</a><a class="red" onclick="toast('Delete?')">Delete</a></td></tr>`).join('')}</tbody>
+    </table>${pgfoot(`1–${rates.length}`,rates.length)}</div>`;
+}
+
+function pg_sup_compliance(){
+  return `<div class="page-title">Compliance Dashboard</div>
+    <p class="page-subtitle">Track KYC, AML, insurance, document expiry and compliance scores across all suppliers</p>
+    <div class="sum-cards"><div class="sum-card green"><div class="sc-lbl">Fully Compliant</div><div class="sc-val green">78</div><div class="sc-sub">Score ≥ 85%</div></div><div class="sum-card orange"><div class="sc-lbl">Partial Compliance</div><div class="sc-val orange">38</div><div class="sc-sub">Score 60–84%</div></div><div class="sum-card red"><div class="sc-lbl">Non-Compliant</div><div class="sc-val red">12</div><div class="sc-sub">Score &lt; 60%</div></div><div class="sum-card"><div class="sc-lbl">KYC Complete</div><div class="sc-val">104 / 142</div><div class="sc-sub">73% completion</div></div></div>
+    <div class="toolbar">${ti('Search supplier...','',180)} ${sel(['All Status','Compliant','Partial','Non-Compliant'])} ${sel(['All Issues','Insurance Expiring','Contract Expiring','KYC Incomplete','Bank Unverified','Owner ID Missing'])} ${sel(['All ORN Managers',...ornTeam.map(t=>t.name)])} ${btn('Search','btn-navy',"toast('Filtering...')")} <div class="toolbar-r">${btn('&#8595; Compliance Report','btn-white',"toast('Generating report...')")}</div></div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','Supplier ↕','Destination ↕','ORN Manager ↕','Score ↕','KYC ↕','Owner ID ↕','Bank Verified ↕','Insurance Expiry ↕','VAT Expiry ↕','Contract ↕','Sanctions ↕','Actions')}
+      ${frow(0,1,1,1,1,1,1,1,1,1,1,1,0)}
+      <tbody>${suppliers.map((s,i)=>`<tr><td class="rn">${i+1}</td><td><a class="lnk" onclick='openSupModal(${esc(s)})'>${s.name}</a></td><td>${s.dest}</td><td style="font-size:11.5px">${s.ornManager}</td><td>${compliancePill(s.complianceScore||50)}</td><td><span class="pill ${s.status==='Active'?'p-green':'p-orange'}">${s.status==='Active'?'Complete':'Pending'}</span></td><td><span class="pill ${s.ownerPassport?'p-green':'p-red'}">${s.ownerPassport?'On file':'Missing'}</span></td><td><span class="pill ${s.outstanding===0&&s.status==='Active'?'p-green':'p-orange'}">${s.outstanding===0&&s.status==='Active'?'Verified':'Pending'}</span></td><td style="font-size:11.5px;color:${(s.insuranceExpiry||'').includes('2025')||s.insuranceExpiry==='Pending'?'var(--red)':'inherit'}">${s.insuranceExpiry||'—'}</td><td style="font-size:11.5px">${s.vatExpiry||'—'}</td><td style="font-size:11.5px;color:${s.contract==='Expired'||s.contract==='Awaiting'?'var(--red)':'inherit'}">${s.contract}</td><td><span class="pill p-green">Clear</span></td><td class="act">${(s.complianceScore||50)<60?'<a onclick="toast(\'Compliance actions...\')">⚠ Fix</a>':''} ${s.contract==='Awaiting'||s.contract==='Expired'?'<a onclick="toast(\'Opening contracts...\')">Renew</a>':''}<a onclick='openSupModal(${esc(s)})'>View</a></td></tr>`).join('')}</tbody>
+    </table>${pgfoot(`1–${suppliers.length}`,142,5)}</div>`;
+}
+
+function pg_sup_audit(){
+  return `<div class="page-title">Audit Trail</div>
+    <p class="page-subtitle">Complete log of all changes, approvals, document uploads and actions</p>
+    <div class="toolbar">${ti('Search supplier or action...','',200)} ${sel(['All Action Types','Contract Uploaded','Payment Approved','Payment Processed','Supplier Added','Supplier Edited','Status Changed','Rate Updated','Tier Changed','Bank Details Verified','Owner Details Added','Document Expiry Alert','Auto-Reminder','Contract Owner Assigned'])} ${sel(['All Users',...ornTeam.map(t=>t.name),'System'])} <input type="date" class="ti" value="2026-04-01"><span style="font-size:12px;color:var(--text3)">–</span><input type="date" class="ti" value="2026-04-26"> ${btn('Search','btn-navy',"toast('Filtering...')")} <div class="toolbar-r">${btn('&#8595; Export Log','btn-white',"toast('Exporting...')")}</div></div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','Timestamp ↕','User ↕','Action ↕','Supplier ↕','Detail')}
+      ${frow(0,1,1,1,1,1)}
+      <tbody>${auditLog.map((a,i)=>`<tr><td class="rn">${i+1}</td><td class="mono" style="white-space:nowrap">${a.ts}</td><td style="font-weight:600;white-space:nowrap">${a.user}</td><td><span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;background:${a.color}22;color:${a.color}">${a.action}</span></td><td class="lnk">${a.supplier}</td><td style="font-size:12px;color:var(--text2);max-width:400px">${a.detail}</td></tr>`).join('')}</tbody>
+    </table>${pgfoot(`1–${auditLog.length}`,1247,5)}</div>`;
+}
+
+function pg_sup_tiers(){
+  const tiers=[{cls:'tc1',l:'Tier 1',t:'Premium',h:50,to:18,ot:8,feats:['Homepage featured placement','Priority in all search results','Gold badge on listing','Commission: 15–20%','Dedicated ORN account manager','Featured in email campaigns','Exclusive promotional offers','Priority SLA 4hrs','Annual rate review']},{cls:'tc2',l:'Tier 2',t:'Standard',h:42,to:31,ot:14,feats:['Standard search listing','Category pages','Silver badge','Commission: 10–15%','Shared account manager','Standard campaigns','SLA 24hrs','Supplier portal access','Biannual rate review']},{cls:'tc3',l:'Tier 3',t:'Budget',h:10,to:12,ot:8,feats:['Basic listing only','Searchable','No badge','Commission: 8–12%','Self-service only','No campaigns','Email SLA 48hrs','Basic reporting only','Annual rate review']}];
+  return `<div class="page-title">Tier Management</div><p class="page-subtitle">Configure supplier tiers, website display priority and commission rules</p>
+    <div class="tier-grid">${tiers.map(t=>`<div class="tier-card ${t.cls}"><div class="tier-hd"><span>${t.l} — ${t.t}</span>${btn('Edit Rules','btn-white btn-sm',`toast('Editing ${t.l}...')`)}</div><div class="tier-body"><div class="tier-stats"><div><div class="ts-val">${t.h}</div><div class="ts-lbl">Hotels</div></div><div><div class="ts-val">${t.to}</div><div class="ts-lbl">Tours</div></div><div><div class="ts-val">${t.ot}</div><div class="ts-lbl">Other</div></div></div>${t.feats.map((f,i)=>`<div class="tf ${i<(t.cls==='tc3'?2:5)?'yes':'no'}">${f}</div>`).join('')}<div style="margin-top:12px">${btn(`View All ${t.l} Suppliers`,'btn-navy',`supTierFilter(${t.cls==='tc1'?1:t.cls==='tc2'?2:3})`,'style="width:100%"')}</div></div></div>`).join('')}</div>`;
+}
+
+function pg_sup_dest(){
+  const dests=[{flag:'🇦🇪',name:'Dubai',sup:38,t1:14,active:36,value:'£842K',lead:'Omar Al Farsi'},{flag:'🇦🇪',name:'Abu Dhabi',sup:24,t1:8,active:23,value:'£521K',lead:'Omar Al Farsi'},{flag:'🇴🇲',name:'Oman',sup:18,t1:6,active:18,value:'£398K',lead:'Omar Al Farsi'},{flag:'🇪🇬',name:'Egypt',sup:14,t1:4,active:11,value:'£287K',lead:'Ravi Patel'},{flag:'🇯🇴',name:'Jordan',sup:10,t1:3,active:10,value:'£198K',lead:'Ravi Patel'},{flag:'🇲🇦',name:'Morocco',sup:8,t1:2,active:7,value:'£164K',lead:'Sarah Mitchell'},{flag:'🇹🇷',name:'Turkey',sup:6,t1:1,active:4,value:'£142K',lead:'Sarah Mitchell'},{flag:'🇲🇻',name:'Maldives',sup:4,t1:2,active:3,value:'£98K',lead:'Priya Sharma'},{flag:'🇸🇦',name:'Saudi Arabia',sup:0,t1:0,active:0,value:'—',lead:'TBC'},{flag:'🇰🇪',name:'Kenya',sup:0,t1:0,active:0,value:'—',lead:'TBC'},{flag:'🇮🇳',name:'India',sup:0,t1:0,active:0,value:'—',lead:'Priya Sharma'},{flag:'🇧🇭',name:'Bahrain',sup:0,t1:0,active:0,value:'—',lead:'TBC'}];
+  return `<div class="page-title">Destinations</div><div class="toolbar"><div class="toolbar-r">${btn('+ Add Destination','btn-navy','openNewDestModal()')}</div></div>
+    <div class="dest-grid">${dests.map(d=>`<div class="dest-card"><div class="dest-flag">${d.flag}</div><div class="dest-info" style="flex:1"><h4>${d.name}</h4><span>${d.sup} suppliers · T1: ${d.t1} · Active: ${d.active}</span><span style="color:${d.value==='—'?'var(--text3)':'var(--green)'};font-weight:600">${d.value} MTD</span><span style="font-size:10.5px;color:var(--text3)">Lead: ${d.lead}</span></div>${btn('Manage','btn-white btn-sm',`toast('Opening ${d.name}...')`)}</div>`).join('')}</div>`;
+}
+
+function pg_hotel_content(){
+  const hotels=[{id:'H-0081',name:'Atlantis The Palm',star:'5',area:'Palm Jumeirah',type:'Resort',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:1},{id:'H-0082',name:'Burj Al Arab Jumeirah',star:'7',area:'Jumeirah',type:'Luxury',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:2},{id:'H-0083',name:'Al Maha Desert Resort',star:'5',area:'Dubai Desert',type:'Desert Resort',status:'Active',mapping:'Mapped',supp:'Yes',tier:1,rank:3},{id:'H-0086',name:'Oman Luxury Resorts',star:'5',area:'Muscat',type:'Resort',status:'Active',mapping:'Mapped',supp:'No',tier:1,rank:4},{id:'H-0096',name:'Pyramids View Hotel',star:'4',area:'Giza',type:'Hotel',status:'Suspended',mapping:'Not Mapped',supp:'No',tier:2,rank:5},{id:'H-0094',name:'Blue Waters Hotel Group',star:'5',area:'Blue Waters',type:'Hotel',status:'Pending',mapping:'Pending',supp:'No',tier:2,rank:6}];
+  return `<div class="page-title">Manage Hotels</div>
+    <div class="toolbar"><input class="ti" placeholder="Destination" style="width:180px"> ${btn('Search','btn-navy',"toast('Searching...')")} <div class="toolbar-r">${btn('+ Add Hotel','btn-navy',"toast('Opening form...')")}</div></div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','✓','ID ↕','Hotel ↕','Star ↕','Area ↕','Type ↕','Status ↕','Online Mapping ↕','Supplements ↕','Tier ↕','Preferred Rank ↕','Featured ↕','Manage')}
+      ${frow(0,0,1,1,1,1,1,1,1,1,1,1,0,0)}
+      <tbody>${hotels.map((h,i)=>`<tr><td class="rn">${i+1}</td><td><input type="checkbox"></td><td class="mono">${h.id}</td><td class="lnk">${h.name}</td><td>${h.star}★</td><td>${h.area}</td><td>${h.type}</td><td><span class="pill ${sc(h.status)}">${h.status}</span></td><td><span class="pill ${h.mapping==='Mapped'?'p-green':h.mapping==='Pending'?'p-orange':'p-gray'}">${h.mapping}</span></td><td>${h.supp==='Yes'?'<span class="pill p-green">Yes</span>':'<span class="pill p-gray">No</span>'}</td><td><span class="tbadge t${h.tier}">Tier ${h.tier}</span></td><td style="text-align:center">${h.rank}</td><td><label class="tog"><input type="checkbox" ${h.supp==='Yes'?'checked':''}><span class="tog-sl"></span></label></td><td class="act"><a>Edit</a><a>Rates</a><a>Contracts</a><a>Content</a></td></tr>`).join('')}</tbody>
+    </table>${pgfoot(`1–${hotels.length}`,50,3)}</div>`;
+}
+function pg_hotel_rates(){return `<div class="page-title">Manage Rates and Inventory</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)">Connect live hotel inventory data to populate.</div>`;}
 function pg_act_all(){
-  return `
-    <div class="page-title">Manage Activities</div>
-    ${toolbar(
-      ti('Search activity or supplier...','',200),
-      sel(['All Types','Tour','Transfer','Experience','Cruise','Diving','Balloon'],''),
-      sel(['All Destinations','Dubai','Egypt','Jordan','Oman','Turkey'],''),
-      btn('Search','btn-navy','toast(\'Searching...\')'),
-      `<div class="toolbar-r">${btn('+ Add Activity','btn-navy','toast(\'Opening form...\')')}</div>`
-    )}
-    <div class="tbl-wrap">
-      <table>
-        ${thdr('#','Supplier ↕','Activity Type ↕','Destination ↕','Duration ↕','Commission ↕','Min Pax ↕','Status ↕','Manage')}
-        ${frow(0,1,1,1,1,1,1,1,0)}
-        <tbody>${[
-          ['Desert Tracks Tours','Desert Safari','Dubai','4–8 hrs','15%','2','Active'],
-          ['Nile Tours Egypt','River Cruise','Egypt','1–7 days','12%','10','Pending'],
-          ['Petra Tours & Travel','Historical Tour','Jordan','Full day','14%','1','Active'],
-          ['Red Sea Divers','Diving / Snorkelling','Egypt','Half day','16%','2','Active'],
-          ['Cappadocia Balloon Tours','Hot Air Balloon','Turkey','3 hrs','17%','2','Active'],
-          ['Abu Dhabi Experiences','City Tour','Abu Dhabi','4 hrs','14%','1','Active'],
-          ['Dead Sea Wellness Spa','Wellness Package','Jordan','Full day','14%','1','Active'],
-          ['Maldives Sunset Cruises','Sunset Cruise','Maldives','3 hrs','18%','4','Pending'],
-        ].map((r,i)=>`<tr>
-          <td class="rn">${i+1}</td>
-          <td class="lnk">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
-          <td><span class="pill ${sc(r[6])}">${r[6]}</span></td>
-          <td class="act"><a onclick="toast('Editing...')">Edit</a><a onclick="toast('Viewing...')">View</a><a onclick="toast('Opening rates...')">Rates</a></td>
-        </tr>`).join('')}</tbody>
-      </table>
-    </div>`;
+  return `<div class="page-title">Manage Activities</div>
+    <div class="toolbar">${ti('Search activity...','',200)} ${sel(['All Types','Tour','Transfer','Experience','Cruise','Diving','Balloon'])} ${sel(['All Destinations','Dubai','Egypt','Jordan','Oman','Turkey'])} ${btn('Search','btn-navy',"toast('Searching...')")} <div class="toolbar-r">${btn('+ Add Activity','btn-navy',"toast('Opening form...')")}</div></div>
+    <div class="tbl-wrap"><table>
+      ${thdr('#','Supplier ↕','Activity Type ↕','Destination ↕','Duration ↕','Min Pax ↕','Commission ↕','Status ↕','ORN Manager ↕','Manage')}
+      ${frow(0,1,1,1,1,1,1,1,1,0)}
+      <tbody>${[['Desert Tracks Tours','Desert Safari','Dubai','4–8 hrs','2','15%','Active','Priya Sharma'],['Nile Tours Egypt','River Cruise','Egypt','1–7 days','10','12%','Pending','Ravi Patel'],['Petra Tours & Travel','Historical Tour','Jordan','Full day','1','14%','Active','Ravi Patel'],['Red Sea Divers','Diving / Snorkelling','Egypt','Half day','2','16%','Active','Ravi Patel'],['Cappadocia Balloon Tours','Hot Air Balloon','Turkey','3 hrs','2','17%','Active','Sarah Mitchell'],['Dead Sea Wellness Spa','Wellness Package','Jordan','Full day','1','14%','Active','Ravi Patel']].map((r,i)=>`<tr><td class="rn">${i+1}</td><td class="lnk">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><span class="pill ${sc(r[6])}">${r[6]}</span></td><td style="font-size:11.5px">${r[7]}</td><td class="act"><a>Edit</a><a>View</a><a>Rates</a></td></tr>`).join('')}</tbody>
+    </table></div>`;
 }
 
-// ── SUPPLIER FORM HTML ────────────────────────────────────────────
-function supplierFormHTML(s={}){
-  return `
-    <div class="form-panel" style="margin-top:14px">
-      <div class="form-head">Company Information</div>
-      <div class="form-body">
-        <div class="fgrid">
-          <div class="fg"><label>Company Name <span class="req">*</span></label><input class="fc" value="${s.name||''}" placeholder="Full legal company name"></div>
-          <div class="fg"><label>Supplier Type <span class="req">*</span></label><select class="fc"><option>Hotel / Accommodation</option><option>Tour Operator</option><option>Activity Provider</option><option>Transport / Transfer</option><option>Restaurant / Dining</option><option>Cruise / Boat</option></select></div>
-          <div class="fg"><label>Destination <span class="req">*</span></label><select class="fc"><option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option><option>Morocco</option><option>Turkey</option><option>Maldives</option></select></div>
-          <div class="fg"><label>Status</label><select class="fc"><option>Active</option><option>Pending</option><option>Suspended</option></select></div>
-          <div class="fg"><label>Company Registration No. <span class="req">*</span></label><input class="fc" value="${s.regNo||''}" placeholder="Official registration number"></div>
-          <div class="fg"><label>TAX / VAT Number <span class="req">*</span></label><input class="fc" value="${s.tax||''}" placeholder="TAX or VAT registration number"></div>
-          <div class="fg"><label>Website</label><input class="fc" type="url" placeholder="https://..."></div>
-          <div class="fg"><label>Years in Operation</label><input class="fc" type="number" placeholder="e.g. 5" min="0"></div>
-        </div>
-      </div>
-    </div>
-    <div class="form-panel">
-      <div class="form-head">Primary Contact</div>
-      <div class="form-body">
-        <div class="fgrid">
-          <div class="fg"><label>Contact Name <span class="req">*</span></label><input class="fc" value="${s.contact||''}" placeholder="Full name"></div>
-          <div class="fg"><label>Job Title</label><input class="fc" placeholder="Position"></div>
-          <div class="fg"><label>Email <span class="req">*</span></label><input class="fc" type="email" value="${s.email||''}" placeholder="email@company.com"></div>
-          <div class="fg"><label>Phone</label><input class="fc" type="tel" value="${s.phone||''}" placeholder="+971..."></div>
-        </div>
-      </div>
-    </div>
-    <div class="form-panel">
-      <div class="form-head">Commercial Settings</div>
-      <div class="form-body">
-        <div class="fgrid">
-          <div class="fg"><label>Assign Tier</label><select class="fc"><option ${s.tier===1?'selected':''}>Tier 1 – Premium</option><option ${s.tier===2?'selected':''}>Tier 2 – Standard</option><option ${s.tier===3?'selected':''}>Tier 3 – Budget</option></select></div>
-          <div class="fg"><label>Commission Rate (%)</label><input class="fc" type="number" value="${s.commission||''}" placeholder="e.g. 15" min="0" max="50"></div>
-          <div class="fg"><label>Payment Terms</label><select class="fc"><option ${s.payTerms==='Net 30'?'selected':''}>Net 30</option><option ${s.payTerms==='Net 15'?'selected':''}>Net 15</option><option ${s.payTerms==='Net 60'?'selected':''}>Net 60</option><option ${s.payTerms==='On Completion'?'selected':''}>On Completion</option></select></div>
-          <div class="fg"><label>Currency</label><select class="fc"><option ${s.currency==='GBP'?'selected':''}>GBP (£)</option><option>USD ($)</option><option>AED (د.إ)</option><option>EUR (€)</option></select></div>
-        </div>
-      </div>
-    </div>
-    <div class="form-panel">
-      <div class="form-head">Document Uploads</div>
-      <div class="form-body">
-        <div class="up-grid">
-          ${[['📄','Company Registration','PDF, JPG up to 10MB'],['🧾','TAX / VAT Certificate','PDF, JPG up to 10MB'],['🛡️','Insurance Certificate','PDF up to 10MB'],['✍️','Signed Contract','PDF up to 20MB'],['🪪','Owner ID / Passport','PDF, JPG up to 5MB'],['📎','Other Documents','Any files']].map(([ic,l,s])=>`
-          <div class="up-zone" onclick="this.querySelector('input').click()">
-            <input type="file" hidden onchange="markUpload(this)">
-            <div class="up-icon">${ic}</div>
-            <div class="up-lbl">${l}</div>
-            <div class="up-sub">${s}</div>
-          </div>`).join('')}
-        </div>
-      </div>
-    </div>
-    <div class="form-panel">
-      <div class="form-head">Notes</div>
-      <div class="form-body">
-        <textarea class="fc" style="height:80px;width:100%" placeholder="Internal notes about this supplier..."></textarea>
-      </div>
-    </div>`;
-}
-
-// ── MODALS ────────────────────────────────────────────────────────
-function openModal(title, body, footer=''){
+// ─── MODALS ───────────────────────────────────────────────────────
+function openModal(title,body,footer=''){
   document.getElementById('modal-title').textContent=title;
   document.getElementById('modal-body').innerHTML=body+(footer?`<div class="modal-foot">${footer}</div>`:'');
   document.getElementById('modal-overlay').classList.add('open');
@@ -689,350 +394,17 @@ function closeModal(){
 }
 window.closeModal=closeModal;
 
-function openSupModal(s){
-  openModal(`Supplier — ${s.name}`,`
-    <div class="tab-bar">
-      <div class="tab active" onclick="switchTab(this,'st-details')">Details</div>
-      <div class="tab" onclick="switchTab(this,'st-contracts')">Contracts</div>
-      <div class="tab" onclick="switchTab(this,'st-payments')">Payments</div>
-      <div class="tab" onclick="switchTab(this,'st-rates')">Rates</div>
-      <div class="tab" onclick="switchTab(this,'st-audit')">Audit Trail</div>
-    </div>
-    <div id="st-details" class="tab-panel active">
-      <div class="fgrid" style="margin-bottom:12px">
-        <div><div style="font-size:11px;color:var(--text3)">ID</div><div class="mono">${s.id}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Type</div><div>${s.type}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Destination</div><div>${s.dest}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Status</div><div><span class="pill ${sc(s.status)}">${s.status}</span></div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Tier</div><div><span class="tbadge t${s.tier}">Tier ${s.tier}</span></div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Commission</div><div>${s.commission}%</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Payment Terms</div><div>${s.payTerms}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Currency</div><div>${s.currency}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">TAX / VAT No.</div><div class="mono">${s.tax}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Company Reg No.</div><div class="mono">${s.regNo}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Contract End</div><div>${s.contract}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Outstanding</div><div style="color:${s.outstanding>0?'var(--red)':'var(--green)'};font-weight:700">${fmtGbp(s.outstanding)}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Contact</div><div>${s.contact}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Email</div><div><a class="lnk" href="mailto:${s.email}">${s.email}</a></div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Phone</div><div>${s.phone}</div></div>
-        <div><div style="font-size:11px;color:var(--text3)">Rating</div><div>⭐ ${s.rating}</div></div>
-      </div>
-    </div>
-    <div id="st-contracts" class="tab-panel">
-      <p style="font-size:12.5px;color:var(--text2);margin-bottom:10px">Contracts and documents for ${s.name}</p>
-      ${contracts.filter(c=>c.supplier===s.name).length===0?'<p style="color:var(--text3)">No documents found.</p>':
-      contracts.filter(c=>c.supplier===s.name).map(c=>`
-        <div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:8px">
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div><b>${c.type}</b> <span class="mono" style="margin-left:8px">${c.id}</span></div>
-            <span class="pill ${sc(c.status)}">${c.status}</span>
-          </div>
-          <div style="font-size:12px;color:var(--text3);margin-top:4px">Uploaded: ${c.uploaded} · Expiry: ${c.expiry} · ${c.value!=='—'?'Value: '+c.value:''}</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:4px">${c.notes}</div>
-          <div style="margin-top:8px;display:flex;gap:8px">
-            ${btn('&#8595; Download','btn-white btn-sm',`toast('Downloading ${c.file}...')`)}
-            ${btn('Edit','btn-white btn-sm',`closeModal();openEditContractModal(${JSON.stringify(c).replace(/'/g,"&#39;")})`)}
-            ${btn('Renew','btn-white btn-sm',`toast('Starting renewal for ${c.id}')`)}
-          </div>
-        </div>`).join('')}
-      <div style="margin-top:12px">${btn('+ Upload New Document','btn-navy','closeModal();openUploadModal()')}</div>
-    </div>
-    <div id="st-payments" class="tab-panel">
-      <p style="font-size:12.5px;color:var(--text2);margin-bottom:10px">Payment history for ${s.name}</p>
-      ${payments.filter(p=>p.supplier===s.name).length===0?'<p style="color:var(--text3)">No payments found.</p>':
-      payments.filter(p=>p.supplier===s.name).map(p=>`
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-lt)">
-          <div>
-            <div style="font-weight:600;font-size:12.5px">${p.desc}</div>
-            <div style="font-size:11.5px;color:var(--text3)">${p.id} · Due: ${p.due}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <b style="font-size:14px">£${p.amount.toLocaleString()}</b>
-            <span class="pill ${sc(p.status)}">${p.status}</span>
-          </div>
-        </div>`).join('')}
-    </div>
-    <div id="st-rates" class="tab-panel">
-      <p style="font-size:12.5px;color:var(--text2);margin-bottom:10px">Rates for ${s.name}</p>
-      ${rates.filter(r=>r.supplier===s.name).length===0?'<p style="color:var(--text3)">No rates configured.</p>':
-      rates.filter(r=>r.supplier===s.name).map(r=>`
-        <div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <span class="pill ${r.season==='Peak'?'p-red':r.season==='High'?'p-orange':'p-blue'}" style="margin-right:8px">${r.season}</span>
-            <b>${r.period}</b>
-          </div>
-          <div style="display:flex;gap:20px;font-size:12.5px">
-            <div><div style="font-size:10px;color:var(--text3)">Net</div><b>${r.net}</b></div>
-            <div><div style="font-size:10px;color:var(--text3)">Gross</div><b>${r.gross}</b></div>
-            <div><div style="font-size:10px;color:var(--text3)">Commission</div>${r.commission}</div>
-          </div>
-          ${btn('Edit','btn-white btn-sm',`toast('Editing rate...')`)}
-        </div>`).join('')}
-    </div>
-    <div id="st-audit" class="tab-panel">
-      <p style="font-size:12.5px;color:var(--text2);margin-bottom:10px">Audit trail for ${s.name}</p>
-      <div class="audit-list">${auditLog.filter(a=>a.supplier===s.name).map(a=>`
-        <div class="audit-item">
-          <div class="audit-dot" style="background:${a.color}"></div>
-          <div class="audit-content">
-            <div class="audit-action">${a.action}</div>
-            <div class="audit-meta">${a.ts} · ${a.user}</div>
-            <div class="audit-detail">${a.detail}</div>
-          </div>
-        </div>`).join('')}
-      </div>
-    </div>`,
-    `${btn('Edit Supplier','btn-white',`closeModal();openEditSupModal(${JSON.stringify(s).replace(/'/g,"&#39;")})`)} ${btn('Close','btn-navy','closeModal()')}`
-  );
-}
-window.openSupModal=openSupModal;
-
-function openEditSupModal(s){
-  openModal(`Edit Supplier — ${s.name}`, supplierFormHTML(s),
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save as Draft','btn-white','toast(\'Saved as draft\')')} ${btn('Save Changes','btn-navy','toast(\'Changes saved!\');closeModal()')}`
-  );
-}
-window.openEditSupModal=openEditSupModal;
-
-function openNewSupModal(){
-  openModal('New Supplier Application', supplierFormHTML(),
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Draft','btn-white','toast(\'Draft saved\')')} ${btn('Submit Application','btn-navy','toast(\'Application submitted!\');closeModal()')}`
-  );
-}
-window.openNewSupModal=openNewSupModal;
-
-function openContractModal(c){
-  openModal(`Contract — ${c.id}`,`
-    <div class="fgrid" style="margin-bottom:12px">
-      <div><div style="font-size:11px;color:var(--text3)">Supplier</div><div style="font-weight:600">${c.supplier}</div></div>
-      <div><div style="font-size:11px;color:var(--text3)">Document Type</div><div>${c.type}</div></div>
-      <div><div style="font-size:11px;color:var(--text3)">Document No.</div><div class="mono">${c.id}</div></div>
-      <div><div style="font-size:11px;color:var(--text3)">Destination</div><div>${c.dest}</div></div>
-      <div><div style="font-size:11px;color:var(--text3)">Uploaded</div><div>${c.uploaded}</div></div>
-      <div><div style="font-size:11px;color:var(--text3)">Expiry Date</div><div style="color:${c.status==='Expired'?'var(--red)':c.status==='Expiring'?'var(--orange)':'inherit'};font-weight:${c.status!=='Valid'?700:400}">${c.expiry}</div></div>
-      <div><div style="font-size:11px;color:var(--text3)">Contract Value</div><div>${c.value}</div></div>
-      <div><div style="font-size:11px;color:var(--text3)">Status</div><div><span class="pill ${sc(c.status)}">${c.status}</span></div></div>
-    </div>
-    <div style="background:var(--bg-page);border:1px solid var(--border-lt);border-radius:var(--r);padding:12px;margin-bottom:12px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:600">NOTES</div>
-      <div style="font-size:12.5px">${c.notes}</div>
-    </div>
-    <div style="border:1px dashed var(--border);border-radius:var(--r);padding:20px;text-align:center;background:var(--bg-page)">
-      <div style="font-size:24px;margin-bottom:6px">📄</div>
-      <div style="font-size:13px;font-weight:600;margin-bottom:4px">${c.file}</div>
-      <div style="font-size:12px;color:var(--text3)">Click Download to retrieve the file</div>
-    </div>`,
-    `${btn('&#8595; Download','btn-white',`toast('Downloading ${c.file}...')`)} ${btn('Edit','btn-white',`closeModal();openEditContractModal(${JSON.stringify(c).replace(/'/g,"&#39;")})`)} ${btn('Renew','btn-white',`toast('Starting renewal...')`)} ${btn('Close','btn-navy','closeModal()')}`
-  );
-}
-window.openContractModal=openContractModal;
-
-function openEditContractModal(c){
-  openModal(`Edit Contract — ${c.id}`,`
-    <div class="form-panel"><div class="form-head">Contract Details</div><div class="form-body">
-      <div class="fgrid">
-        <div class="fg"><label>Supplier</label><input class="fc" value="${c.supplier}"></div>
-        <div class="fg"><label>Document Type</label><select class="fc"><option>Service Contract</option><option>Insurance Certificate</option><option>VAT Certificate</option><option>Company Registration</option><option>Owner ID / Passport</option></select></div>
-        <div class="fg"><label>Document No.</label><input class="fc" value="${c.id}"></div>
-        <div class="fg"><label>Destination</label><input class="fc" value="${c.dest}"></div>
-        <div class="fg"><label>Expiry Date</label><input class="fc" type="date" value="2025-12-31"></div>
-        <div class="fg"><label>Contract Value</label><input class="fc" value="${c.value}"></div>
-        <div class="fg"><label>Status</label><select class="fc"><option>Valid</option><option>Expiring</option><option>Expired</option></select></div>
-      </div>
-    </div></div>
-    <div class="form-panel"><div class="form-head">Notes</div><div class="form-body">
-      <textarea class="fc" style="height:80px;width:100%">${c.notes}</textarea>
-    </div></div>
-    <div class="form-panel"><div class="form-head">Replace Document</div><div class="form-body">
-      <div class="up-zone" onclick="this.querySelector('input').click()" style="max-width:300px">
-        <input type="file" hidden onchange="markUpload(this)">
-        <div class="up-icon">📄</div>
-        <div class="up-lbl">Upload replacement file</div>
-        <div class="up-sub">PDF up to 20MB</div>
-      </div>
-    </div></div>`,
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Changes','btn-navy','toast(\'Contract updated!\');closeModal()')}`
-  );
-}
-window.openEditContractModal=openEditContractModal;
-
-function openNewContractModal(){
-  openModal('New Contract / Document Upload',`
-    <div class="form-panel"><div class="form-head">Document Details</div><div class="form-body">
-      <div class="fgrid">
-        <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select supplier...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
-        <div class="fg"><label>Document Type <span class="req">*</span></label><select class="fc"><option>Service Contract</option><option>Insurance Certificate</option><option>VAT Certificate</option><option>Company Registration</option><option>Owner ID / Passport</option><option>Other</option></select></div>
-        <div class="fg"><label>Document Number</label><input class="fc" placeholder="Auto-generated if blank"></div>
-        <div class="fg"><label>Destination</label><select class="fc"><option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option><option>Morocco</option><option>Turkey</option><option>Maldives</option></select></div>
-        <div class="fg"><label>Expiry Date</label><input class="fc" type="date"></div>
-        <div class="fg"><label>Contract Value (£)</label><input class="fc" type="number" placeholder="0"></div>
-      </div>
-    </div></div>
-    <div class="form-panel"><div class="form-head">Upload File <span class="req">*</span></div><div class="form-body">
-      <div class="up-zone" onclick="this.querySelector('input').click()" style="max-width:300px">
-        <input type="file" hidden onchange="markUpload(this)">
-        <div class="up-icon">📄</div>
-        <div class="up-lbl">Click to upload document</div>
-        <div class="up-sub">PDF, JPG, PNG up to 20MB</div>
-      </div>
-    </div></div>
-    <div class="form-panel"><div class="form-head">Notes</div><div class="form-body">
-      <textarea class="fc" style="height:70px;width:100%" placeholder="Internal notes..."></textarea>
-    </div></div>`,
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save','btn-navy','toast(\'Document saved!\');closeModal()')}`
-  );
-}
-window.openNewContractModal=openNewContractModal;
-
-function openUploadModal(){
-  openModal('Upload Document',`
-    <div class="form-panel"><div class="form-head">Document Upload</div><div class="form-body">
-      <div class="fgrid-2" style="margin-bottom:12px">
-        <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select supplier...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
-        <div class="fg"><label>Document Type <span class="req">*</span></label><select class="fc"><option>Service Contract</option><option>Insurance Certificate</option><option>VAT Certificate</option><option>Company Registration</option><option>Owner ID</option></select></div>
-        <div class="fg"><label>Expiry Date</label><input class="fc" type="date"></div>
-        <div class="fg"><label>Notes</label><input class="fc" placeholder="Optional notes..."></div>
-      </div>
-      <div class="up-zone" onclick="this.querySelector('input').click()" style="max-width:400px">
-        <input type="file" hidden onchange="markUpload(this)">
-        <div class="up-icon">📎</div>
-        <div class="up-lbl">Drop file here or click to upload</div>
-        <div class="up-sub">PDF, JPG, PNG up to 20MB</div>
-      </div>
-    </div></div>`,
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Upload','btn-navy','toast(\'Document uploaded!\');closeModal()')}`
-  );
-}
-window.openUploadModal=openUploadModal;
-
-function openDocsModal(name){
-  const docs=contracts.filter(c=>c.supplier===name);
-  openModal(`Documents — ${name}`,`
-    ${docs.length===0?'<p style="color:var(--text3)">No documents found for this supplier.</p>':
-    docs.map(c=>`
-      <div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-        <div>
-          <div style="font-weight:600;font-size:12.5px;margin-bottom:3px">${c.type} <span class="mono" style="margin-left:8px;font-weight:400">${c.id}</span></div>
-          <div style="font-size:12px;color:var(--text3)">Expiry: ${c.expiry} · ${c.value!=='—'?'Value: '+c.value:''}</div>
-          <div style="font-size:11.5px;color:var(--text2);margin-top:3px">${c.notes}</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
-          <span class="pill ${sc(c.status)}">${c.status}</span>
-          ${btn('&#8595; Download','btn-white btn-sm',`toast('Downloading ${c.file}...')`)}
-          ${btn('Edit','btn-white btn-sm',`closeModal();openEditContractModal(${JSON.stringify(c).replace(/'/g,"&#39;")})`)}
-        </div>
-      </div>`).join('')}
-    <div style="margin-top:12px">${btn('+ Upload New Document','btn-navy','closeModal();openUploadModal()')}</div>`,
-    btn('Close','btn-navy','closeModal()')
-  );
-}
-window.openDocsModal=openDocsModal;
-
-function openAuditModal(name){
-  const logs=auditLog.filter(a=>a.supplier===name);
-  openModal(`Audit Trail — ${name}`,`
-    <div class="audit-list">${logs.length===0?'<p style="color:var(--text3);padding:10px">No audit entries found.</p>':
-    logs.map(a=>`
-      <div class="audit-item">
-        <div class="audit-dot" style="background:${a.color}"></div>
-        <div class="audit-content">
-          <div class="audit-action">${a.action}</div>
-          <div class="audit-meta">${a.ts} · by ${a.user}</div>
-          <div class="audit-detail">${a.detail}</div>
-        </div>
-      </div>`).join('')}
-    </div>`,
-    btn('Close','btn-navy','closeModal()')
-  );
-}
-window.openAuditModal=openAuditModal;
-
-function openNewPaymentModal(){
-  openModal('New Invoice / Payment',`
-    <div class="form-panel"><div class="form-head">Invoice Details</div><div class="form-body">
-      <div class="fgrid">
-        <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
-        <div class="fg"><label>Description <span class="req">*</span></label><input class="fc" placeholder="e.g. April accommodation services"></div>
-        <div class="fg"><label>Amount (£) <span class="req">*</span></label><input class="fc" type="number" placeholder="0.00" min="0"></div>
-        <div class="fg"><label>Due Date <span class="req">*</span></label><input class="fc" type="date"></div>
-        <div class="fg"><label>Destination</label><select class="fc"><option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option></select></div>
-        <div class="fg"><label>Currency</label><select class="fc"><option>GBP</option><option>USD</option><option>AED</option><option>EUR</option></select></div>
-      </div>
-    </div></div>
-    <div class="form-panel"><div class="form-head">Notes</div><div class="form-body">
-      <textarea class="fc" style="height:60px;width:100%" placeholder="Optional notes..."></textarea>
-    </div></div>`,
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save as Draft','btn-white','toast(\'Draft saved...\')')} ${btn('Create Invoice','btn-navy','toast(\'Invoice created!\');closeModal()')}`
-  );
-}
-window.openNewPaymentModal=openNewPaymentModal;
-
-function openNewRateModal(){
-  openModal('Add New Rate',`
-    <div class="form-panel"><div class="form-head">Rate Details</div><div class="form-body">
-      <div class="fgrid">
-        <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
-        <div class="fg"><label>Service Type</label><select class="fc"><option>Hotel Room</option><option>Tour</option><option>Transfer</option><option>Activity</option><option>Dining</option></select></div>
-        <div class="fg"><label>Room / Service Type</label><input class="fc" placeholder="e.g. Deluxe Room, Desert Safari"></div>
-        <div class="fg"><label>Season</label><select class="fc"><option>Peak</option><option>High</option><option>Low</option><option>All Year</option></select></div>
-        <div class="fg"><label>Period From</label><input class="fc" type="date"></div>
-        <div class="fg"><label>Period To</label><input class="fc" type="date"></div>
-        <div class="fg"><label>Net Rate (£) <span class="req">*</span></label><input class="fc" type="number" placeholder="0.00" min="0"></div>
-        <div class="fg"><label>Commission (%)</label><input class="fc" type="number" placeholder="15" min="0" max="50"></div>
-      </div>
-    </div></div>`,
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Add Rate','btn-navy','toast(\'Rate added!\');closeModal()')}`
-  );
-}
-window.openNewRateModal=openNewRateModal;
-function openEditRateModal(sup,season){
-  openModal(`Edit Rate — ${sup} (${season})`,`
-    <div class="form-panel"><div class="form-head">Edit Rate</div><div class="form-body">
-      <div class="fgrid">
-        <div class="fg"><label>Supplier</label><input class="fc" value="${sup}" readonly></div>
-        <div class="fg"><label>Season</label><select class="fc"><option>Peak</option><option>High</option><option>Low</option><option>All Year</option></select></div>
-        <div class="fg"><label>Period From</label><input class="fc" type="date"></div>
-        <div class="fg"><label>Period To</label><input class="fc" type="date"></div>
-        <div class="fg"><label>Net Rate (£)</label><input class="fc" type="number" placeholder="0.00"></div>
-        <div class="fg"><label>Commission (%)</label><input class="fc" type="number" placeholder="15"></div>
-        <div class="fg"><label>Status</label><select class="fc"><option>Active</option><option>Inactive</option><option>Draft</option></select></div>
-      </div>
-    </div></div>`,
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Changes','btn-navy','toast(\'Rate updated!\');closeModal()')}`
-  );
-}
-window.openEditRateModal=openEditRateModal;
-
-function openNewDestModal(){
-  openModal('Add New Destination',`
-    <div class="form-panel"><div class="form-head">Destination Details</div><div class="form-body">
-      <div class="fgrid-2">
-        <div class="fg"><label>Country <span class="req">*</span></label><input class="fc" placeholder="e.g. Saudi Arabia"></div>
-        <div class="fg"><label>City / Region <span class="req">*</span></label><input class="fc" placeholder="e.g. Riyadh"></div>
-        <div class="fg"><label>Flag Emoji</label><input class="fc" placeholder="e.g. 🇸🇦"></div>
-        <div class="fg"><label>Currency</label><select class="fc"><option>GBP</option><option>USD</option><option>SAR</option><option>AED</option></select></div>
-        <div class="fg"><label>Status</label><select class="fc"><option>Active</option><option>Coming Soon</option></select></div>
-        <div class="fg"><label>Region Manager</label><input class="fc" placeholder="Name"></div>
-      </div>
-    </div></div>`,
-    `${btn('Cancel','btn-white','closeModal()')} ${btn('Add Destination','btn-navy','toast(\'Destination added!\');closeModal()')}`
-  );
-}
-window.openNewDestModal=openNewDestModal;
-
-// ── TAB SWITCHER ─────────────────────────────────────────────────
-function switchTab(el, panelId){
+function switchTab(el,panelId){
   const bar=el.closest('.tab-bar');
   bar.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  const modal=el.closest('.modal-body')||el.closest('.content');
-  modal.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const scope=el.closest('.modal-body')||document;
+  scope.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const panel=document.getElementById(panelId);
   if(panel)panel.classList.add('active');
 }
 window.switchTab=switchTab;
 
-// ── MARK UPLOAD ───────────────────────────────────────────────────
 function markUpload(input){
   if(input.files&&input.files[0]){
     const z=input.closest('.up-zone');
@@ -1042,14 +414,261 @@ function markUpload(input){
 }
 window.markUpload=markUpload;
 
-// ── NAV ───────────────────────────────────────────────────────────
-function setPrimary(key){
-  curPrimary=key; curSub=0;
-  document.querySelectorAll('.pnav').forEach(n=>n.classList.toggle('active',n.dataset.p===key));
-  buildSecondary(key);
-  renderContent();
+// Supplier full detail modal — 8 tabs
+function openSupModal(s){
+  if(typeof s==='string')try{s=JSON.parse(s.replace(/&quot;/g,'"'));}catch(e){}
+  openModal(`Supplier — ${s.name}`,`
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab(this,'st-det')">Details</div>
+      <div class="tab" onclick="switchTab(this,'st-own')">Owner / Directors</div>
+      <div class="tab" onclick="switchTab(this,'st-bank')">Bank Details</div>
+      <div class="tab" onclick="switchTab(this,'st-orn')">ORN Team</div>
+      <div class="tab" onclick="switchTab(this,'st-con')">Contracts</div>
+      <div class="tab" onclick="switchTab(this,'st-pay')">Payments</div>
+      <div class="tab" onclick="switchTab(this,'st-rat')">Rates</div>
+      <div class="tab" onclick="switchTab(this,'st-aud')">Audit Trail</div>
+    </div>
+    <div id="st-det" class="tab-panel active">
+      <div class="fgrid" style="margin-bottom:8px">
+        ${[['ID',s.id,'mono'],['Type',s.type,''],['Destination',s.dest,''],['Status',`<span class="pill ${sc(s.status)}">${s.status}</span>`,''],['Tier',`<span class="tbadge t${s.tier}">Tier ${s.tier}</span>`,''],['Commission',s.commission+'%',''],['Payment Terms',s.payTerms,''],['Currency',s.currency,''],['TAX / VAT',s.tax,'mono'],['Reg. No.',s.regNo,'mono'],['Contract End',s.contract,''],['Outstanding',`<span style="color:${s.outstanding>0?'var(--red)':'var(--green)'};font-weight:700">${fmtGbp(s.outstanding)}</span>`,''],['Contact',s.contact,''],['Contact Role',s.contactRole||'—',''],['Email',`<a class="lnk" href="mailto:${s.email}">${s.email}</a>`,''],['Phone',s.phone,''],['Compliance Score',compliancePill(s.complianceScore||0),''],['Rating','⭐ '+s.rating,'']].map(([l,v,c])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div class="${c}" style="font-size:12.5px">${v}</div></div>`).join('')}
+      </div>
+      ${s.notes?`<div style="background:var(--bg-page);border:1px solid var(--border-lt);border-radius:var(--r);padding:8px 12px;font-size:12px;color:var(--text2)"><b style="font-size:10.5px;color:var(--text3)">INTERNAL NOTES</b><br>${s.notes}</div>`:''}
+    </div>
+    <div id="st-own" class="tab-panel">
+      <div style="background:#fff8e6;border:1px solid #ffe082;border-radius:3px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#6d4c00">🔒 <b>Sensitive KYC / AML data</b> — authorised personnel only. Not to be shared externally.</div>
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:8px">Director / Owner 1 (Primary)</div>
+      <div class="fgrid" style="margin-bottom:14px">
+        ${[['Full Legal Name',s.owner||'Not provided',''],['Nationality',s.ownerNationality||'—',''],['Date of Birth',s.ownerDOB||'—',''],['Passport / ID No.',s.ownerPassport||'Not on file','mono'],['Personal Email',s.ownerEmail||'—',''],['Personal Phone',s.ownerPhone||'—',''],['Residential Address',s.ownerAddress||'—',''],['PEP Status','Not a PEP','']].map(([l,v,c])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div class="${c}" style="font-size:12.5px">${v}</div></div>`).join('')}
+      </div>
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:8px">Director / Owner 2</div>
+      <div class="fgrid">
+        ${[['Full Legal Name',s.director2||'Not provided',''],['Role',s.director2Role||'—',''],['Nationality',s.director2Nationality||'—',''],['Passport / ID No.',s.director2Passport||'Not on file','mono']].map(([l,v,c])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div class="${c}" style="font-size:12.5px">${v}</div></div>`).join('')}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">${btn('Edit Owner Details','btn-white btn-sm',`closeModal();openEditSupModal(${esc(s)})`)} ${btn('Upload Passport','btn-white btn-sm','closeModal();openUploadModal()')}</div>
+    </div>
+    <div id="st-bank" class="tab-panel">
+      <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#0d47a1">🏦 <b>Bank details verified by ORN Finance.</b> Any changes require dual authorisation and are fully audited.</div>
+      <div class="fgrid">
+        ${[['Bank Name',s.bankName||'Not provided',''],['Branch',s.bankBranch||'—',''],['Beneficiary Name',s.bankBeneficiary||'—',''],['Account Number',s.bankAccount||'Not on file','mono'],['Sort Code / Routing',s.bankSort||'—','mono'],['IBAN',s.bankIBAN||'Not on file','mono'],['SWIFT / BIC',s.bankSwift||'—','mono'],['Payment Currency',s.bankCurrency||'—',''],['Verification Status',s.bankAccount?'<span class="pill p-green">Verified — Finance Approved</span>':'<span class="pill p-orange">Pending Verification</span>',''],['Verified By',s.outstanding===0&&s.bankAccount?'Nina Kowalski':'Pending','']].map(([l,v,c])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div class="${c}" style="font-size:12.5px">${v}</div></div>`).join('')}
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">${btn('Edit Bank Details','btn-white btn-sm',`closeModal();openEditSupModal(${esc(s)})`)} ${btn('Upload Bank Letter','btn-white btn-sm','closeModal();openUploadModal()')} ${btn('Request Re-Verification','btn-white btn-sm',"toast('Verification request sent to Finance')")}</div>
+    </div>
+    <div id="st-orn" class="tab-panel">
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:10px">ORN Team Responsible for this Supplier</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        ${[['Account Manager',s.ornManager||'Unassigned'],['Contract Owner',s.ornContractOwner||'Unassigned'],['Regional Lead',s.ornRegionalLead||'Unassigned'],['Finance Contact','Nina Kowalski']].map(([l,v])=>{const m=ornTeam.find(t=>t.name===v);return`<div style="background:var(--bg-page);border:1px solid var(--border-lt);border-radius:var(--r);padding:10px"><div style="font-size:10.5px;color:var(--text3);margin-bottom:4px">${l}</div><div style="font-size:13px;font-weight:700;color:var(--navy)">${v}</div>${m?`<div style="font-size:11px;color:var(--text3)">${m.role} · ${m.region}</div><a class="lnk" style="font-size:11.5px" href="mailto:${m.email}">${m.email}</a>`:''}</div>`;}).join('')}
+      </div>
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:8px">ORN Full Team Directory</div>
+      <div class="tbl-wrap"><table>${thdr('Name','Role','Region','Email','Phone')}<tbody>${ornTeam.map(t=>`<tr><td style="font-weight:600">${t.name}</td><td>${t.role}</td><td>${t.region}</td><td><a class="lnk" href="mailto:${t.email}">${t.email}</a></td><td>${t.phone}</td></tr>`).join('')}</tbody></table></div>
+      <div style="margin-top:10px;display:flex;gap:8px">${btn('Reassign Manager','btn-white btn-sm',`closeModal();openEditSupModal(${esc(s)})`)} ${btn('Edit ORN Team','btn-white btn-sm',`closeModal();openEditSupModal(${esc(s)})`)}</div>
+    </div>
+    <div id="st-con" class="tab-panel">
+      ${contracts.filter(c=>c.supplier===s.name).length===0?'<p style="color:var(--text3)">No contracts on file.</p>':contracts.filter(c=>c.supplier===s.name).map(c=>`<div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:12px;margin-bottom:10px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><b>${c.type}</b> <span class="mono" style="margin-left:8px">${c.id}</span></div><span class="pill ${sc(c.status)}">${c.status}</span></div><div class="fgrid" style="margin-bottom:8px">${[['Period',`${c.start} – ${c.expiry}`],['Contract Value',c.value],['Annual Value',c.annualValue],['ORN Contract Owner',c.ornOwner],['ORN Manager',c.ornManager],['Governing Law',c.governingLaw],['Auto-Renew',c.autoRenew],['Review Due',c.reviewDate]].map(([l,v])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div style="font-size:12px">${v}</div></div>`).join('')}</div><div style="background:var(--bg-page);padding:6px 10px;border-radius:var(--r);font-size:12px;margin-bottom:8px">${c.notes}</div><div style="display:flex;gap:6px">${btn('&#8595; Download','btn-white btn-sm',`toast('Downloading...')`)} ${btn('Edit','btn-white btn-sm',`closeModal();openEditContractModal(${esc(c)})`)} ${btn('Renew','btn-white btn-sm',`toast('Starting renewal...')`)}</div></div>`).join('')}
+      <div style="margin-top:8px">${btn('+ Upload Document','btn-navy','closeModal();openUploadModal()')}</div>
+    </div>
+    <div id="st-pay" class="tab-panel">
+      ${payments.filter(p=>p.supplier===s.name).length===0?'<p style="color:var(--text3)">No payments found.</p>':payments.filter(p=>p.supplier===s.name).map(p=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-lt)"><div><div style="font-weight:600;font-size:12.5px">${p.desc}</div><div style="font-size:11.5px;color:var(--text3)">${p.id} · Due: ${p.due} · PO: ${p.poRef} · Approver: ${p.approver}</div></div><div style="display:flex;align-items:center;gap:10px"><b>£${p.amount.toLocaleString()}</b><span class="pill ${sc(p.status)}">${p.status}</span></div></div>`).join('')}
+    </div>
+    <div id="st-rat" class="tab-panel">
+      ${rates.filter(r=>r.supplier===s.name).length===0?'<p style="color:var(--text3)">No rates configured.</p>':rates.filter(r=>r.supplier===s.name).map(r=>`<div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px"><div><span class="pill ${r.season==='Peak'?'p-red':r.season==='High'?'p-orange':'p-blue'}" style="margin-right:8px">${r.season}</span><b>${r.room}</b> · ${r.period}<div style="font-size:11px;color:var(--text3);margin-top:3px">Updated: ${r.lastUpdated} by ${r.updatedBy}</div></div><div style="display:flex;gap:16px;align-items:center"><div style="text-align:center"><div style="font-size:10px;color:var(--text3)">Net</div><b>${r.net}</b></div><div style="text-align:center"><div style="font-size:10px;color:var(--text3)">Gross</div><b>${r.gross}</b></div><div style="text-align:center"><div style="font-size:10px;color:var(--text3)">Comm.</div>${r.commission}</div></div>${btn('Edit','btn-white btn-sm',"toast('Editing rate...')")}</div>`).join('')}
+    </div>
+    <div id="st-aud" class="tab-panel">
+      <div class="audit-list">${auditLog.filter(a=>a.supplier===s.name).length===0?'<p style="color:var(--text3);padding:10px">No audit entries.</p>':auditLog.filter(a=>a.supplier===s.name).map(a=>`<div class="audit-item"><div class="audit-dot" style="background:${a.color}"></div><div class="audit-content"><div class="audit-action">${a.action}</div><div class="audit-meta">${a.ts} · by ${a.user}</div><div class="audit-detail">${a.detail}</div></div></div>`).join('')}</div>
+    </div>`,
+    `${btn('Edit Supplier','btn-white',`closeModal();openEditSupModal(${esc(s)})`)} ${btn('Close','btn-navy','closeModal()')}`
+  );
 }
+window.openSupModal=openSupModal;
 
+function openEditSupModal(s){
+  if(typeof s==='string')try{s=JSON.parse(s.replace(/&quot;/g,'"'));}catch(e){}
+  openModal(`Edit Supplier — ${s.name}`,fullSupplierFormHTML(s),
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Draft','btn-white',"toast('Draft saved')")} ${btn('Save Changes','btn-navy',"toast('Changes saved!');closeModal()")}`);
+}
+window.openEditSupModal=openEditSupModal;
+
+function openNewSupModal(){
+  openModal('New Supplier Application',fullSupplierFormHTML(),
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Draft','btn-white',"toast('Draft saved')")} ${btn('Submit','btn-navy',"toast('Submitted!');closeModal()")}`);
+}
+window.openNewSupModal=openNewSupModal;
+
+function openContractModal(c){
+  if(typeof c==='string')try{c=JSON.parse(c.replace(/&quot;/g,'"'));}catch(e){}
+  openModal(`Contract — ${c.id}`,`
+    <div class="fgrid" style="margin-bottom:12px">
+      ${[['Supplier',c.supplier,''],['Type',c.type,''],['Document No.',c.id,'mono'],['Destination',c.dest,''],['Period',`${c.start} – ${c.expiry}`,''],['Contract Value',c.value,''],['Annual Value',c.annualValue,''],['Status',`<span class="pill ${sc(c.status)}">${c.status}</span>`,''],['ORN Contract Owner',`<b style="color:var(--navy)">${c.ornOwner}</b>`,''],['ORN Account Manager',c.ornManager,''],['Governing Law',c.governingLaw,''],['Exclusivity',c.exclusivity||'—',''],['Auto-Renew',c.autoRenew,''],['Renewal Notice',c.renewalNotice,''],['Review Due',`<span style="color:${c.reviewDate==='Overdue'?'var(--red)':'inherit'};font-weight:${c.reviewDate==='Overdue'?700:400}">${c.reviewDate}</span>`,'']].map(([l,v,cl])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div class="${cl}" style="font-size:12.5px">${v}</div></div>`).join('')}
+    </div>
+    <div style="background:var(--bg-page);border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:12px"><div style="font-size:10.5px;color:var(--text3);font-weight:700;margin-bottom:4px">NOTES</div><div style="font-size:12.5px">${c.notes}</div></div>
+    <div style="border:1px dashed var(--border);border-radius:var(--r);padding:18px;text-align:center;background:var(--bg-page)"><div style="font-size:22px;margin-bottom:6px">📄</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">${c.file}</div><div style="font-size:12px;color:var(--text3)">PDF on file</div></div>`,
+    `${btn('&#8595; Download','btn-white',`toast('Downloading ${c.file}...')`)} ${btn('Edit','btn-white',`closeModal();openEditContractModal(${esc(c)})`)} ${btn('Renew','btn-white',"toast('Starting renewal...')")} ${btn('Close','btn-navy','closeModal()')}`
+  );
+}
+window.openContractModal=openContractModal;
+
+function openEditContractModal(c){
+  if(typeof c==='string')try{c=JSON.parse(c.replace(/&quot;/g,'"'));}catch(e){}
+  openModal(`Edit Contract — ${c.id}`,`
+    <div class="form-panel"><div class="form-head">Contract Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Supplier</label><input class="fc" value="${c.supplier}"></div>
+      <div class="fg"><label>Document Type</label><select class="fc"><option>Service Contract</option><option>Insurance Certificate</option><option>VAT Certificate</option><option>Company Registration</option><option>Owner ID / Passport</option><option>Bank Letter</option><option>KYC Form</option></select></div>
+      <div class="fg"><label>Destination</label><input class="fc" value="${c.dest}"></div>
+      <div class="fg"><label>Start Date</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Expiry Date</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Contract Value (£)</label><input class="fc" value="${c.value}"></div>
+      <div class="fg"><label>Annual Value (£)</label><input class="fc" value="${c.annualValue}"></div>
+      <div class="fg"><label>ORN Contract Owner <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Account Manager <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Governing Law</label><select class="fc"><option>English Law</option><option>UAE Law</option><option>Jordanian Law</option><option>Omani Law</option><option>Egyptian Law</option></select></div>
+      <div class="fg"><label>Auto-Renew</label><select class="fc"><option>No</option><option>Yes</option><option>N/A</option></select></div>
+      <div class="fg"><label>Renewal Notice Period</label><select class="fc"><option>30 days</option><option>60 days</option><option>90 days</option><option>N/A</option></select></div>
+      <div class="fg"><label>Exclusivity</label><select class="fc"><option>Non-exclusive</option><option>Preferred Supplier</option><option>Exclusive</option></select></div>
+      <div class="fg"><label>Review Due Date</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Status</label><select class="fc"><option>Valid</option><option>Expiring</option><option>Expired</option></select></div>
+    </div></div></div>
+    <div class="form-panel"><div class="form-head">Notes</div><div class="form-body"><textarea class="fc" style="height:70px;width:100%">${c.notes}</textarea></div></div>
+    <div class="form-panel"><div class="form-head">Replace Document File</div><div class="form-body">
+      <div class="up-zone" onclick="this.querySelector('input').click()" style="max-width:320px"><input type="file" hidden onchange="markUpload(this)"><div class="up-icon">📄</div><div class="up-lbl">Upload replacement</div><div class="up-sub">PDF up to 20MB</div></div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Changes','btn-navy',"toast('Contract updated!');closeModal()")}`
+  );
+}
+window.openEditContractModal=openEditContractModal;
+
+function openNewContractModal(){
+  openModal('New Contract / Document',`
+    <div class="form-panel"><div class="form-head">Document Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select supplier...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>Document Type <span class="req">*</span></label><select class="fc"><option>Service Contract</option><option>Insurance Certificate</option><option>VAT Certificate</option><option>Company Registration</option><option>Owner ID / Passport</option><option>Bank Letter</option><option>KYC Form</option></select></div>
+      <div class="fg"><label>Destination</label><select class="fc"><option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option><option>Morocco</option><option>Turkey</option></select></div>
+      <div class="fg"><label>Start Date</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Expiry Date <span class="req">*</span></label><input class="fc" type="date"></div>
+      <div class="fg"><label>Contract Value (£)</label><input class="fc" type="number" placeholder="0"></div>
+      <div class="fg"><label>Annual Value (£)</label><input class="fc" type="number" placeholder="0"></div>
+      <div class="fg"><label>ORN Contract Owner <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Account Manager</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Governing Law</label><select class="fc"><option>English Law</option><option>UAE Law</option><option>Local Law</option></select></div>
+      <div class="fg"><label>Auto-Renew</label><select class="fc"><option>No</option><option>Yes</option></select></div>
+      <div class="fg"><label>Renewal Notice</label><select class="fc"><option>30 days</option><option>60 days</option><option>90 days</option></select></div>
+    </div></div></div>
+    <div class="form-panel"><div class="form-head">Upload File <span class="req">*</span></div><div class="form-body">
+      <div class="up-zone" onclick="this.querySelector('input').click()" style="max-width:340px"><input type="file" hidden onchange="markUpload(this)"><div class="up-icon">📎</div><div class="up-lbl">Click to upload document</div><div class="up-sub">PDF, JPG, PNG up to 20MB</div></div>
+    </div></div>
+    <div class="form-panel"><div class="form-head">Notes</div><div class="form-body"><textarea class="fc" style="height:55px;width:100%" placeholder="Internal notes..."></textarea></div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save','btn-navy',"toast('Document saved!');closeModal()")}`
+  );
+}
+window.openNewContractModal=openNewContractModal;
+
+function openUploadModal(){
+  openModal('Upload Document',`
+    <div class="form-panel"><div class="form-head">Upload Details</div><div class="form-body">
+      <div class="fgrid" style="margin-bottom:12px">
+        <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select supplier...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
+        <div class="fg"><label>Document Type <span class="req">*</span></label><select class="fc"><option>Service Contract</option><option>Insurance Certificate</option><option>VAT Certificate</option><option>Company Registration</option><option>Owner ID / Passport</option><option>Bank Letter</option><option>KYC / AML Form</option></select></div>
+        <div class="fg"><label>Expiry Date</label><input class="fc" type="date"></div>
+        <div class="fg"><label>ORN Document Owner</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+        <div class="fg"><label>Notes</label><input class="fc" placeholder="Optional notes..."></div>
+      </div>
+      <div class="up-zone" onclick="this.querySelector('input').click()" style="max-width:420px"><input type="file" hidden onchange="markUpload(this)"><div class="up-icon">📎</div><div class="up-lbl">Drop file here or click to upload</div><div class="up-sub">PDF, JPG, PNG up to 20MB</div></div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Upload','btn-navy',"toast('Document uploaded!');closeModal()")}`
+  );
+}
+window.openUploadModal=openUploadModal;
+
+function openDocsModal(name){
+  const docs=contracts.filter(c=>c.supplier===name);
+  openModal(`Documents — ${name}`,
+    `${docs.length===0?'<p style="color:var(--text3)">No documents found.</p>':docs.map(c=>`<div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div><div style="font-weight:600;font-size:12.5px;margin-bottom:2px">${c.type} <span class="mono" style="margin-left:8px;font-weight:400">${c.id}</span></div><div style="font-size:12px;color:var(--text3)">Expiry: ${c.expiry} · Owner: ${c.ornOwner}${c.value!=='—'?' · Value: '+c.value:''}</div><div style="font-size:11.5px;color:var(--text2);margin-top:3px">${c.notes}</div></div><div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0"><span class="pill ${sc(c.status)}">${c.status}</span>${btn('&#8595; Download','btn-white btn-sm',`toast('Downloading...')`)} ${btn('Edit','btn-white btn-sm',`closeModal();openEditContractModal(${esc(c)})`)}</div></div>`).join('')}
+    <div style="margin-top:12px">${btn('+ Upload New Document','btn-navy','closeModal();openUploadModal()')}</div>`,
+    btn('Close','btn-navy','closeModal()')
+  );
+}
+window.openDocsModal=openDocsModal;
+
+function openAuditModal(name){
+  const logs=auditLog.filter(a=>a.supplier===name);
+  openModal(`Audit Trail — ${name}`,`<div class="audit-list">${logs.length===0?'<p style="color:var(--text3);padding:10px">No audit entries.</p>':logs.map(a=>`<div class="audit-item"><div class="audit-dot" style="background:${a.color}"></div><div class="audit-content"><div class="audit-action">${a.action}</div><div class="audit-meta">${a.ts} · by ${a.user}</div><div class="audit-detail">${a.detail}</div></div></div>`).join('')}</div>`,
+    btn('Close','btn-navy','closeModal()')
+  );
+}
+window.openAuditModal=openAuditModal;
+
+function openNewPaymentModal(){
+  openModal('New Invoice / Payment',`
+    <div class="form-panel"><div class="form-head">Invoice Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>Description <span class="req">*</span></label><input class="fc" placeholder="e.g. April accommodation"></div>
+      <div class="fg"><label>Amount (£) <span class="req">*</span></label><input class="fc" type="number" placeholder="0.00" min="0"></div>
+      <div class="fg"><label>Due Date <span class="req">*</span></label><input class="fc" type="date"></div>
+      <div class="fg"><label>PO Reference</label><input class="fc" placeholder="PO-2026-..."></div>
+      <div class="fg"><label>Destination</label><select class="fc"><option>Dubai</option><option>Abu Dhabi</option><option>Oman</option><option>Egypt</option><option>Jordan</option></select></div>
+      <div class="fg"><label>Approver <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Currency</label><select class="fc"><option>GBP</option><option>USD</option><option>AED</option><option>EUR</option></select></div>
+    </div></div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Draft','btn-white',"toast('Draft saved')")} ${btn('Create Invoice','btn-navy',"toast('Invoice created!');closeModal()")}`
+  );
+}
+window.openNewPaymentModal=openNewPaymentModal;
+
+function openNewRateModal(){
+  openModal('Add New Rate',`
+    <div class="form-panel"><div class="form-head">Rate Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Supplier <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${suppliers.map(s=>`<option>${s.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>Service / Room Type</label><input class="fc" placeholder="e.g. Deluxe Room, Desert Safari"></div>
+      <div class="fg"><label>Season</label><select class="fc"><option>Peak</option><option>High</option><option>Low</option><option>All Year</option></select></div>
+      <div class="fg"><label>Period From</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Period To</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Net Rate (£) <span class="req">*</span></label><input class="fc" type="number" placeholder="0.00" min="0"></div>
+      <div class="fg"><label>Commission (%)</label><input class="fc" type="number" placeholder="15" min="0" max="50"></div>
+      <div class="fg"><label>Updated By</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+    </div></div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Add Rate','btn-navy',"toast('Rate added!');closeModal()")}`
+  );
+}
+window.openNewRateModal=openNewRateModal;
+
+function openEditRateModal(sup,season){
+  openModal(`Edit Rate — ${sup} (${season})`,`
+    <div class="form-panel"><div class="form-head">Edit Rate</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Supplier</label><input class="fc" value="${sup}" readonly></div>
+      <div class="fg"><label>Season</label><select class="fc"><option>Peak</option><option>High</option><option>Low</option><option>All Year</option></select></div>
+      <div class="fg"><label>Period From</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Period To</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Net Rate (£)</label><input class="fc" type="number" placeholder="0.00"></div>
+      <div class="fg"><label>Commission (%)</label><input class="fc" type="number" placeholder="15"></div>
+      <div class="fg"><label>Updated By</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Status</label><select class="fc"><option>Active</option><option>Inactive</option><option>Draft</option></select></div>
+    </div></div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Changes','btn-navy',"toast('Rate updated!');closeModal()")}`
+  );
+}
+window.openEditRateModal=openEditRateModal;
+
+function openNewDestModal(){
+  openModal('Add New Destination',`
+    <div class="form-panel"><div class="form-head">Destination Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Country <span class="req">*</span></label><input class="fc" placeholder="e.g. Saudi Arabia"></div>
+      <div class="fg"><label>City / Region <span class="req">*</span></label><input class="fc" placeholder="e.g. Riyadh"></div>
+      <div class="fg"><label>Flag Emoji</label><input class="fc" placeholder="🇸🇦"></div>
+      <div class="fg"><label>Currency</label><select class="fc"><option>GBP</option><option>USD</option><option>SAR</option><option>AED</option></select></div>
+      <div class="fg"><label>ORN Regional Lead <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Account Manager</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Status</label><select class="fc"><option>Active</option><option>Coming Soon</option><option>Planned</option></select></div>
+      <div class="fg"><label>Target Go-Live</label><input class="fc" type="date"></div>
+    </div></div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Add Destination','btn-navy',"toast('Destination added!');closeModal()")}`
+  );
+}
+window.openNewDestModal=openNewDestModal;
+
+// ─── NAV & INIT ───────────────────────────────────────────────────
+function setPrimary(key){
+  curPrimary=key;curSub=0;
+  document.querySelectorAll('.pnav').forEach(n=>n.classList.toggle('active',n.dataset.p===key));
+  buildSecondary(key);renderContent();
+}
 function setSecondary(idx){
   curSub=idx;
   document.querySelectorAll('.snav').forEach((n,i)=>n.classList.toggle('active',i===idx));
@@ -1059,8 +678,7 @@ window.setSecondary=setSecondary;
 
 function buildSecondary(primary){
   const nav=NAV[primary];
-  const el=document.getElementById('secondary-nav');
-  el.innerHTML=(nav?.sub||[]).map((l,i)=>`<span class="snav ${i===0?'active':''}" onclick="setSecondary(${i})">${l}</span>`).join('');
+  document.getElementById('secondary-nav').innerHTML=(nav?.sub||[]).map((l,i)=>`<span class="snav ${i===0?'active':''}" onclick="setSecondary(${i})">${l}</span>`).join('');
 }
 
 function renderContent(){
@@ -1069,44 +687,562 @@ function renderContent(){
   const el=document.getElementById('content');
   if(pageKey&&typeof window[pageKey]==='function'){
     el.innerHTML=window[pageKey]();
-    if(pageKey==='pg_sup_all') setTimeout(()=>renderSupTable(suppliers),0);
+    if(pageKey==='pg_sup_all')setTimeout(()=>renderSupTable(suppliers),0);
   } else {
-    const label=nav?.sub?.[curSub]||NAV[curPrimary]?.sub?.[0]||curPrimary;
-    el.innerHTML=`<div class="page-title">${label}</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)"><div style="font-size:32px;margin-bottom:10px">📋</div><b>${label}</b><div style="font-size:12.5px;margin-top:6px">Connect live data source to populate this view.</div></div>`;
+    const label=nav?.sub?.[curSub]||curPrimary;
+    el.innerHTML=`<div class="page-title">${label}</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)"><div style="font-size:32px;margin-bottom:10px">📋</div><b>${label}</b><div style="font-size:12.5px;margin-top:6px">Connect live data source to populate.</div></div>`;
   }
 }
 
-// Register page functions on window
-window.pg_sup_dash=pg_sup_dash;
-window.pg_sup_all=pg_sup_all;
-window.pg_sup_onboard=pg_sup_onboard;
-window.pg_sup_contracts=pg_sup_contracts;
-window.pg_sup_payments=pg_sup_payments;
-window.pg_sup_rates=pg_sup_rates;
-window.pg_sup_audit=pg_sup_audit;
-window.pg_sup_tiers=pg_sup_tiers;
-window.pg_sup_dest=pg_sup_dest;
-window.pg_hotel_content=pg_hotel_content;
-window.pg_hotel_rates=pg_hotel_rates;
-window.pg_act_all=pg_act_all;
+
+// ─── DATA: SUPPLY SOURCES ─────────────────────────────────────────
+// Each hotel can have multiple supply sources (direct, API, GDS, bed bank, aggregator)
+// Priority 1 = shown first / preferred. Drag to reorder.
+const supplySources = [
+  { hotelId:'H-0081', hotelName:'Atlantis The Palm', dest:'Dubai', stars:5, ornManager:'Ajay Kawa',
+    sources:[
+      {id:'SS-001',type:'Direct Contract',channel:'Direct',provider:'Atlantis The Palm',contractRef:'CTR-2024-0081',net:285,gross:336,commission:18,currency:'GBP',availability:'Live',lastSync:'—',priority:1,markup:'ORN Rate',active:true,notes:'Primary source. Full allocation 200 rooms. Best net rate.'},
+      {id:'SS-002',type:'API Feed',channel:'API',provider:'Hotelbeds',contractRef:'HB-API-88221',net:302,gross:357,commission:15,currency:'GBP',availability:'Live',lastSync:'2 min ago',priority:2,markup:'Hotelbeds Markup',active:true,notes:'Backup source. Higher cost but real-time availability.'},
+      {id:'SS-003',type:'GDS',channel:'GDS',provider:'Amadeus',contractRef:'AMD-GDS-44112',net:318,gross:375,commission:15,currency:'GBP',availability:'Live',lastSync:'5 min ago',priority:3,markup:'GDS Public',active:false,notes:'Disabled — more expensive than direct. Keep for fallback.'},
+    ]
+  },
+  { hotelId:'H-0082', hotelName:'Burj Al Arab Jumeirah', dest:'Dubai', stars:7, ornManager:'Ajay Kawa',
+    sources:[
+      {id:'SS-004',type:'Direct Contract',channel:'Direct',provider:'Jumeirah Group',contractRef:'CTR-2023-0082',net:680,gross:802,commission:20,currency:'GBP',availability:'Live',lastSync:'—',priority:1,markup:'ORN Exclusive',active:true,notes:'Exclusive rate. Cannot be beaten by any API.'},
+      {id:'SS-005',type:'API Feed',channel:'API',provider:'RateGain',contractRef:'RG-API-22341',net:720,gross:850,commission:15,currency:'GBP',availability:'Live',lastSync:'8 min ago',priority:2,markup:'RateGain',active:true,notes:'Higher net. Used only when direct allotment exhausted.'},
+    ]
+  },
+  { hotelId:'H-0083', hotelName:'Al Maha Desert Resort', dest:'Dubai', stars:5, ornManager:'Priya Sharma',
+    sources:[
+      {id:'SS-006',type:'Bed Bank',channel:'Bed Bank',provider:'W2M / Peakwork',contractRef:'W2M-BB-55112',net:410,gross:484,commission:15,currency:'GBP',availability:'Live',lastSync:'12 min ago',priority:1,markup:'Bed Bank',active:true,notes:'No direct contract. Best rate via bed bank.'},
+      {id:'SS-007',type:'API Feed',channel:'API',provider:'Hotelbeds',contractRef:'HB-API-55113',net:428,gross:505,commission:15,currency:'GBP',availability:'Live',lastSync:'4 min ago',priority:2,markup:'Hotelbeds',active:true,notes:'Comparable rates. Use if W2M offline.'},
+      {id:'SS-008',type:'Aggregator',channel:'Aggregator',provider:'Expedia Partner',contractRef:'EXP-AGG-88221',net:445,gross:525,commission:12,currency:'GBP',availability:'Live',lastSync:'1 hr ago',priority:3,markup:'Expedia',active:false,notes:'Disabled. Highest cost, worst margin.'},
+    ]
+  },
+  { hotelId:'H-0086', hotelName:'Oman Luxury Resorts', dest:'Oman', stars:5, ornManager:'Omar Al Farsi',
+    sources:[
+      {id:'SS-009',type:'Direct Contract',channel:'Direct',provider:'Oman Luxury Resorts SAOG',contractRef:'CTR-2023-0086',net:290,gross:336,commission:16,currency:'GBP',availability:'Live',lastSync:'—',priority:1,markup:'ORN Rate',active:true,notes:'Preferred direct source. 3-year contract.'},
+      {id:'SS-010',type:'GDS',channel:'GDS',provider:'Sabre',contractRef:'SAB-GDS-77112',net:315,gross:372,commission:15,currency:'GBP',availability:'Live',lastSync:'10 min ago',priority:2,markup:'Sabre Public',active:true,notes:'Backup. Used during peak when direct allocation full.'},
+    ]
+  },
+  { hotelId:'H-0096', hotelName:'Pyramids View Hotel', dest:'Egypt', stars:4, ornManager:'Ravi Patel',
+    sources:[
+      {id:'SS-011',type:'API Feed',channel:'API',provider:'Hotelbeds',contractRef:'HB-API-33441',net:95,gross:112,commission:15,currency:'GBP',availability:'Live',lastSync:'3 min ago',priority:1,markup:'Hotelbeds',active:true,notes:'No direct contract. API only — supplier suspended from direct.'},
+      {id:'SS-012',type:'Bed Bank',channel:'Bed Bank',provider:'Tourico',contractRef:'TOU-BB-22341',net:98,gross:116,commission:15,currency:'GBP',availability:'Limited',lastSync:'30 min ago',priority:2,markup:'Tourico',active:true,notes:'Limited availability. Use as second option.'},
+    ]
+  },
+  { hotelId:'H-0094', hotelName:'Blue Waters Hotel Group', dest:'Dubai', stars:5, ornManager:'Priya Sharma',
+    sources:[
+      {id:'SS-013',type:'Direct Contract',channel:'Direct',provider:'Blue Waters Hospitality',contractRef:'Pending',net:null,gross:null,commission:null,currency:'GBP',availability:'Pending',lastSync:'—',priority:1,markup:'—',active:false,notes:'Direct contract under negotiation. Not yet live.'},
+      {id:'SS-014',type:'API Feed',channel:'API',provider:'Hotelbeds',contractRef:'HB-API-66221',net:320,gross:378,commission:15,currency:'GBP',availability:'Live',lastSync:'6 min ago',priority:2,markup:'Hotelbeds',active:true,notes:'Currently serving via API while direct contract finalised.'},
+    ]
+  },
+];
+
+// ─── DATA: REGIONAL OFFICES ───────────────────────────────────────
+const regionalOffices = [
+  { id:'RO-01', flag:'🇬🇧', name:'London — Global HQ', city:'London', country:'UK', type:'Global HQ', address:'12 Berkeley Square, Mayfair, London W1J 6BE', phone:'+44 20 7946 0100', email:'hq@orn.com',
+    head:'James Thornton', headRole:'Commercial Director', headEmail:'james.thornton@orn.com',
+    team:['Ajay Kawa','Layla Hassan','Nina Kowalski'],
+    destinations:['Global Oversight'],
+    contractScope:'Global — all destinations',
+    contractAuthority:'Full authority — all contract types up to £5M',
+    supplierCount:142, contractCount:486, activeContracts:131,
+    contracts:[
+      {ref:'CTR-2024-0081',supplier:'Atlantis The Palm',type:'Service Contract',value:'£840K',expiry:'Dec 2025',owner:'Layla Hassan'},
+      {ref:'CTR-2024-0097',supplier:'Marrakech Riad Collection',type:'Service Contract',value:'£220K',expiry:'Jun 2026',owner:'Layla Hassan'},
+      {ref:'CTR-2024-0099',supplier:'Cappadocia Balloon Tours',type:'Service Contract',value:'£180K',expiry:'Aug 2026',owner:'Layla Hassan'},
+    ]
+  },
+  { id:'RO-02', flag:'🇦🇪', name:'Dubai — Gulf Office', city:'Dubai', country:'UAE', type:'Regional Office', address:'Level 14, Boulevard Plaza Tower 1, Downtown Dubai, UAE', phone:'+971 4 123 4567', email:'gulf@orn.com',
+    head:'Omar Al Farsi', headRole:'Regional Manager – Gulf', headEmail:'omar.alfarsi@orn.com',
+    team:['Omar Al Farsi'],
+    destinations:['Dubai','Abu Dhabi','Oman','Bahrain','Saudi Arabia'],
+    contractScope:'Gulf region — UAE, Oman, Saudi Arabia, Bahrain, Kuwait',
+    contractAuthority:'Regional authority up to £200K per contract. Above requires London sign-off.',
+    supplierCount:62, contractCount:187, activeContracts:181,
+    contracts:[
+      {ref:'CTR-2023-0086',supplier:'Oman Luxury Resorts',type:'Service Contract',value:'£580K',expiry:'May 2026',owner:'Omar Al Farsi'},
+      {ref:'INS-2024-0085',supplier:'Jordan Transfer Co',type:'Insurance',value:'—',expiry:'Sep 2025',owner:'Omar Al Farsi'},
+    ]
+  },
+  { id:'RO-03', flag:'🇪🇬', name:'Cairo — Africa & Middle East', city:'Cairo', country:'Egypt', type:'Regional Office', address:'Nile City Towers, North Tower, 2005C Corniche El Nil, Cairo', phone:'+20 2 2461 9000', email:'africa@orn.com',
+    head:'Ravi Patel', headRole:'Supplier Manager – Africa & ME', headEmail:'ravi.patel@orn.com',
+    team:['Ravi Patel'],
+    destinations:['Egypt','Jordan','Morocco','Kenya','Tanzania'],
+    contractScope:'Africa & Middle East — Egypt, Jordan, Morocco, East Africa',
+    contractAuthority:'Regional authority up to £100K. Larger contracts require London co-sign.',
+    supplierCount:32, contractCount:94, activeContracts:88,
+    contracts:[
+      {ref:'CTR-2023-0083',supplier:'Desert Tracks Tours',type:'Service Contract',value:'£120K',expiry:'Feb 2024',owner:'Ravi Patel'},
+      {ref:'ID-2024-0083',supplier:'Desert Tracks Tours',type:'Owner ID',value:'—',expiry:'Feb 2029',owner:'Ravi Patel'},
+    ]
+  },
+  { id:'RO-04', flag:'🇹🇭', name:'Bangkok — Asia & Maldives', city:'Bangkok', country:'Thailand', type:'Regional Office', address:'Empire Tower, 47th Floor, 1 South Sathorn Road, Bangkok 10120', phone:'+66 2 685 4000', email:'asia@orn.com',
+    head:'Priya Sharma', headRole:'Senior Supplier Manager – Asia', headEmail:'priya.sharma@orn.com',
+    team:['Priya Sharma'],
+    destinations:['Maldives','Thailand','Sri Lanka','India'],
+    contractScope:'Asia Pacific — Maldives, Thailand, Sri Lanka, India',
+    contractAuthority:'Regional authority up to £150K. Escalate to London above threshold.',
+    supplierCount:12, contractCount:28, activeContracts:24,
+    contracts:[
+      {ref:'CTR-MV-2024-01',supplier:'Maldives Sunset Cruises',type:'Service Contract',value:'£95K',expiry:'Awaiting',owner:'Priya Sharma'},
+    ]
+  },
+  { id:'RO-05', flag:'🇪🇸', name:'Madrid — Europe & Americas', city:'Madrid', country:'Spain', type:'Regional Office', address:'Paseo de la Castellana 79, 28046 Madrid, Spain', phone:'+34 91 782 4000', email:'europe@orn.com',
+    head:'Sarah Mitchell', headRole:'Supplier Manager – Europe & Americas', headEmail:'sarah.mitchell@orn.com',
+    team:['Sarah Mitchell'],
+    destinations:['Spain','Portugal','France','Italy','Turkey','Greece','USA','Mexico'],
+    contractScope:'Europe & Americas — Turkey, Mediterranean, Western Europe, Americas',
+    contractAuthority:'Regional authority up to £150K per contract.',
+    supplierCount:18, contractCount:42, activeContracts:38,
+    contracts:[
+      {ref:'CTR-2024-0099',supplier:'Cappadocia Balloon Tours',type:'Service Contract',value:'£180K',expiry:'Aug 2026',owner:'Sarah Mitchell'},
+    ]
+  },
+];
+
+// ─── PAGE: SUPPLY SOURCES ─────────────────────────────────────────
+function pg_hotel_sources(){
+  const srcTypeBadge = t => {
+    const m = {Direct:'src-direct',API:'src-api',GDS:'src-gds','Bed Bank':'src-bed',Aggregator:'src-agg'};
+    return `<span class="src-badge ${m[t]||'src-agg'}">${t==='Direct'?'✦ Direct':t==='API'?'⚡ API':t==='GDS'?'🌐 GDS':t==='Bed Bank'?'🛏 Bed Bank':'🔗 '+t}</span>`;
+  };
+  const avail = a => a==='Live'?'<span class="pill p-green">Live</span>':a==='Limited'?'<span class="pill p-orange">Limited</span>':a==='Pending'?'<span class="pill p-orange">Pending</span>':'<span class="pill p-gray">Offline</span>';
+  const netDisplay = (n,c) => n?`<b>${c==='GBP'?'£':'$'}${n}</b>`:'<span style="color:var(--text3)">—</span>';
+
+  return `
+    <div class="page-title">Supply Source Management</div>
+    <p class="page-subtitle">View all sources for each hotel, set display priority, and enable/disable channels. Priority 1 is always shown first to customers.</p>
+
+    <div class="sum-cards">
+      <div class="sum-card green"><div class="sc-lbl">Hotels with Direct Contract</div><div class="sc-val green">4</div><div class="sc-sub">Best margin source</div></div>
+      <div class="sum-card blue" style="border-left:3px solid var(--navy)"><div class="sc-lbl">Hotels via API Only</div><div class="sc-val" style="color:var(--navy)">1</div><div class="sc-sub">No direct contract</div></div>
+      <div class="sum-card orange"><div class="sc-lbl">Multi-Source Hotels</div><div class="sc-val orange">6</div><div class="sc-sub">Priority selection active</div></div>
+      <div class="sum-card"><div class="sc-lbl">Total Source Connections</div><div class="sc-val">14</div><div class="sc-sub">Across all hotels</div></div>
+      <div class="sum-card red"><div class="sc-lbl">Disabled Sources</div><div class="sc-val red">3</div><div class="sc-sub">Higher cost / backup</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input class="ti" placeholder="Search hotel..." style="width:200px" oninput="srcFilter(this.value)">
+      <select class="ti" onchange="srcFilter(document.querySelector('#src-q').value, this.value)">
+        <option value="">All Destinations</option>
+        <option>Dubai</option><option>Oman</option><option>Egypt</option><option>Jordan</option><option>Maldives</option>
+      </select>
+      <select class="ti">
+        <option>All Source Types</option><option>Direct Contract</option><option>API Feed</option><option>GDS</option><option>Bed Bank</option><option>Aggregator</option>
+      </select>
+      <select class="ti">
+        <option>All Status</option><option>Live</option><option>Limited</option><option>Pending</option><option>Offline</option>
+      </select>
+      ${btn('Search','btn-navy',"toast('Filtering...')")}
+      <div class="toolbar-r">
+        ${btn('&#8595; Export','btn-white',"toast('Exporting...')")}
+        ${btn('+ Add Source','btn-navy','openNewSourceModal()')}
+      </div>
+    </div>
+
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#0d47a1">
+      ℹ️ <b>Priority rules:</b> Priority 1 is the primary source shown to customers and used for availability checks first. Drag rows to reorder within each hotel. Disabled sources are hidden from customers but kept as fallback data. Direct contracts always earn the best margin — promote these to Priority 1.
+    </div>
+
+    <div id="src-list">
+      ${supplySources.map(h=>`
+        <div class="src-card" id="sc-${h.hotelId}">
+          <div class="src-card-head">
+            <div>
+              <div class="src-hotel-name">${'★'.repeat(Math.min(h.stars,5))} ${h.hotelName}</div>
+              <div class="src-hotel-meta">${h.dest} · ${h.sources.length} source${h.sources.length!==1?'s':''} · ORN Manager: ${h.ornManager}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11.5px;color:var(--text3)">${h.sources.filter(s=>s.active).length} active / ${h.sources.length} total</span>
+              ${btn('Manage Sources','btn-white btn-sm',`openSourcesModal('${h.hotelId}')`)}
+              ${btn('+ Add Source','btn-white btn-sm','openNewSourceModal()')}
+            </div>
+          </div>
+          <!-- Column header row -->
+          <div style="display:grid;grid-template-columns:28px 30px 140px 100px 80px 80px 80px 70px 80px 80px 1fr;gap:0;padding:5px 14px;background:var(--bg-page);border-bottom:1px solid var(--border-lt)">
+            ${['','Pri.','Source / Provider','Type','Net Rate','Gross Rate','Commission','Currency','Availability','Last Sync','Actions'].map(h=>`<div style="font-size:10.5px;font-weight:700;color:var(--text3)">${h}</div>`).join('')}
+          </div>
+          <div class="src-rows" id="rows-${h.hotelId}">
+            ${h.sources.map((s,i)=>`
+              <div class="src-row ${!s.active?'':'priority-'+Math.min(s.priority,3)}" data-id="${s.id}" style="${!s.active?'opacity:0.45;background:#f9f9f9':''}">
+                <div class="drag-handle" title="Drag to reorder">⠿</div>
+                <div>
+                  <span class="priority-badge ${s.priority===2?'p2':s.priority>=3?'p3':''}">${s.priority}</span>
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:12px;color:${s.active?'var(--navy)':'var(--text3)'}">${s.provider}</div>
+                  <div style="font-size:10.5px;color:var(--text3)">${s.contractRef}</div>
+                </div>
+                <div>${srcTypeBadge(s.channel)}</div>
+                <div>${netDisplay(s.net,s.currency)}</div>
+                <div>${netDisplay(s.gross,s.currency)}</div>
+                <div style="font-size:11.5px">${s.commission?s.commission+'%':'—'}</div>
+                <div style="font-size:11.5px">${s.currency}</div>
+                <div>${avail(s.availability)}</div>
+                <div style="font-size:10.5px;color:var(--text3)">${s.lastSync}</div>
+                <div style="display:flex;gap:6px;align-items:center">
+                  ${s.priority>1?btn('▲ Make P1','btn-white btn-sm',`toast('Set ${s.provider} as Priority 1 for ${h.hotelName}')`):'<span style="font-size:11px;color:var(--teal);font-weight:700">✦ Priority 1</span>'}
+                  <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11.5px">
+                    <input type="checkbox" ${s.active?'checked':''} onchange="toast(this.checked?'${s.provider} enabled':'${s.provider} disabled')">
+                    ${s.active?'<span style="color:var(--green)">Enabled</span>':'<span style="color:var(--text3)">Disabled</span>'}
+                  </label>
+                  <a class="lnk" style="font-size:11.5px" onclick="openSourceDetailModal('${s.id}','${h.hotelName}')">Edit</a>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+window.pg_hotel_sources = pg_hotel_sources;
+
+function openNewSourceModal(){
+  openModal('Add New Supply Source',`
+    <div class="form-panel"><div class="form-head">Source Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Hotel <span class="req">*</span></label><select class="fc"><option value="">Select hotel...</option>${supplySources.map(h=>`<option value="${h.hotelId}">${h.hotelName}</option>`).join('')}</select></div>
+      <div class="fg"><label>Source Type <span class="req">*</span></label><select class="fc"><option>Direct Contract</option><option>API Feed</option><option>GDS</option><option>Bed Bank</option><option>Aggregator</option></select></div>
+      <div class="fg"><label>Provider / Channel Name <span class="req">*</span></label><input class="fc" placeholder="e.g. Hotelbeds, Amadeus, Sabre"></div>
+      <div class="fg"><label>Contract / API Reference</label><input class="fc" placeholder="e.g. HB-API-88221"></div>
+      <div class="fg"><label>Net Rate (£)</label><input class="fc" type="number" placeholder="0.00" min="0"></div>
+      <div class="fg"><label>Gross Rate (£)</label><input class="fc" type="number" placeholder="0.00" min="0"></div>
+      <div class="fg"><label>Commission (%)</label><input class="fc" type="number" placeholder="e.g. 15" min="0" max="50"></div>
+      <div class="fg"><label>Currency</label><select class="fc"><option>GBP</option><option>USD</option><option>EUR</option><option>AED</option></select></div>
+      <div class="fg"><label>Display Priority</label><input class="fc" type="number" placeholder="1 = highest" min="1" max="10" value="1"></div>
+      <div class="fg"><label>Initial Status</label><select class="fc"><option>Enabled</option><option>Disabled</option></select></div>
+      <div class="fg"><label>Markup Label</label><input class="fc" placeholder="e.g. ORN Rate, Hotelbeds Markup"></div>
+      <div class="fg"><label>ORN Manager</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+    </div>
+    <div class="fg" style="margin-top:10px"><label>Notes / Reason for Adding</label>
+      <textarea class="fc" style="height:60px;width:100%" placeholder="Why is this source being added? Any specific conditions or notes?"></textarea>
+    </div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Add Source','btn-navy',"toast('Source added successfully!');closeModal()")}`
+  );
+}
+window.openNewSourceModal = openNewSourceModal;
+
+function openSourceDetailModal(srcId, hotelName){
+  const all = supplySources.flatMap(h=>h.sources);
+  const s = all.find(x=>x.id===srcId) || {};
+  openModal(`Edit Source — ${hotelName} · ${s.provider||srcId}`,`
+    <div class="form-panel"><div class="form-head">Source Settings</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Provider / Channel</label><input class="fc" value="${s.provider||''}"></div>
+      <div class="fg"><label>Source Type</label><select class="fc"><option ${s.channel==='Direct Contract'?'selected':''}>Direct Contract</option><option ${s.channel==='API'?'selected':''}>API Feed</option><option ${s.channel==='GDS'?'selected':''}>GDS</option><option ${s.channel==='Bed Bank'?'selected':''}>Bed Bank</option><option ${s.channel==='Aggregator'?'selected':''}>Aggregator</option></select></div>
+      <div class="fg"><label>Contract / API Ref</label><input class="fc" value="${s.contractRef||''}"></div>
+      <div class="fg"><label>Net Rate (£)</label><input class="fc" type="number" value="${s.net||''}"></div>
+      <div class="fg"><label>Gross Rate (£)</label><input class="fc" type="number" value="${s.gross||''}"></div>
+      <div class="fg"><label>Commission (%)</label><input class="fc" type="number" value="${s.commission||''}"></div>
+      <div class="fg"><label>Display Priority</label><input class="fc" type="number" value="${s.priority}" min="1" max="10"></div>
+      <div class="fg"><label>Status</label><select class="fc"><option ${s.active?'selected':''}>Enabled</option><option ${!s.active?'selected':''}>Disabled</option></select></div>
+      <div class="fg"><label>Availability</label><select class="fc"><option ${s.availability==='Live'?'selected':''}>Live</option><option ${s.availability==='Limited'?'selected':''}>Limited</option><option ${s.availability==='Pending'?'selected':''}>Pending</option><option ${s.availability==='Offline'?'selected':''}>Offline</option></select></div>
+      <div class="fg"><label>Markup Label</label><input class="fc" value="${s.markup||''}"></div>
+    </div>
+    <div class="fg" style="margin-top:10px"><label>Notes</label><textarea class="fc" style="height:60px;width:100%">${s.notes||''}</textarea></div>
+    </div></div>
+    <div class="form-panel"><div class="form-head">Priority &amp; Display Rules</div><div class="form-body">
+      <div class="fgrid">
+        <div class="fg"><label>When to use this source</label><select class="fc"><option>Always (primary)</option><option>When primary unavailable</option><option>When primary allotment full</option><option>Manual selection only</option></select></div>
+        <div class="fg"><label>Price threshold (show if within £X of lowest)</label><input class="fc" type="number" placeholder="e.g. 20" min="0"></div>
+        <div class="fg"><label>Min availability rooms to trigger</label><input class="fc" type="number" placeholder="e.g. 5" min="1"></div>
+        <div class="fg"><label>Show to customers?</label><select class="fc"><option>Yes — visible on site</option><option>No — internal/fallback only</option></select></div>
+      </div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Changes','btn-navy',"toast('Source updated!');closeModal()")}`
+  );
+}
+window.openSourceDetailModal = openSourceDetailModal;
+
+function openSourcesModal(hotelId){
+  const h = supplySources.find(x=>x.hotelId===hotelId);
+  if(!h) return;
+  openModal(`All Sources — ${h.hotelName}`,`
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Drag rows to set priority order. Priority 1 is shown to customers first.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:var(--bg-page)">${['Priority','Provider','Type','Net','Gross','Comm.','Status','Avail.','Actions'].map(h=>`<th style="padding:6px 8px;text-align:left;font-size:10.5px;color:var(--text3);border-bottom:1px solid var(--border-lt)">${h}</th>`).join('')}</tr></thead>
+      <tbody>${h.sources.map(s=>`<tr style="border-bottom:1px solid var(--border-lt);${!s.active?'opacity:0.5':''}">
+        <td style="padding:7px 8px;text-align:center"><span class="priority-badge ${s.priority===2?'p2':s.priority>=3?'p3':''}">${s.priority}</span></td>
+        <td style="padding:7px 8px;font-weight:600">${s.provider}<div style="font-size:10px;color:var(--text3)">${s.contractRef}</div></td>
+        <td style="padding:7px 8px"><span class="src-badge ${s.channel==='Direct Contract'?'src-direct':s.channel==='API'?'src-api':s.channel==='GDS'?'src-gds':s.channel==='Bed Bank'?'src-bed':'src-agg'}">${s.channel}</span></td>
+        <td style="padding:7px 8px;font-weight:700">${s.net?'£'+s.net:'—'}</td>
+        <td style="padding:7px 8px">${s.gross?'£'+s.gross:'—'}</td>
+        <td style="padding:7px 8px">${s.commission?s.commission+'%':'—'}</td>
+        <td style="padding:7px 8px"><label style="display:flex;align-items:center;gap:4px"><input type="checkbox" ${s.active?'checked':''} onchange="toast('Updated')"><span style="font-size:11px">${s.active?'On':'Off'}</span></label></td>
+        <td style="padding:7px 8px"><span class="pill ${s.availability==='Live'?'p-green':s.availability==='Limited'?'p-orange':'p-gray'}">${s.availability}</span></td>
+        <td style="padding:7px 8px;display:flex;gap:4px">
+          ${s.priority>1?btn('P1','btn-white btn-sm',`toast('Set as Priority 1')`):'<span style="font-size:10px;color:var(--teal);font-weight:700">★ P1</span>'}
+          <a class="lnk" style="font-size:11px" onclick="closeModal();openSourceDetailModal('${s.id}','${h.hotelName}')">Edit</a>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div style="margin-top:12px">${btn('+ Add Source for this Hotel','btn-navy','closeModal();openNewSourceModal()')}</div>`,
+    `${btn('Save Priority Order','btn-navy',"toast('Priority order saved!')")} ${btn('Close','btn-white','closeModal()')}`
+  );
+}
+window.openSourcesModal = openSourcesModal;
+
+function srcFilter(q=''){
+  const lq = q.toLowerCase();
+  document.querySelectorAll('.src-card').forEach(card=>{
+    const name = card.querySelector('.src-hotel-name')?.textContent||'';
+    card.style.display = (!lq || name.toLowerCase().includes(lq)) ? '' : 'none';
+  });
+}
+window.srcFilter = srcFilter;
+
+
+// ─── PAGE: REGIONAL OFFICES & CONTRACT ASSIGNMENT ─────────────────
+function pg_sup_regions(){
+  const scopeBadge = t => t==='Global HQ'?'<span class="pill p-blue">Global HQ</span>':'<span class="pill p-green">Regional Office</span>';
+
+  return `
+    <div class="page-title">Regional Offices &amp; Contract Assignment</div>
+    <p class="page-subtitle">View each ORN office, their regional scope, contract authority levels, and manage which contracts are owned by which office and team member.</p>
+
+    <div class="sum-cards">
+      <div class="sum-card"><div class="sc-lbl">Total Offices</div><div class="sc-val">${regionalOffices.length}</div><div class="sc-sub">1 Global HQ + ${regionalOffices.length-1} Regional</div></div>
+      <div class="sum-card green"><div class="sc-lbl">Active Contracts</div><div class="sc-val green">460</div><div class="sc-sub">Across all offices</div></div>
+      <div class="sum-card orange"><div class="sc-lbl">Unassigned Contracts</div><div class="sc-val orange">12</div><div class="sc-sub">Need office assignment</div></div>
+      <div class="sum-card"><div class="sc-lbl">Destinations Covered</div><div class="sc-val">18</div><div class="sc-sub">By all regional offices</div></div>
+    </div>
+
+    <div class="toolbar">
+      <select class="ti">
+        <option>All Offices</option>${regionalOffices.map(o=>`<option>${o.name}</option>`).join('')}
+      </select>
+      <select class="ti">
+        <option>All Contract Types</option><option>Service Contract</option><option>Insurance</option><option>VAT Certificate</option><option>Owner ID</option>
+      </select>
+      <select class="ti">
+        <option>All Status</option><option>Valid</option><option>Expiring</option><option>Expired</option>
+      </select>
+      ${btn('Search','btn-navy',"toast('Filtering...')")}
+      <div class="toolbar-r">
+        ${btn('&#8595; Export','btn-white',"toast('Exporting...')")}
+        ${btn('+ Add Office','btn-navy','openNewOfficeModal()')}
+        ${btn('Assign Contracts','btn-white','openAssignContractsModal()')}
+      </div>
+    </div>
+
+    <!-- Unassigned contracts alert -->
+    <div style="background:#fff8e6;border:1px solid #ffe082;border-radius:3px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:12.5px;color:#6d4c00">⚠️ <b>12 contracts have no regional office assigned.</b> Assign them to an office to ensure proper ownership and accountability.</div>
+      ${btn('Review Unassigned','btn-navy btn-sm','openAssignContractsModal()')}
+    </div>
+
+    <div class="offices-grid">
+      ${regionalOffices.map(o=>`
+        <div class="roffice-card">
+          <div class="roffice-hd">
+            <div style="display:flex;align-items:flex-start;gap:0">
+              <span class="roffice-flag">${o.flag}</span>
+              <div>
+                <div class="roffice-title">${o.name}</div>
+                <div class="roffice-sub">${o.address}</div>
+                <div style="margin-top:4px">${scopeBadge(o.type)}</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+              ${btn('Edit','btn-white btn-sm',`openEditOfficeModal('${o.id}')`)}
+              ${btn('View All Contracts','btn-white btn-sm',`openOfficeContractsModal('${o.id}')`)}
+            </div>
+          </div>
+
+          <div class="roffice-grid">
+            <div class="roffice-f"><div class="roffice-l">Office Head</div><div class="roffice-v" style="color:var(--navy)">${o.head}</div><div style="font-size:10.5px;color:var(--text3)">${o.headRole}</div></div>
+            <div class="roffice-f"><div class="roffice-l">Contact</div><div style="font-size:11.5px"><a class="lnk" href="mailto:${o.email}">${o.email}</a></div><div style="font-size:11.5px;color:var(--text3)">${o.phone}</div></div>
+            <div class="roffice-f"><div class="roffice-l">Suppliers Managed</div><div class="roffice-v">${o.supplierCount}</div></div>
+            <div class="roffice-f"><div class="roffice-l">Active Contracts</div><div class="roffice-v" style="color:var(--green)">${o.activeContracts}</div></div>
+            <div class="roffice-f" style="grid-column:span 2"><div class="roffice-l">Regional Scope</div><div style="font-size:12px">${o.destinations.join(' · ')}</div></div>
+            <div class="roffice-f" style="grid-column:span 2"><div class="roffice-l">Contract Authority</div><div style="font-size:12px;color:var(--text2)">${o.contractAuthority}</div></div>
+          </div>
+
+          <div class="roffice-contracts">
+            <div style="font-size:10.5px;font-weight:700;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Recent Contracts</div>
+            <table class="roffice-ctbl">
+              <thead><tr><th>Ref</th><th>Supplier</th><th>Type</th><th>Value</th><th>Expiry</th><th>ORN Owner</th></tr></thead>
+              <tbody>
+                ${o.contracts.map(c=>`<tr>
+                  <td class="mono" style="font-size:11px">${c.ref}</td>
+                  <td class="lnk" style="font-size:12px">${c.supplier}</td>
+                  <td style="font-size:11.5px">${c.type}</td>
+                  <td style="font-size:11.5px;font-weight:600">${c.value}</td>
+                  <td style="font-size:11.5px">${c.expiry}</td>
+                  <td style="font-size:11.5px">${c.owner}</td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+            <div style="margin-top:8px">${btn('Assign Contract to this Office','btn-white btn-sm',`openAssignToOfficeModal('${o.id}','${o.name}')`)}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+window.pg_sup_regions = pg_sup_regions;
+
+function openEditOfficeModal(officeId){
+  const o = regionalOffices.find(x=>x.id===officeId)||{};
+  openModal(`Edit Office — ${o.name}`,`
+    <div class="form-panel"><div class="form-head">Office Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Office Name <span class="req">*</span></label><input class="fc" value="${o.name||''}"></div>
+      <div class="fg"><label>City</label><input class="fc" value="${o.city||''}"></div>
+      <div class="fg"><label>Country</label><input class="fc" value="${o.country||''}"></div>
+      <div class="fg"><label>Office Type</label><select class="fc"><option ${o.type==='Global HQ'?'selected':''}>Global HQ</option><option ${o.type==='Regional Office'?'selected':''}>Regional Office</option><option>Representative Office</option></select></div>
+      <div class="fg"><label>Phone</label><input class="fc" value="${o.phone||''}"></div>
+      <div class="fg"><label>Email</label><input class="fc" type="email" value="${o.email||''}"></div>
+      <div class="fg"><label>Office Head</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Contract Authority Limit (£)</label><input class="fc" type="number" placeholder="e.g. 200000"></div>
+    </div>
+    <div class="fg" style="margin-top:10px"><label>Full Address</label><textarea class="fc" style="height:55px;width:100%">${o.address||''}</textarea></div>
+    </div></div>
+    <div class="form-panel"><div class="form-head">Regional Scope &amp; Destinations</div><div class="form-body">
+      <div class="fg"><label>Contract Scope Description</label><textarea class="fc" style="height:55px;width:100%">${o.contractScope||''}</textarea></div>
+      <div class="fg" style="margin-top:10px"><label>Destinations Covered</label><input class="fc" value="${(o.destinations||[]).join(', ')}" placeholder="Dubai, Oman, Egypt..."></div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Changes','btn-navy',"toast('Office updated!');closeModal()")}`
+  );
+}
+window.openEditOfficeModal = openEditOfficeModal;
+
+function openNewOfficeModal(){
+  openModal('Add New Regional Office',`
+    <div class="form-panel"><div class="form-head">Office Details</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Office Name <span class="req">*</span></label><input class="fc" placeholder="e.g. Riyadh — Saudi Arabia"></div>
+      <div class="fg"><label>City <span class="req">*</span></label><input class="fc" placeholder="City"></div>
+      <div class="fg"><label>Country <span class="req">*</span></label><input class="fc" placeholder="Country"></div>
+      <div class="fg"><label>Flag Emoji</label><input class="fc" placeholder="🇸🇦"></div>
+      <div class="fg"><label>Office Type</label><select class="fc"><option>Regional Office</option><option>Representative Office</option><option>Global HQ</option></select></div>
+      <div class="fg"><label>Phone</label><input class="fc" placeholder="+966..."></div>
+      <div class="fg"><label>Email</label><input class="fc" type="email" placeholder="office@orn.com"></div>
+      <div class="fg"><label>Office Head <span class="req">*</span></label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Contract Authority Limit (£)</label><input class="fc" type="number" placeholder="e.g. 150000"></div>
+      <div class="fg"><label>Requires London Co-Sign Above (£)</label><input class="fc" type="number" placeholder="e.g. 150000"></div>
+    </div>
+    <div class="fg" style="margin-top:10px"><label>Full Address</label><textarea class="fc" style="height:55px;width:100%" placeholder="Full office address..."></textarea></div>
+    </div></div>
+    <div class="form-panel"><div class="form-head">Regional Scope</div><div class="form-body">
+      <div class="fg"><label>Destinations Covered</label><input class="fc" placeholder="e.g. Saudi Arabia, Kuwait, Bahrain"></div>
+      <div class="fg" style="margin-top:10px"><label>Contract Scope</label><textarea class="fc" style="height:55px;width:100%" placeholder="Describe what this office is responsible for..."></textarea></div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Create Office','btn-navy',"toast('Office created!');closeModal()")}`
+  );
+}
+window.openNewOfficeModal = openNewOfficeModal;
+
+function openOfficeContractsModal(officeId){
+  const o = regionalOffices.find(x=>x.id===officeId)||{};
+  openModal(`Contracts — ${o.name}`,`
+    <div style="margin-bottom:12px">
+      <div class="fgrid" style="margin-bottom:10px">
+        <div><div style="font-size:10.5px;color:var(--text3)">Office Head</div><div style="font-size:13px;font-weight:700">${o.head}</div></div>
+        <div><div style="font-size:10.5px;color:var(--text3)">Regional Scope</div><div style="font-size:12.5px">${o.contractScope}</div></div>
+        <div><div style="font-size:10.5px;color:var(--text3)">Contract Authority</div><div style="font-size:12.5px">${o.contractAuthority}</div></div>
+        <div><div style="font-size:10.5px;color:var(--text3)">Active Contracts</div><div style="font-size:13px;font-weight:700;color:var(--green)">${o.activeContracts}</div></div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:var(--bg-page)">${['Ref','Supplier','Type','Value','Expiry','ORN Owner','Status','Actions'].map(h=>`<th style="padding:6px 8px;text-align:left;font-size:10.5px;color:var(--text3);border-bottom:1px solid var(--border-lt)">${h}</th>`).join('')}</tr></thead>
+      <tbody>${o.contracts.map(c=>`<tr style="border-bottom:1px solid var(--border-lt)">
+        <td style="padding:7px 8px" class="mono">${c.ref}</td>
+        <td style="padding:7px 8px;font-weight:600">${c.supplier}</td>
+        <td style="padding:7px 8px">${c.type}</td>
+        <td style="padding:7px 8px;font-weight:700">${c.value}</td>
+        <td style="padding:7px 8px">${c.expiry}</td>
+        <td style="padding:7px 8px">${c.owner}</td>
+        <td style="padding:7px 8px"><span class="pill p-green">Valid</span></td>
+        <td style="padding:7px 8px;display:flex;gap:4px">
+          <a class="lnk" style="font-size:11.5px" onclick="toast('Viewing contract...')">View</a>
+          <a class="lnk" style="font-size:11.5px" onclick="toast('Reassigning...')">Reassign</a>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div style="margin-top:12px">${btn('+ Assign Contract to this Office','btn-navy',`closeModal();openAssignToOfficeModal('${o.id}','${o.name}')`)}</div>`,
+    `${btn('Close','btn-navy','closeModal()')}`
+  );
+}
+window.openOfficeContractsModal = openOfficeContractsModal;
+
+function openAssignToOfficeModal(officeId, officeName){
+  openModal(`Assign Contract — ${officeName}`,`
+    <div class="form-panel"><div class="form-head">Contract Assignment</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Select Contract <span class="req">*</span></label><select class="fc"><option value="">Choose contract...</option>${contracts.map(c=>`<option value="${c.id}">${c.id} — ${c.supplier} (${c.type})</option>`).join('')}</select></div>
+      <div class="fg"><label>Assign to Office</label><select class="fc">${regionalOffices.map(o=>`<option value="${o.id}" ${o.id===officeId?'selected':''}>${o.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>ORN Contract Owner <span class="req">*</span></label><select class="fc"><option value="">Select team member...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Account Manager</label><select class="fc"><option value="">Select team member...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Contract Scope</label><select class="fc"><option>Global</option><option>Regional</option><option>Destination-Specific</option></select></div>
+      <div class="fg"><label>Authority Level</label><select class="fc"><option>Regional — within authority</option><option>Requires London Co-Sign</option><option>London HQ Only</option></select></div>
+      <div class="fg"><label>Effective Date</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Notify Team</label><select class="fc"><option>Yes — email all owners</option><option>No — silent assign</option></select></div>
+    </div>
+    <div class="fg" style="margin-top:10px"><label>Reason for Assignment</label>
+      <textarea class="fc" style="height:55px;width:100%" placeholder="Why is this contract being assigned to this office?"></textarea>
+    </div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Assign Contract','btn-navy',"toast('Contract assigned to '+arguments[0]+'!');closeModal()")}`
+  );
+}
+window.openAssignToOfficeModal = openAssignToOfficeModal;
+
+function openAssignContractsModal(){
+  const unassigned = [
+    {ref:'CTR-2026-0101',supplier:'Sahara Adventure Tours',type:'Service Contract',dest:'Morocco',value:'£85K',expiry:'Jun 2027'},
+    {ref:'INS-2026-0102',supplier:'Istanbul Express Transfers',type:'Insurance',dest:'Turkey',value:'—',expiry:'Apr 2027'},
+    {ref:'CTR-2026-0103',supplier:'Maldives Sunset Cruises',type:'Service Contract',dest:'Maldives',value:'£95K',expiry:'Awaiting'},
+    {ref:'VAT-2026-0104',supplier:'Nile Tours Egypt',type:'VAT Certificate',dest:'Egypt',value:'—',expiry:'Dec 2027'},
+  ];
+  openModal('Assign Unassigned Contracts',`
+    <p style="font-size:12.5px;color:var(--text2);margin-bottom:12px">The following contracts have no regional office or ORN owner assigned. Assign each to an office and team member to ensure accountability.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:var(--bg-page)">${['Contract Ref','Supplier','Type','Destination','Value','Expiry','Assign to Office','ORN Owner'].map(h=>`<th style="padding:6px 8px;text-align:left;font-size:10.5px;color:var(--text3);border-bottom:1px solid var(--border-lt)">${h}</th>`).join('')}</tr></thead>
+      <tbody>${unassigned.map(c=>`<tr style="border-bottom:1px solid var(--border-lt)">
+        <td style="padding:7px 8px" class="mono">${c.ref}</td>
+        <td style="padding:7px 8px;font-weight:600">${c.supplier}</td>
+        <td style="padding:7px 8px">${c.type}</td>
+        <td style="padding:7px 8px">${c.dest}</td>
+        <td style="padding:7px 8px">${c.value}</td>
+        <td style="padding:7px 8px">${c.expiry}</td>
+        <td style="padding:7px 8px"><select class="fc" style="width:160px"><option value="">Select office...</option>${regionalOffices.map(o=>`<option>${o.name}</option>`).join('')}</select></td>
+        <td style="padding:7px 8px"><select class="fc" style="width:140px"><option value="">Select...</option>${ornTeamSel()}</select></td>
+      </tr>`).join('')}</tbody>
+    </table>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save All Assignments','btn-navy',"toast('All contracts assigned!');closeModal()")}`
+  );
+}
+window.openAssignContractsModal = openAssignContractsModal;
+
+// Register all page functions
+window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
 window.pg_sales_dest=function(){return '<div class="page-title">Destination Dashboard</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)">Connect live data to populate.</div>';};
 
-// ── TOAST ─────────────────────────────────────────────────────────
 function toast(msg,err=false){
-  const el=document.getElementById('toast');
-  if(!el)return;
-  el.textContent=msg;
-  el.className='toast'+(err?' err':'');
-  el.classList.add('show');
-  clearTimeout(window._toastTimer);
-  window._toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
+  const el=document.getElementById('toast');if(!el)return;
+  el.textContent=msg;el.className='toast'+(err?' err':'');
+  el.classList.add('show');clearTimeout(window._tt);
+  window._tt=setTimeout(()=>el.classList.remove('show'),3200);
 }
 window.toast=toast;
 
-// ── INIT ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.pnav').forEach(el=>{
-    el.addEventListener('click',e=>{e.preventDefault();setPrimary(el.dataset.p);});
-  });
+  document.querySelectorAll('.pnav').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();setPrimary(el.dataset.p);}));
+  // Inject audit/modal helper styles
+  const s=document.createElement('style');
+  s.textContent=`
+    .audit-list{display:flex;flex-direction:column}
+    .audit-item{display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border-lt)}
+    .audit-item:last-child{border-bottom:none}
+    .audit-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+    .audit-content{flex:1}
+    .audit-action{font-size:12.5px;font-weight:700}
+    .audit-meta{font-size:11.5px;color:var(--text3)}
+    .audit-detail{font-size:12px;color:var(--text2);margin-top:3px;background:var(--bg-page);padding:4px 8px;border-radius:2px;border-left:3px solid var(--border)}
+    .modal-foot{padding:10px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;background:var(--bg-top);flex-shrink:0}
+    .page-subtitle{font-size:12.5px;color:var(--text3);margin:-8px 0 14px}
+    .sum-cards{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+    .sum-card{background:#fff;border:1px solid var(--border-lt);border-radius:var(--r);padding:14px 18px;flex:1;min-width:140px}
+    .sum-card.green{border-left:3px solid var(--green)}.sum-card.orange{border-left:3px solid var(--orange)}.sum-card.red{border-left:3px solid var(--red)}
+    .sc-lbl{font-size:11px;color:var(--text3);margin-bottom:4px}.sc-val{font-size:20px;font-weight:800}.sc-val.green{color:var(--green)}.sc-val.orange{color:var(--orange)}.sc-val.red{color:var(--red)}.sc-sub{font-size:11px;color:var(--text3);margin-top:2px}
+    .form-actions{display:flex;justify-content:flex-end;gap:8px;padding:12px 0}
+    .fgrid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  `;
+  document.head.appendChild(s);
   setPrimary('suppliers');
 });
