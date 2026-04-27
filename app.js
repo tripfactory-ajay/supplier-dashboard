@@ -375,21 +375,27 @@ function pg_sup_contracts(){
     <div id="ctr-all">
     <div class="tbl-wrap"><table>
       ${thdr('#','Supplier ↕','Type ↕','Doc No. ↕','Destination ↕','Start ↕','Expiry ↕','Value ↕','Annual Value ↕','Status ↕','ORN Owner ↕','ORN Manager ↕','Source Markets ↕','Governing Law ↕','Auto-Renew ↕','Review Due ↕','Manage')}
-      ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0)}
-      <tbody>${contracts.map((c,i)=>`<tr><td class="rn">${i+1}</td>
+      ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0)}
+      <tbody>${contracts.map((c,i)=>{
+        const mcolors={UK:'#1a3a6b',Ireland:'#169b62','UAE':'#ef3340','UAE / GCC':'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',India:'#ff9933',Oman:'#db161b',Jordan:'#007a3d'};
+        const mflags={UK:'🇬🇧',Ireland:'🇮🇪',UAE:'🇦🇪','UAE / GCC':'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',India:'🇮🇳',Oman:'🇴🇲',Jordan:'🇯🇴'};
+        const mkts=(c.sourceMarkets||['UK']);
+        const mktBadges=mkts.map(m=>{const col=mcolors[m]||'#888';const fl=mflags[m]||'🌍';return `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700;background:${col}20;color:${col};margin:1px;white-space:nowrap">${fl} ${m}</span>`;}).join('');
+        return `<tr><td class="rn">${i+1}</td>
         <td><a class="lnk" onclick='openContractModal(${esc(c)})'>${c.supplier}</a></td>
         <td>${c.type}</td><td class="mono">${c.id}</td><td>${c.dest}</td>
         <td style="font-size:11px">${c.start}</td>
         <td style="color:${c.status==='Expired'?'var(--red)':c.status==='Expiring'?'var(--orange)':'inherit'};font-weight:${c.status!=='Valid'?700:400}">${c.expiry}</td>
         <td>${c.value}</td><td>${c.annualValue}</td>
         <td><span class="pill ${sc(c.status)}">${c.status}</span></td>
-        <td style="font-size:11.5px">${c.ornOwner}</td>
+        <td style="font-size:11.5px;font-weight:600;color:var(--navy)">${c.ornOwner}</td>
         <td style="font-size:11.5px">${c.ornManager}</td>
+        <td style="max-width:160px"><div style="display:flex;flex-wrap:wrap;gap:2px">${mktBadges}</div>${c.marketScope?`<div style="font-size:10px;color:var(--text3);margin-top:2px">${c.marketScope}</div>`:''}</td>
         <td style="font-size:11.5px">${c.governingLaw}</td>
         <td style="font-size:11.5px">${c.autoRenew}</td>
         <td style="font-size:11.5px;color:${c.reviewDate==='Overdue'?'var(--red)':'inherit'};font-weight:${c.reviewDate==='Overdue'?700:400}">${c.reviewDate}</td>
-        <td class="act"><a onclick='openContractModal(${esc(c)})'>View</a><a onclick='openEditContractModal(${esc(c)})'>Edit</a><a onclick="toast('Downloading...')">&#8595;</a><a onclick="toast('Renewal started')">Renew</a><a class="red" onclick="if(confirm('Delete?'))toast('Deleted')">Del</a></td>
-      </tr>`).join('')}</tbody>
+        <td class="act"><a onclick='openContractModal(${esc(c)})'>View</a><a onclick='openEditContractModal(${esc(c)})'>Edit</a><a onclick="openMarketAssignModal('${c.id}','${c.supplier}')">Markets</a><a onclick="toast('Downloading...')">&#8595;</a><a onclick="toast('Renewal started')">Renew</a></td>
+      </tr>`;}).join('')}</tbody>
     </table>${pgfoot(`1–${contracts.length}`,486,5)}</div>
     </div>`; // close ctr-all
 }
