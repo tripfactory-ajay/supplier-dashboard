@@ -24,11 +24,11 @@ const suppliers=[
 ];
 
 const contracts=[
-  {id:'CTR-2024-0081',supplier:'Atlantis The Palm',type:'Service Contract',dest:'Dubai',uploaded:'15 Jan 2024',start:'01 Jan 2024',expiry:'31 Dec 2025',status:'Valid',value:'£840,000',annualValue:'£420,000',file:'atlantis_contract_2024.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Ajay Kawa',ornManagerId:'T01',renewalNotice:'90 days',autoRenew:'No',governingLaw:'English Law',exclusivity:'Non-exclusive',reviewDate:'01 Oct 2025',notes:'Annual rolling contract. Room block 200 rooms peak season.'},
-  {id:'CTR-2023-0083',supplier:'Desert Tracks Tours',type:'Service Contract',dest:'Dubai',uploaded:'01 Mar 2023',start:'01 Mar 2023',expiry:'28 Feb 2024',status:'Expired',value:'£120,000',annualValue:'£120,000',file:'deserttracks_2023.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Priya Sharma',ornManagerId:'T02',renewalNotice:'60 days',autoRenew:'No',governingLaw:'English Law',exclusivity:'Non-exclusive',reviewDate:'Overdue',notes:'Expired. Renewal in progress.'},
-  {id:'INS-2024-0085',supplier:'Jordan Transfer Co',type:'Insurance Certificate',dest:'Jordan',uploaded:'10 Sep 2024',start:'10 Sep 2024',expiry:'09 Sep 2025',status:'Expiring',value:'—',annualValue:'—',file:'jordan_transfer_insurance.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Ravi Patel',ornManagerId:'T03',renewalNotice:'30 days',autoRenew:'N/A',governingLaw:'Jordanian Law',exclusivity:'N/A',reviewDate:'10 Aug 2025',notes:'Public liability £5M. Renewal reminder sent.'},
-  {id:'CTR-2023-0086',supplier:'Oman Luxury Resorts',type:'Service Contract',dest:'Oman',uploaded:'01 Jun 2023',start:'01 Jun 2023',expiry:'31 May 2026',status:'Valid',value:'£580,000',annualValue:'£193,000',file:'oman_luxury_2023.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Omar Al Farsi',ornManagerId:'T07',renewalNotice:'90 days',autoRenew:'Yes',governingLaw:'English Law',exclusivity:'Preferred',reviewDate:'01 Mar 2026',notes:'3-year contract. Preferred supplier status.'},
-  {id:'ID-2024-0083',supplier:'Desert Tracks Tours',type:'Owner ID / Passport',dest:'Dubai',uploaded:'01 Mar 2024',start:'01 Mar 2024',expiry:'28 Feb 2029',status:'Valid',value:'—',annualValue:'—',file:'dt_owner_passport.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Priya Sharma',ornManagerId:'T02',renewalNotice:'N/A',autoRenew:'N/A',governingLaw:'N/A',exclusivity:'N/A',reviewDate:'N/A',notes:'Passport copy on file. UK national.'},
+  {id:'CTR-2024-0081',supplier:'Atlantis The Palm',type:'Service Contract',dest:'Dubai',uploaded:'15 Jan 2024',start:'01 Jan 2024',expiry:'31 Dec 2025',status:'Valid',value:'£840,000',annualValue:'£420,000',file:'atlantis_contract_2024.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Ajay Kawa',ornManagerId:'T01',renewalNotice:'90 days',autoRenew:'No',governingLaw:'English Law',exclusivity:'Non-exclusive',reviewDate:'01 Oct 2025',notes:'Annual rolling contract. Room block 200 rooms peak season.',sourceMarkets:['UK','Ireland','UAE'],marketScope:'Multi-market',marketNotes:'UK & Ireland via London HQ. UAE direct via Dubai office. Not valid for Germany, France or US markets.',marketOwner:'Ajay Kawa',marketOwnerId:'T01',ukAlloc:'60%',gccAlloc:'30%',otherAlloc:'10%'},
+  {id:'CTR-2023-0083',supplier:'Desert Tracks Tours',type:'Service Contract',dest:'Dubai',uploaded:'01 Mar 2023',start:'01 Mar 2023',expiry:'28 Feb 2024',status:'Expired',value:'£120,000',annualValue:'£120,000',file:'deserttracks_2023.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Priya Sharma',ornManagerId:'T02',renewalNotice:'60 days',autoRenew:'No',governingLaw:'English Law',exclusivity:'Non-exclusive',reviewDate:'Overdue',notes:'Expired. Renewal in progress.',sourceMarkets:['UK'],marketScope:'UK Only',marketNotes:'UK source market only. All bookings must originate from UK B2B partners.',marketOwner:'Priya Sharma',marketOwnerId:'T02',ukAlloc:'100%',gccAlloc:'0%',otherAlloc:'0%'},
+  {id:'INS-2024-0085',supplier:'Jordan Transfer Co',type:'Insurance Certificate',dest:'Jordan',uploaded:'10 Sep 2024',start:'10 Sep 2024',expiry:'09 Sep 2025',status:'Expiring',value:'—',annualValue:'—',file:'jordan_transfer_insurance.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Ravi Patel',ornManagerId:'T03',renewalNotice:'30 days',autoRenew:'N/A',governingLaw:'Jordanian Law',exclusivity:'N/A',reviewDate:'10 Aug 2025',notes:'Public liability £5M. Renewal reminder sent.',sourceMarkets:['UK','Jordan'],marketScope:'Multi-market',marketNotes:'Insurance covers operations in Jordan and UK-sourced bookings.',marketOwner:'Ravi Patel',marketOwnerId:'T03',ukAlloc:'70%',gccAlloc:'0%',otherAlloc:'30%'},
+  {id:'CTR-2023-0086',supplier:'Oman Luxury Resorts',type:'Service Contract',dest:'Oman',uploaded:'01 Jun 2023',start:'01 Jun 2023',expiry:'31 May 2026',status:'Valid',value:'£580,000',annualValue:'£193,000',file:'oman_luxury_2023.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Omar Al Farsi',ornManagerId:'T07',renewalNotice:'90 days',autoRenew:'Yes',governingLaw:'English Law',exclusivity:'Preferred',reviewDate:'01 Mar 2026',notes:'3-year contract. Preferred supplier status.',sourceMarkets:['UK','UAE','Germany'],marketScope:'Global',marketNotes:'Open to all source markets. Best rates for UK and UAE. German market rates via Frankfurt B2B partner agreement.',marketOwner:'Omar Al Farsi',marketOwnerId:'T07',ukAlloc:'45%',gccAlloc:'40%',otherAlloc:'15%'},
+  {id:'ID-2024-0083',supplier:'Desert Tracks Tours',type:'Owner ID / Passport',dest:'Dubai',uploaded:'01 Mar 2024',start:'01 Mar 2024',expiry:'28 Feb 2029',status:'Valid',value:'—',annualValue:'—',file:'dt_owner_passport.pdf',ornOwner:'Layla Hassan',ornOwnerId:'T06',ornManager:'Priya Sharma',ornManagerId:'T02',renewalNotice:'N/A',autoRenew:'N/A',governingLaw:'N/A',exclusivity:'N/A',reviewDate:'N/A',notes:'Passport copy on file. UK national.',sourceMarkets:['UK'],marketScope:'UK Only',marketNotes:'KYC document — not market-specific but filed under UK entity.',marketOwner:'Layla Hassan',marketOwnerId:'T06',ukAlloc:'100%',gccAlloc:'0%',otherAlloc:'0%'},
 ];
 
 const payments=[
@@ -1405,6 +1405,101 @@ function openDestDrillModal(destRaw){
         </div>`).join('')}
       </div>`;
 
+
+  // ── TAB: SOURCE MARKETS ──
+  // All contracts for this destination, grouped by source market
+  // Shows which markets each contract is valid for, allocations, and market owner
+
+  // Build enriched source market data
+  const allSourceMarkets = ['UK','Ireland','UAE','Saudi Arabia','Germany','France','USA','Netherlands','Italy','Spain','Australia','India'];
+
+  // Group contracts by source market
+  const marketMap = {};
+  destContracts.forEach(c => {
+    const markets = c.sourceMarkets || ['UK']; // default UK if not set
+    markets.forEach(m => {
+      if(!marketMap[m]) marketMap[m] = [];
+      marketMap[m].push(c);
+    });
+  });
+
+  // Also build per-contract market breakdown
+  const smRows = destContracts.map((c,i) => {
+    const markets = c.sourceMarkets || ['UK'];
+    const scope = c.marketScope || 'UK Only';
+    const mktOwner = c.marketOwner || c.ornOwner;
+    const marketBadges = markets.map(m => {
+      const colors = {UK:'#1a3a6b',Ireland:'#169b62',UAE:'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933'};
+      const col = colors[m]||'#666';
+      return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;background:${col}22;color:${col};margin:1px">${m}</span>`;
+    }).join('');
+    return `<tr>
+      <td class="rn">${i+1}</td>
+      <td><a class="lnk" onclick="closeModal();setTimeout(()=>openContractModal(${esc(c)}),120)">${c.supplier}</a></td>
+      <td class="mono" style="font-size:11px">${c.id}</td>
+      <td style="font-size:11.5px">${c.type}</td>
+      <td><b>${c.value}</b></td>
+      <td><span class="pill ${scope==='Global'?'p-blue':scope==='Multi-market'?'p-green':'p-gray'}">${scope}</span></td>
+      <td style="max-width:200px">${marketBadges}</td>
+      <td style="font-size:11.5px">${c.ukAlloc||'—'}</td>
+      <td style="font-size:11.5px">${c.gccAlloc||'—'}</td>
+      <td style="font-size:11.5px">${c.otherAlloc||'—'}</td>
+      <td style="font-size:11.5px;font-weight:600;color:var(--navy)">${mktOwner}</td>
+      <td style="font-size:11px;color:var(--text2);max-width:200px">${c.marketNotes||'—'}</td>
+      <td class="act">
+        <a onclick="openMarketAssignModal('${c.id}','${c.supplier}')">Edit Markets</a>
+        <a onclick="closeModal();setTimeout(()=>openContractModal(${esc(c)}),120)">View</a>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Summary by source market
+  const smSummary = Object.entries(marketMap).map(([market, ctrs]) => {
+    const colors = {UK:'#1a3a6b',Ireland:'#169b62',UAE:'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933'};
+    const col = colors[market]||'#888';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid ${col}33;border-left:4px solid ${col};border-radius:3px;background:${col}08;margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <b style="font-size:13px;color:${col}">${market}</b>
+        <span style="font-size:12px;color:var(--text2)">${ctrs.length} contract${ctrs.length!==1?'s':''} valid for this market</span>
+        <span style="font-size:11.5px;color:var(--text3)">${ctrs.map(c=>c.supplier).join(', ')}</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <span class="pill p-green">Active</span>
+        <button class="btn btn-white btn-sm" onclick="openMarketFilterModal('${market}','${dest}')">View Contracts</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const noMarketContracts = destContracts.filter(c=>!c.sourceMarkets||c.sourceMarkets.length===0);
+
+  const tabSourceMarkets = `
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#0d47a1">
+      🌍 <b>Source market contracts</b> define which customer origin markets a supplier contract is valid for. A hotel contract may be available to UK and UAE customers but <b>not</b> German or US markets — these are tracked here separately per destination office.
+    </div>
+
+    <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:8px">Markets with active contracts in ${dest}</div>
+    ${smSummary || '<p style="color:var(--text3)">No market assignments found.</p>'}
+
+    ${noMarketContracts.length>0?`<div style="background:#fff8e6;border:1px solid #ffe082;border-radius:3px;padding:8px 12px;margin:12px 0;font-size:12px;color:#6d4c00">
+      ⚠️ <b>${noMarketContracts.length} contract${noMarketContracts.length!==1?'s':''}</b> in ${dest} have no source market assigned — they will default to UK only.
+    </div>`:''}
+
+    <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin:14px 0 8px">All Contracts — Source Market Breakdown</div>
+    <div class="tbl-wrap"><table>
+      <tr>${['#','Supplier','Doc No.','Type','Value','Market Scope','Valid Markets','UK Alloc.','GCC Alloc.','Other','Market Owner','Notes','Manage'].map(h=>`<th>${h}</th>`).join('')}</tr>
+      <tbody>${smRows||'<tr><td colspan="13" style="text-align:center;color:var(--text3);padding:20px">No contracts for this destination.</td></tr>'}</tbody>
+    </table></div>
+
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border-lt)">
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:8px">Available Source Markets — Not Yet Contracted in ${dest}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${allSourceMarkets.filter(m=>!marketMap[m]).map(m=>`
+          <div style="padding:6px 12px;border:1px dashed var(--border);border-radius:3px;font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px">
+            ${m} <button class="btn btn-white btn-sm" style="padding:1px 6px;font-size:10px" onclick="openMarketAssignNewModal('${m}','${dest}')">+ Assign Contract</button>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
   // ── ASSEMBLE MODAL ──
   const flags = {'Dubai':'🇦🇪','Abu Dhabi':'🇦🇪','Oman':'🇴🇲','Egypt':'🇪🇬','Jordan':'🇯🇴',
                  'Morocco':'🇲🇦','Turkey':'🇹🇷','Maldives':'🇲🇻','Saudi Arabia':'🇸🇦','Kenya':'🇰🇪'};
@@ -1422,13 +1517,15 @@ function openDestDrillModal(destRaw){
       <div class="tab" onclick="switchTab(this,'dd-rat')">Rates (${destRates.length})</div>
       <div class="tab" onclick="switchTab(this,'dd-cmp')">Compliance</div>
       <div class="tab" onclick="switchTab(this,'dd-aud')">Audit (${destAudit.length})</div>
+      <div class="tab" onclick="switchTab(this,'dd-sm')">Source Markets</div>
     </div>
     <div id="dd-sup" class="tab-panel active">${tabSuppliers}</div>
     <div id="dd-con" class="tab-panel">${tabContracts}</div>
     <div id="dd-pay" class="tab-panel">${tabPayments}</div>
     <div id="dd-rat" class="tab-panel">${tabRates}</div>
     <div id="dd-cmp" class="tab-panel">${tabCompliance}</div>
-    <div id="dd-aud" class="tab-panel">${tabAudit}</div>`,
+    <div id="dd-aud" class="tab-panel">${tabAudit}</div>
+    <div id="dd-sm" class="tab-panel">${tabSourceMarkets}</div>`,
     `${btn('+ New Supplier','btn-white','closeModal();openNewSupModal()')}
      ${btn('+ Upload Contract','btn-white','closeModal();openUploadModal()')}
      ${btn('&#8595; Export Destination','btn-white',"toast('Exporting "+dest+" data...')")}
@@ -1436,6 +1533,117 @@ function openDestDrillModal(destRaw){
   );
 }
 window.openDestDrillModal = openDestDrillModal;
+
+
+// ─── SOURCE MARKET MODALS ────────────────────────────────────────
+function openMarketAssignModal(contractId, supplierName){
+  const c = contracts.find(x=>x.id===contractId)||{};
+  const allMarkets = ['UK','Ireland','UAE','Saudi Arabia','Germany','France','USA','Netherlands','Italy','Spain','Australia','India','Oman','Kuwait','Bahrain','Qatar'];
+  const existing = c.sourceMarkets||['UK'];
+  const marketColors = {UK:'#1a3a6b',Ireland:'#169b62',UAE:'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933',Oman:'#db161b',Kuwait:'#007a3d',Bahrain:'#ce1126',Qatar:'#8d1b3d'};
+  openModal(`Source Market Assignment — ${supplierName}`,`
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#0d47a1">
+      🌍 Select which source markets this contract is valid for. Customers booking from unselected markets will not see rates from this contract.
+    </div>
+    <div class="form-panel"><div class="form-head">Contract: ${c.id||contractId} — ${supplierName}</div><div class="form-body">
+      <div class="fgrid" style="margin-bottom:14px">
+        <div class="fg"><label>Contract Value</label><div style="font-size:13px;font-weight:700">${c.value||'—'}</div></div>
+        <div class="fg"><label>Destination</label><div style="font-size:13px">${c.dest||'—'}</div></div>
+        <div class="fg"><label>ORN Contract Owner</label><div style="font-size:13px;font-weight:600;color:var(--navy)">${c.ornOwner||'—'}</div></div>
+        <div class="fg"><label>Expiry</label><div style="font-size:13px">${c.expiry||'—'}</div></div>
+      </div>
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:10px">Valid Source Markets</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+        ${allMarkets.map(m=>{
+          const col = marketColors[m]||'#666';
+          const chk = existing.includes(m)?'checked':'';
+          return `<label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid ${chk?col:'var(--border-lt)'};border-radius:4px;cursor:pointer;background:${chk?col+'18':'#fff'};transition:all .15s">
+            <input type="checkbox" ${chk} onchange="this.closest('label').style.background=this.checked?'${col}18':'#fff';this.closest('label').style.borderColor=this.checked?'${col}':'var(--border-lt)'">
+            <span style="font-size:12px;font-weight:600;color:${chk?col:'var(--text2)'}">${m}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div class="fgrid">
+        <div class="fg"><label>Market Scope Label</label>
+          <select class="fc"><option ${(c.marketScope||'')==='UK Only'?'selected':''}>UK Only</option><option ${(c.marketScope||'')==='Multi-market'?'selected':''}>Multi-market</option><option ${(c.marketScope||'')==='Global'?'selected':''}>Global</option><option ${(c.marketScope||'')==='GCC Only'?'selected':''}>GCC Only</option><option ${(c.marketScope||'')==='Europe Only'?'selected':''}>Europe Only</option></select></div>
+        <div class="fg"><label>Market Owner (ORN)</label>
+          <select class="fc"><option value="">Select team member...</option>${ornTeamSel()}</select></div>
+        <div class="fg"><label>UK / Ireland Allocation %</label><input class="fc" type="number" value="${c.ukAlloc||''}" placeholder="e.g. 60" min="0" max="100"></div>
+        <div class="fg"><label>GCC / Gulf Allocation %</label><input class="fc" type="number" value="${c.gccAlloc||''}" placeholder="e.g. 30" min="0" max="100"></div>
+        <div class="fg"><label>Other Markets Allocation %</label><input class="fc" type="number" value="${c.otherAlloc||''}" placeholder="e.g. 10" min="0" max="100"></div>
+        <div class="fg"><label>Minimum Booking Origin?</label>
+          <select class="fc"><option>No restriction</option><option>Must be from selected markets only</option><option>Preferred from selected — others by request</option></select></div>
+      </div>
+      <div class="fg" style="margin-top:10px"><label>Market Notes</label>
+        <textarea class="fc" style="height:60px;width:100%" placeholder="e.g. UK & UAE via ORN direct. German market requires Frankfurt B2B agreement.">${c.marketNotes||''}</textarea></div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Market Assignment','btn-navy',"toast('Source markets updated for '+arguments[0]+'!');closeModal()")}`
+  );
+}
+window.openMarketAssignModal = openMarketAssignModal;
+
+function openMarketAssignNewModal(market, dest){
+  openModal(`Assign Contract for ${market} market — ${dest}`,`
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#0d47a1">
+      No existing contract in <b>${dest}</b> is currently assigned to the <b>${market}</b> source market. You can assign an existing contract or create a new one.
+    </div>
+    <div class="form-panel"><div class="form-head">Option 1 — Assign Existing Contract to ${market} Market</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Select Contract</label>
+        <select class="fc"><option value="">Choose contract...</option>${contracts.filter(c=>c.dest===dest).map(c=>`<option value="${c.id}">${c.id} — ${c.supplier} (${c.value})</option>`).join('')}</select></div>
+      <div class="fg"><label>Allocation % for ${market}</label><input class="fc" type="number" placeholder="e.g. 100" min="0" max="100"></div>
+      <div class="fg"><label>Market Owner</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Booking Restriction</label>
+        <select class="fc"><option>No restriction — open to all</option><option>Only ${market} customers</option><option>Preferred for ${market} — others by request</option></select></div>
+    </div></div></div>
+    <div class="form-panel"><div class="form-head">Option 2 — Create New Contract for ${market} Market</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Supplier</label><select class="fc"><option value="">Select supplier...</option>${suppliers.filter(s=>s.dest===dest).map(s=>`<option>${s.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>Contract Type</label><select class="fc"><option>Service Contract</option><option>Rate Agreement</option><option>Preferred Partner Agreement</option></select></div>
+      <div class="fg"><label>Net Rate (£)</label><input class="fc" type="number" placeholder="Market-specific rate"></div>
+      <div class="fg"><label>Commission (%)</label><input class="fc" type="number" placeholder="e.g. 15"></div>
+      <div class="fg"><label>Valid From</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Valid To</label><input class="fc" type="date"></div>
+      <div class="fg"><label>ORN Contract Owner</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Governing Law</label><select class="fc"><option>English Law</option><option>UAE Law</option><option>Local Law</option></select></div>
+    </div></div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Assign Existing Contract','btn-white',"toast('Contract assigned to '+arguments[0]+' market!')")} ${btn('Create New Contract','btn-navy',"toast('New market contract created!');closeModal()")}`
+  );
+}
+window.openMarketAssignNewModal = openMarketAssignNewModal;
+
+function openMarketFilterModal(market, dest){
+  const mktContracts = contracts.filter(c=>c.dest===dest&&(c.sourceMarkets||['UK']).includes(market));
+  const mktSuppliers = suppliers.filter(s=>s.dest===dest);
+  const marketColors = {UK:'#1a3a6b',Ireland:'#169b62',UAE:'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234'};
+  const col = marketColors[market]||'#1a3a6b';
+  openModal(`${market} Market Contracts — ${dest}`,`
+    <div style="border-left:4px solid ${col};padding:8px 14px;background:${col}10;border-radius:0 3px 3px 0;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:700;color:${col}">${market} Source Market</div>
+      <div style="font-size:12.5px;color:var(--text2);margin-top:2px">${mktContracts.length} contract${mktContracts.length!==1?'s':''} in ${dest} valid for ${market} customers · ${mktSuppliers.length} suppliers total in destination</div>
+    </div>
+    ${mktContracts.length===0
+      ? `<div style="text-align:center;padding:30px;color:var(--text3)"><div style="font-size:28px;margin-bottom:8px">📋</div><b>No contracts assigned to ${market} market in ${dest}</b><div style="margin-top:10px">${btn('+ Assign Contract','btn-navy',`closeModal();openMarketAssignNewModal('${market}','${dest}')`)}</div></div>`
+      : `<div class="tbl-wrap"><table>
+          <tr>${['Supplier','Contract Ref','Type','Value','Expiry','ORN Owner','UK Alloc.','GCC Alloc.','Market Notes','Actions'].map(h=>`<th>${h}</th>`).join('')}</tr>
+          <tbody>${mktContracts.map(c=>`<tr>
+            <td class="lnk" onclick="closeModal();setTimeout(()=>openContractModal(${esc(c)}),120)">${c.supplier}</td>
+            <td class="mono" style="font-size:11px">${c.id}</td>
+            <td style="font-size:11.5px">${c.type}</td>
+            <td><b>${c.value}</b></td>
+            <td>${c.expiry}</td>
+            <td style="font-size:11.5px;font-weight:600;color:var(--navy)">${c.marketOwner||c.ornOwner}</td>
+            <td style="font-size:11.5px">${c.ukAlloc||'—'}</td>
+            <td style="font-size:11.5px">${c.gccAlloc||'—'}</td>
+            <td style="font-size:11px;color:var(--text2);max-width:180px">${c.marketNotes||'—'}</td>
+            <td class="act">
+              <a onclick="closeModal();setTimeout(()=>openMarketAssignModal('${c.id}','${c.supplier}'),120)">Edit Markets</a>
+              <a onclick="closeModal();setTimeout(()=>openContractModal(${esc(c)}),120)">View</a>
+            </td>
+          </tr>`).join('')}</tbody>
+        </table>`}`,
+    `${btn('+ Add Contract for ${market}','btn-white',`closeModal();openMarketAssignNewModal('${market}','${dest}')`)} ${btn('Close','btn-navy','closeModal()')}`
+  );
+}
+window.openMarketFilterModal = openMarketFilterModal;
 
 // Register all page functions
 window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
