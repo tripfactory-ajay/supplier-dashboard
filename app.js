@@ -1,6 +1,6 @@
 // ORN Global Supplier Management Portal
 'use strict';
-const NAV={products:{sub:['Product Catalogue','Categories','Pricing'],pages:[]},sales:{sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'],pages:['pg_sales_dest']},supply:{sub:['Overview','Availability','Allotments'],pages:[]},suppliers:{sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts & Docs','Payments','Rates & Pricing','Compliance','Audit Trail','Tier Management','Destinations','Regional Offices','Market Contracts'],pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_compliance','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_sup_regions','pg_sup_market_contracts']},hotels:{sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Supply Sources','GIT Blockings','GIT Calendar'],pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings','pg_hotel_sources']},activities:{sub:['All Activities','Tours','Transfers','Experiences'],pages:['pg_act_all']},vehicles:{sub:['Fleet','Bookings','Maintenance'],pages:[]},delivery:{sub:['Overview','Pending','Completed'],pages:[]}};
+const NAV={products:{sub:['Product Catalogue','Categories','Pricing'],pages:[]},sales:{sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'],pages:['pg_sales_dest']},supply:{sub:['Overview','Availability','Allotments'],pages:[]},suppliers:{sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts & Docs','Payments','Rates & Pricing','Compliance','Audit Trail','Tier Management','Destinations','Regional Offices'],pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_compliance','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_sup_regions']},hotels:{sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Supply Sources','GIT Blockings','GIT Calendar'],pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings','pg_hotel_sources']},activities:{sub:['All Activities','Tours','Transfers','Experiences'],pages:['pg_act_all']},vehicles:{sub:['Fleet','Bookings','Maintenance'],pages:[]},delivery:{sub:['Overview','Pending','Completed'],pages:[]}};
 let curPrimary='suppliers',curSub=0;
 
 const ornTeam=[
@@ -628,7 +628,6 @@ function openNewSupModal(){
 window.openNewSupModal=openNewSupModal;
 
 function openContractModal(c){
-  if(typeof s==='string')try{c=JSON.parse(c.replace(/&quot;/g,'"'));}catch(e){}
   if(typeof c==='string')try{c=JSON.parse(c.replace(/&quot;/g,'"'));}catch(e){}
   const mb=document.getElementById('modal-box');
   if(mb)mb.style.width='920px';
@@ -2105,7 +2104,7 @@ function contractViewToggle(mode){
 window.contractViewToggle=contractViewToggle;
 
 // Register all page functions
-window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_sup_market_contracts=pg_sup_market_contracts;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
+window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
 window.pg_sales_dest=function(){return '<div class="page-title">Destination Dashboard</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)">Connect live data to populate.</div>';};
 
 function toast(msg,err=false){
