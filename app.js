@@ -1,6 +1,6 @@
 // ORN Global Supplier Management Portal
 'use strict';
-const NAV={products:{sub:['Product Catalogue','Categories','Pricing'],pages:[]},sales:{sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'],pages:['pg_sales_dest']},supply:{sub:['Overview','Availability','Allotments'],pages:[]},suppliers:{sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts & Docs','Payments','Rates & Pricing','Compliance','Audit Trail','Tier Management','Destinations','Regional Offices'],pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_compliance','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_sup_regions']},hotels:{sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Supply Sources','GIT Blockings','GIT Calendar'],pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings','pg_hotel_sources']},activities:{sub:['All Activities','Tours','Transfers','Experiences'],pages:['pg_act_all']},vehicles:{sub:['Fleet','Bookings','Maintenance'],pages:[]},delivery:{sub:['Overview','Pending','Completed'],pages:[]}};
+const NAV={products:{sub:['Product Catalogue','Categories','Pricing'],pages:[]},sales:{sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'],pages:['pg_sales_dest']},supply:{sub:['Overview','Availability','Allotments'],pages:[]},suppliers:{sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts & Docs','Payments','Rates & Pricing','Compliance','Audit Trail','Tier Management','Destinations','Regional Offices','Market Contracts'],pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_compliance','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_sup_regions','pg_sup_market_contracts']},hotels:{sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Supply Sources','GIT Blockings','GIT Calendar'],pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings','pg_hotel_sources']},activities:{sub:['All Activities','Tours','Transfers','Experiences'],pages:['pg_act_all']},vehicles:{sub:['Fleet','Bookings','Maintenance'],pages:[]},delivery:{sub:['Overview','Pending','Completed'],pages:[]}};
 let curPrimary='suppliers',curSub=0;
 
 const ornTeam=[
@@ -311,10 +311,70 @@ function pg_sup_contracts(){
       ${sel(['All Destinations','Dubai','Abu Dhabi','Oman','Egypt','Jordan','Morocco'])}
       ${sel(['All ORN Contract Owners',...ornTeam.map(t=>t.name)])}
       ${btn('Search','btn-navy',"toast('Searching...')")}
-      <div class="toolbar-r">${btn('+ Upload Document','btn-navy','openUploadModal()')} ${btn('+ New Contract','btn-white','openNewContractModal()')}</div>
+      <div class="toolbar-r">
+        ${btn('+ Upload Document','btn-navy','openUploadModal()')}
+        ${btn('+ New Contract','btn-white','openNewContractModal()')}
+      </div>
     </div>
+
+    <!-- View toggle -->
+    <div style="display:flex;gap:0;margin-bottom:12px;border:1px solid var(--border-lt);border-radius:var(--r);overflow:hidden;width:fit-content">
+      <button id="ctv-all" class="btn btn-navy" style="border-radius:0;border:none" onclick="contractViewToggle('all')">All Contracts</button>
+      <button id="ctv-mkt" class="btn btn-white" style="border-radius:0;border:none;border-left:1px solid var(--border-lt)" onclick="contractViewToggle('market')">By Source Market</button>
+    </div>
+
+    <!-- BY SOURCE MARKET VIEW -->
+    <div id="ctr-by-market" style="display:none">
+      ${(()=>{
+        const allMarkets = [...new Set(contracts.flatMap(c=>c.sourceMarkets||['UK']))].sort();
+        const mcolors = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',India:'#ff9933',Oman:'#db161b'};
+        const mflags  = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',India:'🇮🇳',Oman:'🇴🇲'};
+        return allMarkets.map(market=>{
+          const col   = mcolors[market]||'#888';
+          const flag  = mflags[market]||'🌍';
+          const mctrs = contracts.filter(c=>(c.sourceMarkets||['UK']).includes(market));
+          const totalVal = mctrs.filter(c=>c.value&&c.value!=='—').length;
+          return `<div style="border:1px solid ${col}33;border-left:4px solid ${col};border-radius:var(--r);margin-bottom:14px;overflow:hidden">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:${col}08;border-bottom:1px solid ${col}22">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:22px">${flag}</span>
+                <div>
+                  <div style="font-size:14px;font-weight:700;color:${col}">${market} Source Market</div>
+                  <div style="font-size:12px;color:var(--text2)">${mctrs.length} contract${mctrs.length!==1?'s':''} · ${mctrs.filter(c=>c.status==='Valid').length} valid · ${mctrs.filter(c=>c.status==='Expiring'||c.status==='Expired').length} expiring/expired</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px">
+                ${btn('+ Add Contract for '+market,'btn-white btn-sm',`openMarketAssignNewModal('${market}','All')`)}
+              </div>
+            </div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead><tr style="background:var(--bg-page)">${['Supplier','Doc No.','Type','Destination','Value','ORN Owner','ORN Manager','Expiry','Status','Allocation','Manage'].map(h=>`<th style="padding:5px 10px;text-align:left;font-size:10.5px;color:var(--text3);border-bottom:1px solid var(--border-lt);font-weight:700">${h}</th>`).join('')}</tr></thead>
+              <tbody>${mctrs.map(c=>`<tr style="border-bottom:1px solid var(--border-lt)">
+                <td style="padding:7px 10px;font-weight:600"><a class="lnk" onclick="openContractModal(${esc(c)})">${c.supplier}</a></td>
+                <td style="padding:7px 10px" class="mono">${c.id}</td>
+                <td style="padding:7px 10px;font-size:11.5px">${c.type}</td>
+                <td style="padding:7px 10px;font-size:11.5px">${c.dest}</td>
+                <td style="padding:7px 10px;font-weight:700">${c.value}</td>
+                <td style="padding:7px 10px;font-size:11.5px;font-weight:600;color:var(--navy)">${c.ornOwner}</td>
+                <td style="padding:7px 10px;font-size:11.5px">${c.ornManager}</td>
+                <td style="padding:7px 10px;font-size:11.5px;color:${c.status==='Expired'?'var(--red)':c.status==='Expiring'?'var(--orange)':'inherit'};font-weight:${c.status!=='Valid'?700:400}">${c.expiry}</td>
+                <td style="padding:7px 10px"><span class="pill ${sc(c.status)}">${c.status}</span></td>
+                <td style="padding:7px 10px;font-size:11.5px">${market==='UK'?c.ukAlloc||'—':market==='UAE / GCC'?c.gccAlloc||'—':c.otherAlloc||'—'}</td>
+                <td style="padding:7px 10px;display:flex;gap:4px">
+                  <a class="lnk" style="font-size:11.5px" onclick="openContractModal(${esc(c)})">View</a>
+                  <a class="lnk" style="font-size:11.5px" onclick="openMarketAssignModal('${c.id}','${c.supplier}')">Edit Markets</a>
+                </td>
+              </tr>`).join('')}</tbody>
+            </table>
+          </div>`;
+        }).join('');
+      })()}
+    </div>
+
+    <!-- ALL CONTRACTS VIEW (default) -->
+    <div id="ctr-all">
     <div class="tbl-wrap"><table>
-      ${thdr('#','Supplier ↕','Type ↕','Doc No. ↕','Destination ↕','Start ↕','Expiry ↕','Value ↕','Annual Value ↕','Status ↕','ORN Owner ↕','ORN Manager ↕','Governing Law ↕','Auto-Renew ↕','Review Due ↕','Manage')}
+      ${thdr('#','Supplier ↕','Type ↕','Doc No. ↕','Destination ↕','Start ↕','Expiry ↕','Value ↕','Annual Value ↕','Status ↕','ORN Owner ↕','ORN Manager ↕','Source Markets ↕','Governing Law ↕','Auto-Renew ↕','Review Due ↕','Manage')}
       ${frow(0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0)}
       <tbody>${contracts.map((c,i)=>`<tr><td class="rn">${i+1}</td>
         <td><a class="lnk" onclick='openContractModal(${esc(c)})'>${c.supplier}</a></td>
@@ -330,7 +390,8 @@ function pg_sup_contracts(){
         <td style="font-size:11.5px;color:${c.reviewDate==='Overdue'?'var(--red)':'inherit'};font-weight:${c.reviewDate==='Overdue'?700:400}">${c.reviewDate}</td>
         <td class="act"><a onclick='openContractModal(${esc(c)})'>View</a><a onclick='openEditContractModal(${esc(c)})'>Edit</a><a onclick="toast('Downloading...')">&#8595;</a><a onclick="toast('Renewal started')">Renew</a><a class="red" onclick="if(confirm('Delete?'))toast('Deleted')">Del</a></td>
       </tr>`).join('')}</tbody>
-    </table>${pgfoot(`1–${contracts.length}`,486,5)}</div>`;
+    </table>${pgfoot(`1–${contracts.length}`,486,5)}</div>
+    </div>`; // close ctr-all
 }
 
 function pg_sup_payments(){
@@ -495,7 +556,47 @@ function openSupModal(s){
       <div style="margin-top:10px;display:flex;gap:8px">${btn('Reassign Manager','btn-white btn-sm',`closeModal();openEditSupModal(${esc(s)})`)} ${btn('Edit ORN Team','btn-white btn-sm',`closeModal();openEditSupModal(${esc(s)})`)}</div>
     </div>
     <div id="st-con" class="tab-panel">
-      ${contracts.filter(c=>c.supplier===s.name).length===0?'<p style="color:var(--text3)">No contracts on file.</p>':contracts.filter(c=>c.supplier===s.name).map(c=>`<div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:12px;margin-bottom:10px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><b>${c.type}</b> <span class="mono" style="margin-left:8px">${c.id}</span></div><span class="pill ${sc(c.status)}">${c.status}</span></div><div class="fgrid" style="margin-bottom:8px">${[['Period',`${c.start} – ${c.expiry}`],['Contract Value',c.value],['Annual Value',c.annualValue],['ORN Contract Owner',c.ornOwner],['ORN Manager',c.ornManager],['Governing Law',c.governingLaw],['Auto-Renew',c.autoRenew],['Review Due',c.reviewDate]].map(([l,v])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div style="font-size:12px">${v}</div></div>`).join('')}</div><div style="background:var(--bg-page);padding:6px 10px;border-radius:var(--r);font-size:12px;margin-bottom:8px">${c.notes}</div><div style="display:flex;gap:6px">${btn('&#8595; Download','btn-white btn-sm',`toast('Downloading...')`)} ${btn('Edit','btn-white btn-sm',`closeModal();openEditContractModal(${esc(c)})`)} ${btn('Renew','btn-white btn-sm',`toast('Starting renewal...')`)}</div></div>`).join('')}
+      ${(()=>{
+        const supContracts = contracts.filter(c=>c.supplier===s.name);
+        if(!supContracts.length) return '<p style="color:var(--text3)">No contracts on file.</p>';
+        const mcolors = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',India:'#ff9933',Oman:'#db161b'};
+        const mflags  = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',India:'🇮🇳',Oman:'🇴🇲'};
+        return supContracts.map(c=>{
+          const markets = c.sourceMarkets||['UK'];
+          const marketBadges = markets.map(m=>{
+            const col=mcolors[m]||'#888';
+            const flag=mflags[m]||'🌍';
+            return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:700;background:${col}22;color:${col};margin:1px">${flag} ${m}</span>`;
+          }).join('');
+          const scopePill = c.marketScope ? `<span class="pill ${c.marketScope==='Global'?'p-blue':c.marketScope==='Multi-market'?'p-green':'p-gray'}" style="font-size:10px">${c.marketScope}</span>` : '';
+          return `<div style="border:1px solid var(--border-lt);border-radius:var(--r);padding:12px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <b>${c.type}</b> <span class="mono" style="font-weight:400">${c.id}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                ${scopePill}
+                <span class="pill ${sc(c.status)}">${c.status}</span>
+              </div>
+            </div>
+            <div class="fgrid" style="margin-bottom:8px">
+              ${[['Period',`${c.start} – ${c.expiry}`],['Value',c.value],['Annual',c.annualValue],['ORN Owner',`<b>${c.ornOwner}</b>`],['ORN Manager',c.ornManager],['Governing Law',c.governingLaw],['Auto-Renew',c.autoRenew],['Review Due',c.reviewDate]].map(([l,v])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div style="font-size:12px">${v}</div></div>`).join('')}
+            </div>
+            <div style="margin-bottom:8px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:4px">Valid Source Markets</div>
+              <div style="display:flex;flex-wrap:wrap;gap:3px">${marketBadges}</div>
+              ${c.marketNotes?`<div style="font-size:11.5px;color:var(--text2);margin-top:5px;padding-top:5px;border-top:1px solid var(--border-lt)">${c.marketNotes}</div>`:''}
+            </div>
+            <div style="background:var(--bg-page);padding:6px 10px;border-radius:var(--r);font-size:12px;margin-bottom:8px">${c.notes}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              ${btn('View Full Contract','btn-white btn-sm',`closeModal();setTimeout(()=>openContractModal(${esc(c)}),120)`)}
+              ${btn('Source Markets','btn-white btn-sm',`closeModal();setTimeout(()=>{openContractModal(${esc(c)});setTimeout(()=>{document.querySelector('[onclick*=cm-sm]')?.click()},200)},120)`)}
+              ${btn('&#8595; Download','btn-white btn-sm',`toast('Downloading...')`)}
+              ${btn('Renew','btn-white btn-sm',`toast('Starting renewal...')`)}
+            </div>
+          </div>`;
+        }).join('');
+      })()}
       <div style="margin-top:8px">${btn('+ Upload Document','btn-navy','closeModal();openUploadModal()')}</div>
     </div>
     <div id="st-pay" class="tab-panel">
@@ -527,14 +628,153 @@ function openNewSupModal(){
 window.openNewSupModal=openNewSupModal;
 
 function openContractModal(c){
+  if(typeof s==='string')try{c=JSON.parse(c.replace(/&quot;/g,'"'));}catch(e){}
   if(typeof c==='string')try{c=JSON.parse(c.replace(/&quot;/g,'"'));}catch(e){}
-  openModal(`Contract — ${c.id}`,`
+  const mb=document.getElementById('modal-box');
+  if(mb)mb.style.width='920px';
+
+  // ── TAB 1: DETAILS ──
+  const tabDetails = `
     <div class="fgrid" style="margin-bottom:12px">
       ${[['Supplier',c.supplier,''],['Type',c.type,''],['Document No.',c.id,'mono'],['Destination',c.dest,''],['Period',`${c.start} – ${c.expiry}`,''],['Contract Value',c.value,''],['Annual Value',c.annualValue,''],['Status',`<span class="pill ${sc(c.status)}">${c.status}</span>`,''],['ORN Contract Owner',`<b style="color:var(--navy)">${c.ornOwner}</b>`,''],['ORN Account Manager',c.ornManager,''],['Governing Law',c.governingLaw,''],['Exclusivity',c.exclusivity||'—',''],['Auto-Renew',c.autoRenew,''],['Renewal Notice',c.renewalNotice,''],['Review Due',`<span style="color:${c.reviewDate==='Overdue'?'var(--red)':'inherit'};font-weight:${c.reviewDate==='Overdue'?700:400}">${c.reviewDate}</span>`,'']].map(([l,v,cl])=>`<div><div style="font-size:10.5px;color:var(--text3)">${l}</div><div class="${cl}" style="font-size:12.5px">${v}</div></div>`).join('')}
     </div>
-    <div style="background:var(--bg-page);border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:12px"><div style="font-size:10.5px;color:var(--text3);font-weight:700;margin-bottom:4px">NOTES</div><div style="font-size:12.5px">${c.notes}</div></div>
-    <div style="border:1px dashed var(--border);border-radius:var(--r);padding:18px;text-align:center;background:var(--bg-page)"><div style="font-size:22px;margin-bottom:6px">📄</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">${c.file}</div><div style="font-size:12px;color:var(--text3)">PDF on file</div></div>`,
-    `${btn('&#8595; Download','btn-white',`toast('Downloading ${c.file}...')`)} ${btn('Edit','btn-white',`closeModal();openEditContractModal(${esc(c)})`)} ${btn('Renew','btn-white',"toast('Starting renewal...')")} ${btn('Close','btn-navy','closeModal()')}`
+    <div style="background:var(--bg-page);border:1px solid var(--border-lt);border-radius:var(--r);padding:10px;margin-bottom:12px">
+      <div style="font-size:10.5px;color:var(--text3);font-weight:700;margin-bottom:4px">NOTES</div>
+      <div style="font-size:12.5px">${c.notes}</div>
+    </div>
+    <div style="border:1px dashed var(--border);border-radius:var(--r);padding:16px;text-align:center;background:var(--bg-page)">
+      <div style="font-size:22px;margin-bottom:6px">📄</div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px">${c.file}</div>
+      <div style="font-size:12px;color:var(--text3)">PDF on file</div>
+      <div style="margin-top:8px">${btn('&#8595; Download PDF','btn-white btn-sm',`toast('Downloading ${c.file}...')`)} ${btn('Replace File','btn-white btn-sm','closeModal();openUploadModal()')}</div>
+    </div>`;
+
+  // ── TAB 2: SOURCE MARKETS ──
+  const activeMarkets  = (c.sourceMarkets||['UK']).filter(Boolean);
+  const marketScope    = c.marketScope || 'UK Only';
+  const marketColors = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',UAE:'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933',Oman:'#db161b'};
+  const flagMap = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',UAE:'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',Netherlands:'🇳🇱',Italy:'🇮🇹',Spain:'🇪🇸',Australia:'🇦🇺',India:'🇮🇳',Oman:'🇴🇲'};
+  const allPossibleMarkets = ['UK','Ireland','UAE / GCC','Germany','France','USA','Netherlands','Italy','Spain','Australia','India','Saudi Arabia','Oman','Japan'];
+  const notCovered = allPossibleMarkets.filter(m=>!activeMarkets.includes(m));
+
+  const tabSourceMarkets = `
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 14px;margin-bottom:16px;font-size:12.5px;color:#0d47a1">
+      🌍 <b>Source markets</b> define which customer origin markets this contract is valid for. Rates from this contract will only be offered to customers booking from the listed markets.
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:10px">✓ Markets this contract covers (${activeMarkets.length})</div>
+        ${activeMarkets.map(m=>{
+          const col = marketColors[m]||'#666';
+          const flag = flagMap[m]||'🌍';
+          // find matching contact from supplier's sourceMarketContacts
+          const sup = suppliers.find(x=>x.name===c.supplier);
+          const smData = sup ? sourceMarketContacts[sup.id] : null;
+          const mContact = smData?.markets?.find(x=>x.market===m);
+          return `<div style="border:1px solid ${col}44;border-left:4px solid ${col};border-radius:3px;padding:10px 12px;margin-bottom:8px;background:${col}08">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:20px">${flag}</span>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:${col}">${m}</div>
+                  <div style="font-size:11px;color:var(--text3)">${c.ukAlloc&&m==='UK'?'Allocation: '+c.ukAlloc:c.gccAlloc&&(m==='UAE / GCC'||m==='UAE')?'Allocation: '+c.gccAlloc:c.otherAlloc?'Allocation: '+c.otherAlloc:''}</div>
+                </div>
+              </div>
+              <span class="pill p-green" style="font-size:10.5px">Active</span>
+            </div>
+            ${mContact ? `
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:#fff;border-radius:3px;border:1px solid ${col}22">
+                <div style="flex:1">
+                  <div style="font-size:11.5px;font-weight:600">${mContact.contactName} <span style="font-weight:400;color:var(--text3)">— ${mContact.role}</span></div>
+                  <div style="font-size:11px;color:var(--text3)">${mContact.officeHours}</div>
+                  <a href="mailto:${mContact.email}" class="lnk" style="font-size:11px">${mContact.email}</a>
+                  ${mContact.whatsapp?`<span style="font-size:11px;color:#25D366;margin-left:8px">💬 ${mContact.whatsapp}</span>`:''}
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  <span style="font-size:10.5px;color:var(--text3)">ORN: ${mContact.ornLiaison}</span>
+                  ${btn('View Contact','btn-white btn-sm',`toast('Opening contact for ${m}...')`)}
+                </div>
+              </div>` : `<div style="font-size:11.5px;color:var(--text3);padding:4px 0">No contact assigned for this market — <a class="lnk" onclick="toast('Opening add contact form...')">+ Add contact</a></div>`}
+            ${c.marketNotes?`<div style="font-size:11.5px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid ${col}22">${c.marketNotes}</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:10px">✗ Markets not covered by this contract (${notCovered.length})</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+          ${notCovered.map(m=>{
+            const col = marketColors[m]||'#aaa';
+            const flag = flagMap[m]||'🌍';
+            return `<div style="display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px dashed #ccc;border-radius:3px;font-size:12px;color:var(--text3);background:#fafafa">
+              <span>${flag}</span> ${m}
+              <button class="btn btn-white btn-sm" style="padding:1px 6px;font-size:10px;margin-left:4px" onclick="openMarketAssignModal('${c.id}','${c.supplier}')">+ Add</button>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <div style="background:var(--bg-page);border:1px solid var(--border-lt);border-radius:var(--r);padding:12px;margin-top:8px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin-bottom:8px">Market Scope Summary</div>
+          ${[
+            ['Scope Label', `<span class="pill ${marketScope==='Global'?'p-blue':marketScope==='Multi-market'?'p-green':'p-gray'}">${marketScope}</span>`],
+            ['UK / Ireland Alloc.', c.ukAlloc||'—'],
+            ['GCC / Gulf Alloc.', c.gccAlloc||'—'],
+            ['Other Markets Alloc.', c.otherAlloc||'—'],
+            ['Market Owner', `<b>${c.marketOwner||c.ornOwner}</b>`],
+          ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border-lt);font-size:12px"><span style="color:var(--text3)">${l}</span><span>${v}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid var(--border-lt)">
+      ${btn('Edit Source Markets','btn-navy',`closeModal();openMarketAssignModal('${c.id}','${c.supplier}')`)}
+      ${btn('+ Add Market','btn-white',`closeModal();openMarketAssignModal('${c.id}','${c.supplier}')`)}
+    </div>`;
+
+  // ── TAB 3: MARKET CONTACTS CROSS-REF ──
+  const sup2 = suppliers.find(x=>x.name===c.supplier);
+  const smData2 = sup2 ? sourceMarketContacts[sup2.id] : null;
+  const allMktContacts = smData2?.markets || [];
+
+  const tabMarketContacts = `
+    <div style="background:#fff8e6;border:1px solid #ffe082;border-radius:3px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#6d4c00">
+      📋 All source market contacts on file for <b>${c.supplier}</b>. Contacts marked ✓ have an active ORN contract. Contacts marked ✗ are for negotiation only.
+    </div>
+    ${allMktContacts.length===0 ? '<p style="color:var(--text3)">No market contacts configured for this supplier.</p>' :
+    `<div class="tbl-wrap"><table>
+      <tr>${['Market','Contact Name','Role','Email','Phone / WhatsApp','Office Hours','ORN Liaison','Rate Type','Contract?','Active Markets'].map(h=>`<th>${h}</th>`).join('')}</tr>
+      <tbody>${allMktContacts.map(m=>{
+        const col = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',India:'#ff9933'}[m.market]||'#888';
+        const flag = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',India:'🇮🇳',Australia:'🇦🇺'}[m.market]||'🌍';
+        const coveredByThis = (c.sourceMarkets||['UK']).includes(m.market);
+        return `<tr style="${!m.available?'opacity:0.55':''}">
+          <td><span style="display:flex;align-items:center;gap:6px;font-weight:700;color:${col}">${flag} ${m.market}</span></td>
+          <td style="font-weight:600">${m.contactName}</td>
+          <td style="font-size:11.5px">${m.role}</td>
+          <td><a href="mailto:${m.email}" class="lnk" style="font-size:11.5px">${m.email}</a></td>
+          <td style="font-size:11.5px">${m.phone}${m.whatsapp?`<div style="color:#25D366;font-size:11px">💬 ${m.whatsapp}</div>`:''}</td>
+          <td style="font-size:11px;color:var(--text3)">${m.officeHours}</td>
+          <td style="font-size:11.5px;font-weight:600;color:var(--navy)">${m.ornLiaison}</td>
+          <td style="font-size:11px"><span style="background:${col}18;color:${col};padding:2px 6px;border-radius:3px;font-weight:600">${m.rateType}</span></td>
+          <td><span class="pill ${m.available?'p-green':'p-gray'}" style="font-size:10px">${m.available?'✓ Live':'✗ None'}</span></td>
+          <td><span class="pill ${coveredByThis?'p-green':'p-gray'}" style="font-size:10px">${coveredByThis?'✓ This contract':'✗ Not this contract'}</span></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`}
+    <div style="margin-top:12px;display:flex;gap:8px">
+      ${btn('Add Market Contact','btn-white',`closeModal();openAddMarketContactModal('${sup2?.id||''}')`)}
+      ${btn('Manage All Markets','btn-white',`closeModal();openMarketAssignModal('${c.id}','${c.supplier}')`)}
+    </div>`;
+
+  openModal(`Contract — ${c.id}`,`
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab(this,'cm-det')">Contract Details</div>
+      <div class="tab" onclick="switchTab(this,'cm-sm')">Source Markets (${activeMarkets.length})</div>
+      <div class="tab" onclick="switchTab(this,'cm-mc')">All Market Contacts (${allMktContacts.length})</div>
+    </div>
+    <div id="cm-det" class="tab-panel active">${tabDetails}</div>
+    <div id="cm-sm" class="tab-panel">${tabSourceMarkets}</div>
+    <div id="cm-mc" class="tab-panel">${tabMarketContacts}</div>`,
+    `${btn('&#8595; Download','btn-white',`toast('Downloading ${c.file}...')`)} ${btn('Edit Contract','btn-white',`closeModal();openEditContractModal(${esc(c)})`)} ${btn('Edit Markets','btn-white',`closeModal();openMarketAssignModal('${c.id}','${c.supplier}')`)} ${btn('Renew','btn-white',"toast('Starting renewal...')")} ${btn('Close','btn-navy','closeModal()')}`
   );
 }
 window.openContractModal=openContractModal;
@@ -1846,8 +2086,26 @@ function openAddMarketContactModal(supId){
 }
 window.openAddMarketContactModal = openAddMarketContactModal;
 
+
+// ─── CONTRACT VIEW TOGGLE ─────────────────────────────────────────
+function contractViewToggle(mode){
+  const all = document.getElementById('ctr-all');
+  const mkt = document.getElementById('ctr-by-market');
+  const btnAll = document.getElementById('ctv-all');
+  const btnMkt = document.getElementById('ctv-mkt');
+  if(!all||!mkt) return;
+  if(mode==='market'){
+    all.style.display='none'; mkt.style.display='block';
+    btnAll.className='btn btn-white'; btnMkt.className='btn btn-navy';
+  } else {
+    all.style.display='block'; mkt.style.display='none';
+    btnAll.className='btn btn-navy'; btnMkt.className='btn btn-white';
+  }
+}
+window.contractViewToggle=contractViewToggle;
+
 // Register all page functions
-window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
+window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_sup_market_contracts=pg_sup_market_contracts;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
 window.pg_sales_dest=function(){return '<div class="page-title">Destination Dashboard</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)">Connect live data to populate.</div>';};
 
 function toast(msg,err=false){
