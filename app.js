@@ -1,6 +1,6 @@
 // ORN Global Supplier Management Portal
 'use strict';
-const NAV={products:{sub:['Product Catalogue','Categories','Pricing'],pages:[]},sales:{sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'],pages:['pg_sales_dest']},supply:{sub:['Overview','Availability','Allotments'],pages:[]},suppliers:{sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts & Docs','Payments','Rates & Pricing','Compliance','Audit Trail','Tier Management','Destinations','Regional Offices'],pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_compliance','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_sup_regions']},hotels:{sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Supply Sources','GIT Blockings','GIT Calendar'],pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings','pg_hotel_sources']},activities:{sub:['All Activities','Tours','Transfers','Experiences'],pages:['pg_act_all']},vehicles:{sub:['Fleet','Bookings','Maintenance'],pages:[]},delivery:{sub:['Overview','Pending','Completed'],pages:[]}};
+const NAV={products:{sub:['Product Catalogue','Categories','Pricing'],pages:[]},sales:{sub:['Business Dashboard','Dest Dashboard','Groups Dashboard','Expert Dashboard','B2C Expert Dashboard','BM Dashboard','KAM Dashboard','FS Dashboard'],pages:['pg_sales_dest']},supply:{sub:['Overview','Availability','Allotments'],pages:[]},suppliers:{sub:['Supplier Dashboard','All Suppliers','Onboarding','Contracts & Docs','Payments','Rates & Pricing','Compliance','Audit Trail','Tier Management','Destinations','Regional Offices','Source Markets'],pages:['pg_sup_dash','pg_sup_all','pg_sup_onboard','pg_sup_contracts','pg_sup_payments','pg_sup_rates','pg_sup_compliance','pg_sup_audit','pg_sup_tiers','pg_sup_dest','pg_sup_regions','pg_sup_source_markets']},hotels:{sub:['Manage Rates and Inventory','Manage Contracts','Inventory Position','Hotel Content','Preferred Rankings','Supply Sources','GIT Blockings','GIT Calendar'],pages:['pg_hotel_rates','pg_hotel_contracts','pg_hotel_inv','pg_hotel_content','pg_hotel_rankings','pg_hotel_sources']},activities:{sub:['All Activities','Tours','Transfers','Experiences'],pages:['pg_act_all']},vehicles:{sub:['Fleet','Bookings','Maintenance'],pages:[]},delivery:{sub:['Overview','Pending','Completed'],pages:[]}};
 let curPrimary='suppliers',curSub=0;
 
 const ornTeam=[
@@ -1078,7 +1078,144 @@ const regionalOffices = [
       {ref:'CTR-2024-0099',supplier:'Cappadocia Balloon Tours',type:'Service Contract',value:'£180K',expiry:'Aug 2026',owner:'Sarah Mitchell'},
     ]
   },
+  ,{ id:'RO-06', flag:'🇮🇳', name:'Bangalore — India Office', city:'Bangalore', country:'India', type:'Regional Office', address:'RMZ Infinity, Tower C, 3rd Floor, Old Madras Road, Bangalore 560016', phone:'+91 80 6741 2000', email:'india@orn.com',
+    head:'Priya Sharma', headRole:'Senior Supplier Manager – Asia', headEmail:'priya.sharma@orn.com',
+    team:['Priya Sharma'],
+    destinations:['India','Sri Lanka','Nepal','Bhutan'],
+    contractScope:'India subcontinent — India, Sri Lanka, Nepal, Bhutan',
+    contractAuthority:'Regional authority up to £100K. Above requires Bangkok or London co-sign.',
+    supplierCount:0, contractCount:0, activeContracts:0,
+    contracts:[]
+  }
 ];
+
+// ─── CONTRACT ↔ OFFICE ↔ SOURCE MARKET ALLOCATIONS ──────────────
+// This is the master junction table. Each entry = one contract assigned
+// to one regional office, valid for specific source markets only.
+const contractOfficeMarkets = [
+  {
+    id:'COM-001', contractRef:'CTR-2024-0081', supplier:'Atlantis The Palm',
+    dest:'Dubai', contractType:'Service Contract', contractValue:'£840K', contractExpiry:'Dec 2025',
+    officeId:'RO-01', officeName:'London — Global HQ', officeFlag:'🇬🇧',
+    sourceMarkets:['UK','Ireland'],
+    marketScope:'UK & Ireland only', allocation:'60%',
+    ornOwner:'Layla Hassan', ornManager:'Ajay Kawa',
+    rateType:'ORN UK Rate', currency:'GBP',
+    notes:'Primary UK allocation. All UK and Ireland B2B bookings through London HQ.',
+    status:'Active', validFrom:'01 Jan 2024', validTo:'31 Dec 2025'
+  },
+  {
+    id:'COM-002', contractRef:'CTR-2024-0081', supplier:'Atlantis The Palm',
+    dest:'Dubai', contractType:'Service Contract', contractValue:'£840K', contractExpiry:'Dec 2025',
+    officeId:'RO-02', officeName:'Dubai — Gulf Office', officeFlag:'🇦🇪',
+    sourceMarkets:['UAE / GCC','Saudi Arabia'],
+    marketScope:'GCC markets', allocation:'30%',
+    ornOwner:'Omar Al Farsi', ornManager:'Omar Al Farsi',
+    rateType:'GCC Rate', currency:'GBP / AED',
+    notes:'GCC allocation — UAE, Saudi Arabia, Kuwait, Bahrain bookings through Dubai office.',
+    status:'Active', validFrom:'01 Jan 2024', validTo:'31 Dec 2025'
+  },
+  {
+    id:'COM-003', contractRef:'CTR-2024-0081', supplier:'Atlantis The Palm',
+    dest:'Dubai', contractType:'Service Contract', contractValue:'£840K', contractExpiry:'Dec 2025',
+    officeId:'RO-05', officeName:'Madrid — Europe & Americas', officeFlag:'🇪🇸',
+    sourceMarkets:['Germany','France','Netherlands'],
+    marketScope:'Continental Europe', allocation:'10%',
+    ornOwner:'Sarah Mitchell', ornManager:'Sarah Mitchell',
+    rateType:'EU Agent Rate', currency:'EUR',
+    notes:'European allocation at public EU rates. No exclusive ORN contract for EU markets yet.',
+    status:'Pending', validFrom:'01 Jan 2024', validTo:'31 Dec 2025'
+  },
+  {
+    id:'COM-004', contractRef:'CTR-2023-0086', supplier:'Oman Luxury Resorts',
+    dest:'Oman', contractType:'Service Contract', contractValue:'£580K', contractExpiry:'May 2026',
+    officeId:'RO-01', officeName:'London — Global HQ', officeFlag:'🇬🇧',
+    sourceMarkets:['UK','Ireland'],
+    marketScope:'UK & Ireland', allocation:'45%',
+    ornOwner:'Layla Hassan', ornManager:'Omar Al Farsi',
+    rateType:'ORN UK Rate', currency:'GBP',
+    notes:'UK market primary. Fatima Al Balushi is supplier contact for UK bookings.',
+    status:'Active', validFrom:'01 Jun 2023', validTo:'31 May 2026'
+  },
+  {
+    id:'COM-005', contractRef:'CTR-2023-0086', supplier:'Oman Luxury Resorts',
+    dest:'Oman', contractType:'Service Contract', contractValue:'£580K', contractExpiry:'May 2026',
+    officeId:'RO-02', officeName:'Dubai — Gulf Office', officeFlag:'🇦🇪',
+    sourceMarkets:['UAE / GCC','Oman'],
+    marketScope:'Gulf & Oman', allocation:'40%',
+    ornOwner:'Omar Al Farsi', ornManager:'Omar Al Farsi',
+    rateType:'GCC Direct Rate', currency:'OMR / GBP',
+    notes:'GCC & Oman domestic bookings. Sultan Al Busaidi handles directly.',
+    status:'Active', validFrom:'01 Jun 2023', validTo:'31 May 2026'
+  },
+  {
+    id:'COM-006', contractRef:'CTR-2023-0086', supplier:'Oman Luxury Resorts',
+    dest:'Oman', contractType:'Service Contract', contractValue:'£580K', contractExpiry:'May 2026',
+    officeId:'RO-05', officeName:'Madrid — Europe & Americas', officeFlag:'🇪🇸',
+    sourceMarkets:['Germany'],
+    marketScope:'Germany / DACH', allocation:'15%',
+    ornOwner:'Sarah Mitchell', ornManager:'Sarah Mitchell',
+    rateType:'EU ORN Rate', currency:'EUR',
+    notes:'DACH market allocation. Klaus Weber is supplier contact based in Munich.',
+    status:'Active', validFrom:'01 Jun 2023', validTo:'31 May 2026'
+  },
+  {
+    id:'COM-007', contractRef:'CTR-2023-0083', supplier:'Desert Tracks Tours',
+    dest:'Dubai', contractType:'Service Contract', contractValue:'£120K', contractExpiry:'Feb 2024',
+    officeId:'RO-01', officeName:'London — Global HQ', officeFlag:'🇬🇧',
+    sourceMarkets:['UK','Ireland'],
+    marketScope:'UK Only', allocation:'100%',
+    ornOwner:'Layla Hassan', ornManager:'Priya Sharma',
+    rateType:'ORN UK Rate', currency:'GBP',
+    notes:'UK-only contract. All bookings must originate from UK B2B partners.',
+    status:'Expired', validFrom:'01 Mar 2023', validTo:'28 Feb 2024'
+  },
+  {
+    id:'COM-008', contractRef:'CTR-MV-2024-01', supplier:'Maldives Sunset Cruises',
+    dest:'Maldives', contractType:'Service Contract', contractValue:'£95K', contractExpiry:'Awaiting',
+    officeId:'RO-04', officeName:'Bangkok — Asia & Maldives', officeFlag:'🇹🇭',
+    sourceMarkets:['UK'],
+    marketScope:'UK Only — pending expansion', allocation:'100%',
+    ornOwner:'Priya Sharma', ornManager:'Priya Sharma',
+    rateType:'ORN UK Rate', currency:'GBP',
+    notes:'Contract pending sign-off. Bangkok office managing. Expanding to India market once Bangalore office live.',
+    status:'Pending', validFrom:'Pending', validTo:'Awaiting'
+  },
+  {
+    id:'COM-009', contractRef:'CTR-MV-2024-01', supplier:'Maldives Sunset Cruises',
+    dest:'Maldives', contractType:'Service Contract', contractValue:'£95K', contractExpiry:'Awaiting',
+    officeId:'RO-06', officeName:'Bangalore — India Office', officeFlag:'🇮🇳',
+    sourceMarkets:['India'],
+    marketScope:'India market — planned', allocation:'TBD',
+    ornOwner:'Priya Sharma', ornManager:'Priya Sharma',
+    rateType:'India Rate — TBD', currency:'GBP / INR',
+    notes:'Planned India market allocation once Bangalore office fully operational. Contract expansion required.',
+    status:'Planned', validFrom:'TBD', validTo:'TBD'
+  },
+  {
+    id:'COM-010', contractRef:'CTR-2024-0099', supplier:'Cappadocia Balloon Tours',
+    dest:'Turkey', contractType:'Service Contract', contractValue:'£180K', contractExpiry:'Aug 2026',
+    officeId:'RO-05', officeName:'Madrid — Europe & Americas', officeFlag:'🇪🇸',
+    sourceMarkets:['UK','Germany','France','Netherlands'],
+    marketScope:'Europe', allocation:'80%',
+    ornOwner:'Sarah Mitchell', ornManager:'Sarah Mitchell',
+    rateType:'EU ORN Rate', currency:'GBP / EUR',
+    notes:'Primary European allocation. Madrid office manages all European source market bookings for Turkey.',
+    status:'Active', validFrom:'01 Sep 2024', validTo:'31 Aug 2026'
+  },
+  {
+    id:'COM-011', contractRef:'CTR-2024-0099', supplier:'Cappadocia Balloon Tours',
+    dest:'Turkey', contractType:'Service Contract', contractValue:'£180K', contractExpiry:'Aug 2026',
+    officeId:'RO-01', officeName:'London — Global HQ', officeFlag:'🇬🇧',
+    sourceMarkets:['UAE / GCC'],
+    marketScope:'GCC market via London', allocation:'20%',
+    ornOwner:'Layla Hassan', ornManager:'Sarah Mitchell',
+    rateType:'GCC via London Rate', currency:'GBP',
+    notes:'GCC customers booking Turkey tours routed through London HQ contract.',
+    status:'Active', validFrom:'01 Sep 2024', validTo:'31 Aug 2026'
+  },
+];
+
 
 // ─── PAGE: SUPPLY SOURCES ─────────────────────────────────────────
 function pg_hotel_sources(){
@@ -2109,8 +2246,432 @@ function contractViewToggle(mode){
 }
 window.contractViewToggle=contractViewToggle;
 
+
+// ─── PAGE: SOURCE MARKET MANAGEMENT ──────────────────────────────
+function pg_sup_source_markets(){
+
+  const mcolors = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',UAE:'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933',Oman:'#db161b',Jordan:'#007a3d'};
+  const mflags  = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',UAE:'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',Netherlands:'🇳🇱',Italy:'🇮🇹',Spain:'🇪🇸',Australia:'🇦🇺',India:'🇮🇳',Oman:'🇴🇲',Jordan:'🇯🇴'};
+
+  const mktBadge = (m) => {
+    const col = mcolors[m]||'#888';
+    const fl  = mflags[m]||'🌍';
+    return `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:${col}20;color:${col};white-space:nowrap">${fl} ${m}</span>`;
+  };
+
+  const statusPill = s => s==='Active'?'<span class="pill p-green">Active</span>':s==='Pending'?'<span class="pill p-orange">Pending</span>':s==='Planned'?'<span class="pill p-blue">Planned</span>':'<span class="pill p-red">Expired</span>';
+
+  // KPI strip
+  const allMarkets = [...new Set(contractOfficeMarkets.flatMap(r=>r.sourceMarkets))].sort();
+  const allOffices  = [...new Set(contractOfficeMarkets.map(r=>r.officeName))];
+  const active      = contractOfficeMarkets.filter(r=>r.status==='Active').length;
+  const pending     = contractOfficeMarkets.filter(r=>r.status==='Pending'||r.status==='Planned').length;
+
+  // Build the main matrix view: rows = contracts, cols = offices × markets
+  // Group by contractRef first
+  const contractRefs = [...new Set(contractOfficeMarkets.map(r=>r.contractRef))];
+
+  // ── VIEW 1: By Contract ──
+  const byContractRows = contractRefs.map(ref => {
+    const rows = contractOfficeMarkets.filter(r=>r.contractRef===ref);
+    const first = rows[0];
+    return `
+      <div class="smgr-contract-block" style="border:1px solid var(--border-lt);border-radius:var(--r);margin-bottom:14px;overflow:hidden">
+        <!-- Contract header -->
+        <div style="background:var(--bg-top);padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div>
+              <span class="mono" style="font-size:11px;color:var(--text3)">${first.contractRef}</span>
+              <div style="font-size:13.5px;font-weight:700;color:var(--navy);margin-top:1px">${first.supplier}</div>
+              <div style="font-size:11.5px;color:var(--text3)">${first.dest} · ${first.contractType} · ${first.contractValue} · Expiry: ${first.contractExpiry}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            ${btn('+ Add Office / Market','btn-navy btn-sm',`openAddCOMModal('${ref}','${first.supplier}')`)}
+            ${btn('View Contract','btn-white btn-sm',`toast('Opening contract ${ref}...')`)}
+          </div>
+        </div>
+        <!-- Office × Market rows -->
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead>
+            <tr style="background:var(--bg-page)">
+              ${['Regional Office','Office Head','Source Markets','Market Scope','Allocation','ORN Owner','ORN Manager','Rate Type','Currency','Status','Valid Period','Actions'].map(h=>`<th style="padding:6px 10px;text-align:left;font-size:10.5px;color:var(--text3);border-bottom:1px solid var(--border-lt);font-weight:700;white-space:nowrap">${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => {
+              const office = regionalOffices.find(o=>o.id===r.officeId)||{};
+              return `<tr style="border-bottom:1px solid var(--border-lt);${r.status==='Expired'?'opacity:0.5':''}">
+                <td style="padding:8px 10px">
+                  <div style="font-size:13px">${r.officeFlag} <b>${r.officeName.split('—')[0].trim()}</b></div>
+                  <div style="font-size:10.5px;color:var(--text3)">${office.city||''}, ${office.country||''}</div>
+                </td>
+                <td style="padding:8px 10px;font-size:11.5px;font-weight:600;color:var(--navy)">${office.head||'—'}</td>
+                <td style="padding:8px 10px;max-width:180px">
+                  <div style="display:flex;flex-wrap:wrap;gap:3px">
+                    ${r.sourceMarkets.map(m=>mktBadge(m)).join('')}
+                  </div>
+                </td>
+                <td style="padding:8px 10px;font-size:11.5px">${r.marketScope}</td>
+                <td style="padding:8px 10px;font-size:12px;font-weight:700;color:var(--navy)">${r.allocation}</td>
+                <td style="padding:8px 10px;font-size:11.5px;font-weight:600">${r.ornOwner}</td>
+                <td style="padding:8px 10px;font-size:11.5px">${r.ornManager}</td>
+                <td style="padding:8px 10px;font-size:11px;color:var(--text2)">
+                  <span style="background:var(--bg-page);border:1px solid var(--border-lt);padding:2px 6px;border-radius:3px">${r.rateType}</span>
+                </td>
+                <td style="padding:8px 10px;font-size:11.5px">${r.currency}</td>
+                <td style="padding:8px 10px">${statusPill(r.status)}</td>
+                <td style="padding:8px 10px;font-size:11px;color:var(--text3);white-space:nowrap">${r.validFrom}<br>→ ${r.validTo}</td>
+                <td style="padding:8px 10px">
+                  <div style="display:flex;gap:4px;flex-wrap:wrap">
+                    ${btn('Edit','btn-white btn-sm',`openEditCOMModal('${r.id}')`)}
+                    ${btn('Remove','btn-white btn-sm',`if(confirm('Remove this office/market allocation?'))toast('Removed')`,'style="color:var(--red)"')}
+                  </div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        <!-- Notes row -->
+        ${rows.some(r=>r.notes) ? `
+        <div style="padding:8px 14px;background:var(--bg-page);border-top:1px solid var(--border-lt);display:flex;flex-direction:column;gap:4px">
+          ${rows.filter(r=>r.notes).map(r=>`<div style="font-size:11.5px;color:var(--text2)"><b style="color:var(--text3)">${r.officeFlag} ${r.officeName.split('—')[0].trim()}:</b> ${r.notes}</div>`).join('')}
+        </div>` : ''}
+      </div>`;
+  }).join('');
+
+  // ── VIEW 2: By Office ──
+  const byOfficeBlocks = regionalOffices.map(office => {
+    const rows = contractOfficeMarkets.filter(r=>r.officeId===office.id);
+    if(!rows.length && office.id !== 'RO-06') return ''; // hide empty offices except Bangalore
+    const allMkts = [...new Set(rows.flatMap(r=>r.sourceMarkets))];
+    return `
+      <div style="border:1px solid var(--border-lt);border-left:4px solid var(--navy);border-radius:var(--r);margin-bottom:14px;overflow:hidden">
+        <div style="background:var(--bg-top);padding:10px 14px;border-bottom:1px solid var(--border-lt);display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">${office.flag}</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--navy)">${office.name}</div>
+              <div style="font-size:11.5px;color:var(--text3)">${office.head} · ${office.headRole} · ${rows.length} contract allocation${rows.length!==1?'s':''}</div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+                ${allMkts.length ? allMkts.map(m=>mktBadge(m)).join('') : '<span style="font-size:11.5px;color:var(--text3);font-style:italic">No markets assigned yet</span>'}
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px">
+            ${btn('+ Assign Contract','btn-navy btn-sm',`openAssignContractToOfficeMarketModal('${office.id}','${office.name}')`)}
+          </div>
+        </div>
+        ${rows.length === 0 ? `
+          <div style="padding:20px 14px;text-align:center;color:var(--text3)">
+            <div style="font-size:28px;margin-bottom:6px">📋</div>
+            <b>No contracts assigned to ${office.name} yet.</b><br>
+            <div style="font-size:12px;margin-top:4px">Click "Assign Contract" to allocate a contract with source market restrictions.</div>
+          </div>` : `
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="background:var(--bg-page)">
+            ${['Contract Ref','Supplier','Destination','Source Markets','Market Scope','Allocation','ORN Owner','Rate Type','Status','Actions'].map(h=>`<th style="padding:6px 10px;text-align:left;font-size:10.5px;color:var(--text3);border-bottom:1px solid var(--border-lt);font-weight:700">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${rows.map(r=>`<tr style="border-bottom:1px solid var(--border-lt);${r.status==='Expired'?'opacity:0.5':''}">
+              <td style="padding:7px 10px" class="mono">${r.contractRef}</td>
+              <td style="padding:7px 10px;font-weight:600"><a class="lnk">${r.supplier}</a></td>
+              <td style="padding:7px 10px;font-size:11.5px">${r.dest}</td>
+              <td style="padding:7px 10px;max-width:200px"><div style="display:flex;flex-wrap:wrap;gap:3px">${r.sourceMarkets.map(m=>mktBadge(m)).join('')}</div></td>
+              <td style="padding:7px 10px;font-size:11.5px">${r.marketScope}</td>
+              <td style="padding:7px 10px;font-weight:700;color:var(--navy)">${r.allocation}</td>
+              <td style="padding:7px 10px;font-size:11.5px;font-weight:600">${r.ornOwner}</td>
+              <td style="padding:7px 10px;font-size:11px;color:var(--text2)">${r.rateType}</td>
+              <td style="padding:7px 10px">${statusPill(r.status)}</td>
+              <td style="padding:7px 10px;display:flex;gap:4px">
+                ${btn('Edit','btn-white btn-sm',`openEditCOMModal('${r.id}')`)}
+                ${btn('Remove','btn-white btn-sm',`if(confirm('Remove?'))toast('Removed')`,'style="color:var(--red)"')}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`}
+      </div>`;
+  }).join('');
+
+  // ── VIEW 3: By Source Market ──
+  const byMarketBlocks = allMarkets.map(market => {
+    const rows = contractOfficeMarkets.filter(r=>r.sourceMarkets.includes(market));
+    const col  = mcolors[market]||'#888';
+    const fl   = mflags[market]||'🌍';
+    return `
+      <div style="border:1px solid ${col}33;border-left:4px solid ${col};border-radius:var(--r);margin-bottom:14px;overflow:hidden">
+        <div style="background:${col}08;padding:10px 14px;border-bottom:1px solid ${col}22;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">${fl}</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:${col}">${market} Source Market</div>
+              <div style="font-size:11.5px;color:var(--text2)">${rows.filter(r=>r.status==='Active').length} active · ${rows.filter(r=>r.status==='Pending'||r.status==='Planned').length} pending · across ${[...new Set(rows.map(r=>r.officeId))].length} office${[...new Set(rows.map(r=>r.officeId))].length!==1?'s':''}</div>
+            </div>
+          </div>
+          ${btn('+ Add Contract for '+market,'btn-white btn-sm',`openMarketAssignNewModal('${market}','All')`)}
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="background:var(--bg-page)">
+            ${['Contract Ref','Supplier','Destination','Regional Office','Allocation','ORN Owner','Rate Type','Currency','Status','Actions'].map(h=>`<th style="padding:6px 10px;text-align:left;font-size:10.5px;color:var(--text3);border-bottom:1px solid var(--border-lt);font-weight:700">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${rows.map(r=>`<tr style="border-bottom:1px solid var(--border-lt);${r.status==='Expired'?'opacity:0.5':''}">
+              <td style="padding:7px 10px" class="mono">${r.contractRef}</td>
+              <td style="padding:7px 10px;font-weight:600"><a class="lnk">${r.supplier}</a></td>
+              <td style="padding:7px 10px;font-size:11.5px">${r.dest}</td>
+              <td style="padding:7px 10px">${r.officeFlag} <span style="font-size:11.5px;font-weight:600">${r.officeName.split('—')[0].trim()}</span></td>
+              <td style="padding:7px 10px;font-weight:700;color:${col}">${r.allocation}</td>
+              <td style="padding:7px 10px;font-size:11.5px;font-weight:600">${r.ornOwner}</td>
+              <td style="padding:7px 10px;font-size:11px;color:var(--text2)">${r.rateType}</td>
+              <td style="padding:7px 10px;font-size:11.5px">${r.currency}</td>
+              <td style="padding:7px 10px">${statusPill(r.status)}</td>
+              <td style="padding:7px 10px;display:flex;gap:4px">
+                ${btn('Edit','btn-white btn-sm',`openEditCOMModal('${r.id}')`)}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="page-title">Source Market Management</div>
+    <p class="page-subtitle">Manage which regional office owns each contract and which source markets it applies to. A single contract can be split across multiple offices each with different source market restrictions.</p>
+
+    <div class="sum-cards">
+      <div class="sum-card"><div class="sc-lbl">Total Allocations</div><div class="sc-val">${contractOfficeMarkets.length}</div><div class="sc-sub">Contract × Office × Market</div></div>
+      <div class="sum-card green"><div class="sc-lbl">Active</div><div class="sc-val green">${active}</div><div class="sc-sub">Live allocations</div></div>
+      <div class="sum-card orange"><div class="sc-lbl">Pending / Planned</div><div class="sc-val orange">${pending}</div><div class="sc-sub">Not yet live</div></div>
+      <div class="sum-card"><div class="sc-lbl">Regional Offices</div><div class="sc-val">${regionalOffices.length}</div><div class="sc-sub">${allOffices.length} with contracts</div></div>
+      <div class="sum-card"><div class="sc-lbl">Source Markets Covered</div><div class="sc-val">${allMarkets.length}</div><div class="sc-sub">Across all allocations</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input class="ti" placeholder="Search supplier or contract..." style="width:220px" id="sm-q" oninput="smFilter()">
+      <select class="ti" id="sm-office" onchange="smFilter()">
+        <option value="">All Offices</option>
+        ${regionalOffices.map(o=>`<option value="${o.id}">${o.flag} ${o.name}</option>`).join('')}
+      </select>
+      <select class="ti" id="sm-market" onchange="smFilter()">
+        <option value="">All Source Markets</option>
+        ${allMarkets.map(m=>`<option value="${m}">${mflags[m]||'🌍'} ${m}</option>`).join('')}
+      </select>
+      <select class="ti" id="sm-status" onchange="smFilter()">
+        <option value="">All Status</option>
+        <option>Active</option><option>Pending</option><option>Planned</option><option>Expired</option>
+      </select>
+      ${btn('Clear','btn-white','smClear()')}
+      <div class="toolbar-r">
+        ${btn('&#8595; Export','btn-white',"toast('Exporting...')")}
+        ${btn('+ New Allocation','btn-navy','openAddCOMModal(null,null)')}
+      </div>
+    </div>
+
+    <!-- View toggle -->
+    <div style="display:flex;gap:0;margin-bottom:16px;border:1px solid var(--border-lt);border-radius:var(--r);overflow:hidden;width:fit-content">
+      <button id="smv-contract" class="btn btn-navy" style="border-radius:0;border:none" onclick="smViewToggle('contract')">By Contract</button>
+      <button id="smv-office"   class="btn btn-white" style="border-radius:0;border:none;border-left:1px solid var(--border-lt)" onclick="smViewToggle('office')">By Office</button>
+      <button id="smv-market"   class="btn btn-white" style="border-radius:0;border:none;border-left:1px solid var(--border-lt)" onclick="smViewToggle('market')">By Source Market</button>
+    </div>
+
+    <div id="smv-by-contract">${byContractRows}</div>
+    <div id="smv-by-office"   style="display:none">${byOfficeBlocks}</div>
+    <div id="smv-by-market"   style="display:none">${byMarketBlocks}</div>`;
+}
+window.pg_sup_source_markets = pg_sup_source_markets;
+
+function smViewToggle(mode){
+  ['contract','office','market'].forEach(m=>{
+    const el = document.getElementById('smv-by-'+m);
+    const btn = document.getElementById('smv-'+m);
+    if(!el||!btn) return;
+    const active = m===mode;
+    el.style.display  = active ? '' : 'none';
+    btn.className     = 'btn '+(active?'btn-navy':'btn-white');
+  });
+}
+window.smViewToggle = smViewToggle;
+
+function smFilter(){
+  const q  = (document.getElementById('sm-q')?.value||'').toLowerCase();
+  const of = document.getElementById('sm-office')?.value||'';
+  const mk = document.getElementById('sm-market')?.value||'';
+  const st = document.getElementById('sm-status')?.value||'';
+  document.querySelectorAll('.smgr-contract-block').forEach(el=>{
+    const txt = el.textContent.toLowerCase();
+    const show = (!q||txt.includes(q));
+    el.style.display = show ? '' : 'none';
+  });
+  toast('Filters applied');
+}
+function smClear(){
+  ['sm-q','sm-office','sm-market','sm-status'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.tagName==='SELECT'?el.selectedIndex=0:el.value='';
+  });
+  document.querySelectorAll('.smgr-contract-block').forEach(el=>el.style.display='');
+  toast('Cleared');
+}
+window.smFilter=smFilter;window.smClear=smClear;
+
+// ── MODALS ──
+function openAddCOMModal(contractRef, supplierName){
+  const preContract = contractRef || '';
+  const preName = supplierName || '';
+  openModal(`Add Office & Source Market Allocation${preName?' — '+preName:''}`,`
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#0d47a1">
+      🌍 Assign a regional office to manage a specific contract for specific source markets only. The same contract can have different offices managing different markets.
+    </div>
+    <div class="form-panel"><div class="form-head">Contract & Office Assignment</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Contract <span class="req">*</span></label>
+        <select class="fc" id="com-contract">
+          <option value="">Select contract...</option>
+          ${contracts.map(c=>`<option value="${c.id}" ${c.id===preContract?'selected':''}>${c.id} — ${c.supplier} (${c.dest}, ${c.value})</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label>Regional Office <span class="req">*</span></label>
+        <select class="fc" id="com-office">
+          <option value="">Select office...</option>
+          ${regionalOffices.map(o=>`<option value="${o.id}">${o.flag} ${o.name} — ${o.head}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label>ORN Owner at this Office <span class="req">*</span></label>
+        <select class="fc"><option value="">Select...</option>${ornTeamSel()}</select>
+      </div>
+      <div class="fg"><label>ORN Account Manager</label>
+        <select class="fc"><option value="">Select...</option>${ornTeamSel()}</select>
+      </div>
+      <div class="fg"><label>Allocation %</label>
+        <input class="fc" type="number" placeholder="e.g. 60" min="0" max="100">
+      </div>
+      <div class="fg"><label>Rate Type / Label</label>
+        <input class="fc" placeholder="e.g. ORN UK Rate, GCC Rate, EU Agent Rate">
+      </div>
+      <div class="fg"><label>Billing Currency</label>
+        <select class="fc"><option>GBP</option><option>USD</option><option>EUR</option><option>AED</option><option>OMR</option><option>INR</option></select>
+      </div>
+      <div class="fg"><label>Status</label>
+        <select class="fc"><option>Active</option><option>Pending</option><option>Planned</option></select>
+      </div>
+      <div class="fg"><label>Valid From</label><input class="fc" type="date"></div>
+      <div class="fg"><label>Valid To</label><input class="fc" type="date"></div>
+    </div></div></div>
+
+    <div class="form-panel"><div class="form-head">Source Markets for this Office <span class="req">*</span></div><div class="form-body">
+      <p style="font-size:12px;color:var(--text2);margin-bottom:10px">Select which source markets this office will handle for this contract. Only customers booking from these markets will be served by this office.</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        ${['UK','Ireland','UAE / GCC','Germany','France','USA','Netherlands','Italy','Spain','Australia','India','Saudi Arabia','Oman','Jordan','Japan','China'].map(m=>{
+          const col = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933',Oman:'#db161b',Jordan:'#007a3d'}[m]||'#666';
+          const fl  = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',Netherlands:'🇳🇱',Italy:'🇮🇹',Spain:'🇪🇸',Australia:'🇦🇺',India:'🇮🇳',Oman:'🇴🇲',Jordan:'🇯🇴'}[m]||'🌍';
+          return `<label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--border-lt);border-radius:4px;cursor:pointer;background:#fff;transition:all .15s" onmouseover="this.style.borderColor='${col}'" onmouseout="this.style.borderColor='var(--border-lt)'">
+            <input type="checkbox" value="${m}" onchange="const l=this.closest('label');l.style.background=this.checked?'${col}18':'#fff';l.style.borderColor=this.checked?'${col}':'var(--border-lt)'">
+            <span style="font-size:12.5px">${fl} ${m}</span>
+          </label>`;
+        }).join('')}
+      </div>
+    </div></div>
+
+    <div class="form-panel"><div class="form-head">Market Scope & Notes</div><div class="form-body">
+      <div class="fgrid">
+        <div class="fg"><label>Market Scope Label</label>
+          <select class="fc"><option>UK Only</option><option>UK & Ireland</option><option>GCC markets</option><option>Continental Europe</option><option>Global</option><option>Multi-market</option><option>India subcontinent</option><option>Asia Pacific</option><option>Custom</option></select>
+        </div>
+        <div class="fg"><label>Booking Restriction</label>
+          <select class="fc"><option>Only listed markets</option><option>Preferred for listed — others by request</option><option>No restriction</option></select>
+        </div>
+      </div>
+      <div class="fg" style="margin-top:10px"><label>Internal Notes</label>
+        <textarea class="fc" style="height:65px;width:100%" placeholder="e.g. Bangkok office handles all UK bookings for Maldives. India market to be added once Bangalore office operational."></textarea>
+      </div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Save Allocation','btn-navy',"toast('Allocation saved!');closeModal()")}`
+  );
+}
+window.openAddCOMModal = openAddCOMModal;
+
+function openEditCOMModal(comId){
+  const r = contractOfficeMarkets.find(x=>x.id===comId)||{};
+  const office = regionalOffices.find(o=>o.id===r.officeId)||{};
+  openModal(`Edit Allocation — ${r.contractRef||comId}`,`
+    <div class="form-panel"><div class="form-head">Allocation: ${r.officeFlag||''} ${r.officeName||''} × ${r.contractRef||''}</div><div class="form-body"><div class="fgrid">
+      <div class="fg"><label>Supplier</label><input class="fc" value="${r.supplier||''}" readonly></div>
+      <div class="fg"><label>Contract Ref</label><input class="fc" value="${r.contractRef||''}" readonly></div>
+      <div class="fg"><label>Regional Office</label><select class="fc">${regionalOffices.map(o=>`<option value="${o.id}" ${o.id===r.officeId?'selected':''}>${o.flag} ${o.name}</option>`).join('')}</select></div>
+      <div class="fg"><label>ORN Owner</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>ORN Manager</label><select class="fc"><option value="">Select...</option>${ornTeamSel()}</select></div>
+      <div class="fg"><label>Allocation %</label><input class="fc" type="number" value="${r.allocation?.replace('%','')||''}"></div>
+      <div class="fg"><label>Rate Type</label><input class="fc" value="${r.rateType||''}"></div>
+      <div class="fg"><label>Currency</label><select class="fc"><option>GBP</option><option>EUR</option><option>USD</option><option>AED</option><option>INR</option></select></div>
+      <div class="fg"><label>Status</label><select class="fc"><option ${r.status==='Active'?'selected':''}>Active</option><option ${r.status==='Pending'?'selected':''}>Pending</option><option ${r.status==='Planned'?'selected':''}>Planned</option><option ${r.status==='Expired'?'selected':''}>Expired</option></select></div>
+      <div class="fg"><label>Market Scope</label><input class="fc" value="${r.marketScope||''}"></div>
+    </div></div></div>
+
+    <div class="form-panel"><div class="form-head">Source Markets</div><div class="form-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        ${['UK','Ireland','UAE / GCC','Germany','France','USA','Netherlands','Italy','Spain','Australia','India','Saudi Arabia','Oman','Jordan','Japan','China'].map(m=>{
+          const checked = (r.sourceMarkets||[]).includes(m);
+          const col = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933',Oman:'#db161b',Jordan:'#007a3d'}[m]||'#666';
+          const fl  = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',Netherlands:'🇳🇱',Italy:'🇮🇹',Spain:'🇪🇸',Australia:'🇦🇺',India:'🇮🇳',Oman:'🇴🇲',Jordan:'🇯🇴'}[m]||'🌍';
+          return `<label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid ${checked?col:'var(--border-lt)'};border-radius:4px;cursor:pointer;background:${checked?col+'18':'#fff'}" onmouseover="this.style.borderColor='${col}'" onmouseout="if(!this.querySelector('input').checked)this.style.borderColor='var(--border-lt)'">
+            <input type="checkbox" value="${m}" ${checked?'checked':''} onchange="const l=this.closest('label');l.style.background=this.checked?'${col}18':'#fff';l.style.borderColor=this.checked?'${col}':'var(--border-lt)'">
+            <span style="font-size:12.5px">${fl} ${m}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div class="fg" style="margin-top:10px"><label>Notes</label>
+        <textarea class="fc" style="height:60px;width:100%">${r.notes||''}</textarea>
+      </div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Delete Allocation','btn-white',`if(confirm('Delete this allocation?')){closeModal();toast('Deleted')}`,'style="color:var(--red)"')} ${btn('Save Changes','btn-navy',"toast('Allocation updated!');closeModal()")}`
+  );
+}
+window.openEditCOMModal = openEditCOMModal;
+
+function openAssignContractToOfficeMarketModal(officeId, officeName){
+  openModal(`Assign Contract — ${officeName}`,`
+    <div style="background:#e8f4fe;border:1px solid #90caf9;border-radius:3px;padding:9px 14px;margin-bottom:14px;font-size:12.5px;color:#0d47a1">
+      Select a contract and specify which source markets this office (<b>${officeName}</b>) will handle. The same contract can be split across multiple offices for different markets.
+    </div>
+    <div class="form-panel"><div class="form-head">Select Contract</div><div class="form-body"><div class="fgrid">
+      <div class="fg" style="grid-column:span 2"><label>Contract <span class="req">*</span></label>
+        <select class="fc" style="width:100%">
+          <option value="">Choose contract...</option>
+          ${contracts.map(c=>`<option value="${c.id}">${c.id} — ${c.supplier} · ${c.dest} · ${c.value} · Expiry: ${c.expiry}</option>`).join('')}
+        </select>
+      </div>
+      <div class="fg"><label>ORN Owner at this Office <span class="req">*</span></label>
+        <select class="fc"><option value="">Select...</option>${ornTeamSel()}</select>
+      </div>
+      <div class="fg"><label>Allocation %</label>
+        <input class="fc" type="number" placeholder="e.g. 100 if sole office for this market" min="0" max="100">
+      </div>
+      <div class="fg"><label>Rate Type</label><input class="fc" placeholder="e.g. ORN UK Rate, India Rate"></div>
+      <div class="fg"><label>Currency</label>
+        <select class="fc"><option>GBP</option><option>USD</option><option>EUR</option><option>AED</option><option>INR</option></select>
+      </div>
+    </div></div></div>
+    <div class="form-panel"><div class="form-head">Source Markets this Office Handles <span class="req">*</span></div><div class="form-body">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        ${['UK','Ireland','UAE / GCC','Germany','France','USA','Netherlands','Italy','Spain','Australia','India','Saudi Arabia','Oman','Jordan'].map(m=>{
+          const col = {UK:'#1a3a6b',Ireland:'#169b62','UAE / GCC':'#ef3340',Germany:'#cc0000','Saudi Arabia':'#006c35',France:'#0055a4',USA:'#b22234',Netherlands:'#ae1c28',Italy:'#009246',Spain:'#aa151b',Australia:'#00008b',India:'#ff9933',Oman:'#db161b',Jordan:'#007a3d'}[m]||'#666';
+          const fl = {UK:'🇬🇧',Ireland:'🇮🇪','UAE / GCC':'🇦🇪',Germany:'🇩🇪','Saudi Arabia':'🇸🇦',France:'🇫🇷',USA:'🇺🇸',Netherlands:'🇳🇱',Italy:'🇮🇹',Spain:'🇪🇸',Australia:'🇦🇺',India:'🇮🇳',Oman:'🇴🇲',Jordan:'🇯🇴'}[m]||'🌍';
+          return `<label style="display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--border-lt);border-radius:4px;cursor:pointer;background:#fff" onmouseover="this.style.borderColor='${col}'" onmouseout="if(!this.querySelector('input').checked)this.style.borderColor='var(--border-lt)'">
+            <input type="checkbox" value="${m}" onchange="const l=this.closest('label');l.style.background=this.checked?'${col}18':'#fff';l.style.borderColor=this.checked?'${col}':'var(--border-lt)'">
+            <span style="font-size:12.5px">${fl} ${m}</span>
+          </label>`;
+        }).join('')}
+      </div>
+      <div class="fg" style="margin-top:10px"><label>Notes</label>
+        <textarea class="fc" style="height:55px;width:100%" placeholder="e.g. Bangalore office handles all India market bookings for this contract..."></textarea>
+      </div>
+    </div></div>`,
+    `${btn('Cancel','btn-white','closeModal()')} ${btn('Assign Contract','btn-navy',"toast('Contract assigned to '+arguments[0]+'!');closeModal()")}`
+  );
+}
+window.openAssignContractToOfficeMarketModal = openAssignContractToOfficeMarketModal;
+
 // Register all page functions
-window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
+window.pg_sup_dash=pg_sup_dash;window.pg_sup_all=pg_sup_all;window.pg_sup_onboard=pg_sup_onboard;window.pg_sup_contracts=pg_sup_contracts;window.pg_sup_payments=pg_sup_payments;window.pg_sup_rates=pg_sup_rates;window.pg_sup_compliance=pg_sup_compliance;window.pg_sup_audit=pg_sup_audit;window.pg_sup_tiers=pg_sup_tiers;window.pg_sup_dest=pg_sup_dest;window.pg_sup_regions=pg_sup_regions;window.pg_sup_source_markets=pg_sup_source_markets;window.pg_hotel_content=pg_hotel_content;window.pg_hotel_rates=pg_hotel_rates;window.pg_hotel_sources=pg_hotel_sources;window.pg_act_all=pg_act_all;
 window.pg_sales_dest=function(){return '<div class="page-title">Destination Dashboard</div><div style="background:#fff;border:1px solid var(--border-lt);padding:40px;text-align:center;color:var(--text3)">Connect live data to populate.</div>';};
 
 function toast(msg,err=false){
